@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiGet, apiDelete } from '@/lib/api';
 import { ADMIN_BASE } from '@/lib/constants';
+import type { Blog } from '@/types';
 
 export default function BlogsPage() {
   const [page, setPage] = useState(1);
