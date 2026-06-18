@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -30,6 +30,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    localStorage.removeItem('token');
+  }, []);
+
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -44,7 +48,7 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string }; status?: number }; code?: string; message?: string };
       if (!axiosErr.response) {
-        setError('Cannot reach API server. Start MongoDB, then run: cd backend && npm run dev');
+        setError('Cannot reach API server. Start MongoDB, then run: npm run dev');
       } else if (axiosErr.response.status === 401) {
         setError(axiosErr.response.data?.message || 'Invalid email or password');
       } else {
