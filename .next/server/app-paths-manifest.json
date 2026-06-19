@@ -1,0 +1,5 @@
+{
+  "/admin/[[...path]]/page": "app/admin/[[...path]]/page.js",
+  "/console/login/page": "app/console/login/page.js",
+  "/console/forgot-password/page": "app/console/forgot-password/page.js"
+}
