@@ -14,7 +14,7 @@ import apiApp from './server/app';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
-const port = parseInt(process.env.APP_PORT || '3000', 10);
+const port = parseInt(process.env.APP_PORT || '3002', 10);
 
 const nextApp = next({ dev, hostname });
 const handle = nextApp.getRequestHandler();
@@ -52,7 +52,7 @@ async function main() {
       console.error(`\nPort ${port} is already in use. Stop the other server first:`);
       console.error(`  netstat -ano | findstr :${port}`);
       console.error(`  taskkill /PID <pid> /F\n`);
-      console.error(`Or run on another port: $env:PORT=3001; npm run dev`);
+      console.error(`Or run on another port: $env:APP_PORT=3003; npm run dev`);
       process.exit(1);
     }
     throw err;

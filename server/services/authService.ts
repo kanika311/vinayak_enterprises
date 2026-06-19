@@ -4,6 +4,7 @@ import Admin from '../models/Admin';
 import { ROLE_PERMISSIONS, ROLES } from '../constants';
 import { AppError } from '../utils/helpers';
 import { sendEmail, isEmailConfigured } from '../config/email';
+import { getClientUrl } from '../utils/clientUrl';
 
 export const generateToken = (admin: {
   _id: string;
@@ -58,7 +59,7 @@ export const forgotPassword = async (email: string) => {
   admin.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000);
   await admin.save();
 
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const clientUrl = getClientUrl();
   const resetUrl = `${clientUrl}/console/reset-password?token=${resetToken}`;
 
   if (isEmailConfigured()) {
@@ -76,7 +77,8 @@ export const forgotPassword = async (email: string) => {
       });
     } catch (err) {
       console.error('Failed to send reset email:', err);
-      throw new AppError('Could not send email. Check SMTP settings in backend .env', 500);
+      const message = err instanceof Error ? err.message : 'Unknown email error';
+      throw new AppError(`Could not send email: ${message}`, 500);
     }
   } else if (process.env.NODE_ENV === 'development') {
     console.log('\n--- PASSWORD RESET LINK (SMTP not configured) ---');
