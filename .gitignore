@@ -1,6 +1,10 @@
 ﻿node_modules/
+.next/
+dist/
+dist-server/
 .env
 .env.local
-dist/
-uploads/
+.env*.local
 *.log
+.DS_Store
+tsconfig.tsbuildinfo
