@@ -64,6 +64,7 @@ router.put('/products/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PE
 router.delete('/products/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PRODUCTS), productCtrl.deleteProduct);
 // Categories
 router.get('/categories', moduleCtrl.getCategories);
+router.get('/categories/slug/:slug', moduleCtrl.getCategoryBySlug);
 router.post('/categories', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATEGORIES), moduleCtrl.createCategory);
 router.put('/categories/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATEGORIES), moduleCtrl.updateCategory);
 router.delete('/categories/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATEGORIES), moduleCtrl.deleteCategory);
@@ -79,8 +80,9 @@ router.get('/rfqs', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSION
 router.put('/rfqs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.RFQS), moduleCtrl.updateRFQ);
 router.get('/rfqs/report', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.RFQS), moduleCtrl.getRFQReport);
 // Blogs
-router.get('/blogs', moduleCtrl.getBlogs);
+router.get('/blogs', auth_1.optionalAuth, moduleCtrl.getBlogs);
 router.get('/blogs/slug/:slug', moduleCtrl.getBlogBySlug);
+router.get('/blogs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), moduleCtrl.getBlogById);
 router.post('/blogs', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), validators_1.blogValidation, validate_1.validate, moduleCtrl.createBlog);
 router.put('/blogs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), moduleCtrl.updateBlog);
 router.delete('/blogs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), moduleCtrl.deleteBlog);

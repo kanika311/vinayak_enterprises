@@ -87,6 +87,16 @@ export const getBlogBySlug = asyncHandler(async (req: AuthRequest, res: Response
   sendResponse(res, 200, blog);
 });
 
+export const getBlogById = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const blog = await blogService.getBlogById(getParam(req.params.id));
+  sendResponse(res, 200, blog);
+});
+
+export const getCategoryBySlug = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const category = await categoryService.getCategoryBySlug(getParam(req.params.slug));
+  sendResponse(res, 200, category);
+});
+
 export const createBlog = asyncHandler(async (req: AuthRequest, res: Response) => {
   const blog = await blogService.createBlog({ ...req.body, author: req.user!.id });
   sendResponse(res, 201, blog);

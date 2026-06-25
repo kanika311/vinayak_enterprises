@@ -12,6 +12,34 @@ export interface AuthRequest extends Request {
   };
 }
 
+/** Sets req.user when a valid token is present; does not fail when absent. */
+export const optionalAuth = async (req: AuthRequest, _res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return next();
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: string;
+      email: string;
+      role: string;
+      permissions: string[];
+    };
+    const admin = await Admin.findById(decoded.id).select('-password');
+    if (admin?.isActive) {
+      req.user = {
+        id: admin._id.toString(),
+        email: admin.email,
+        role: admin.role,
+        permissions: admin.permissions,
+      };
+    }
+  } catch {
+    // ignore invalid token on public routes
+  }
+  next();
+};
+
 export const protect = async (req: AuthRequest, _res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {

@@ -23,6 +23,7 @@ export default function ProductsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['products-public', search, category],
     queryFn: () => apiGet<{ products: Product[] }>('/products', { status: 'published', limit: 24, search, category }),
+    refetchOnMount: 'always',
   });
 
   const apiProducts = data?.products || [];
@@ -35,7 +36,7 @@ export default function ProductsPage() {
     <div className="bg-slate-50 min-h-screen">
       <PageHeader
         title="All Products"
-        subtitle="Browse our complete catalogue of scientific instruments"
+        subtitle="Browse our complete catalogue — manufactured & supplied by Vinayak Enterprises"
         dark
       />
 

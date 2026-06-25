@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, optionalAuth } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { authLimiter } from '../middleware/rateLimiter';
 import { upload } from '../middleware/upload';
@@ -34,6 +34,7 @@ router.get('/products', productCtrl.getProducts);
 router.get('/products/slug/:slug', productCtrl.getProductBySlug);
 
 // Products - Admin
+router.post('/products/upload-image', protect, authorize(PERMISSIONS.PRODUCTS), upload.single('file'), productCtrl.uploadProductImage);
 router.get('/products/:id', protect, authorize(PERMISSIONS.PRODUCTS), productCtrl.getProduct);
 router.post('/products', protect, authorize(PERMISSIONS.PRODUCTS), productValidation, validate, productCtrl.createProduct);
 router.put('/products/:id', protect, authorize(PERMISSIONS.PRODUCTS), productCtrl.updateProduct);
@@ -41,6 +42,7 @@ router.delete('/products/:id', protect, authorize(PERMISSIONS.PRODUCTS), product
 
 // Categories
 router.get('/categories', moduleCtrl.getCategories);
+router.get('/categories/slug/:slug', moduleCtrl.getCategoryBySlug);
 router.post('/categories', protect, authorize(PERMISSIONS.CATEGORIES), moduleCtrl.createCategory);
 router.put('/categories/:id', protect, authorize(PERMISSIONS.CATEGORIES), moduleCtrl.updateCategory);
 router.delete('/categories/:id', protect, authorize(PERMISSIONS.CATEGORIES), moduleCtrl.deleteCategory);
@@ -59,8 +61,9 @@ router.put('/rfqs/:id', protect, authorize(PERMISSIONS.RFQS), moduleCtrl.updateR
 router.get('/rfqs/report', protect, authorize(PERMISSIONS.RFQS), moduleCtrl.getRFQReport);
 
 // Blogs
-router.get('/blogs', moduleCtrl.getBlogs);
+router.get('/blogs', optionalAuth, moduleCtrl.getBlogs);
 router.get('/blogs/slug/:slug', moduleCtrl.getBlogBySlug);
+router.get('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.getBlogById);
 router.post('/blogs', protect, authorize(PERMISSIONS.BLOGS), blogValidation, validate, moduleCtrl.createBlog);
 router.put('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.updateBlog);
 router.delete('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.deleteBlog);

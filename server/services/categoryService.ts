@@ -6,6 +6,12 @@ export const getCategories = async (activeOnly = false) => {
   return Category.find(filter).sort({ order: 1, name: 1 });
 };
 
+export const getCategoryBySlug = async (slug: string) => {
+  const category = await Category.findOne({ slug, isActive: true });
+  if (!category) throw new AppError('Category not found', 404);
+  return category;
+};
+
 export const createCategory = async (data: Record<string, unknown>) => {
   if (!data.slug) data.slug = generateSlug(data.name as string);
   return Category.create(data);

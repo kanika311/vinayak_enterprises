@@ -20,11 +20,12 @@ export const leadValidation = [
 ];
 
 export const rfqValidation = [
-  body('name').notEmpty(),
-  body('email').isEmail(),
-  body('companyName').notEmpty(),
-  body('product').notEmpty(),
-  body('quantity').isInt({ min: 1 }),
+  body('name').trim().notEmpty().withMessage('Name required'),
+  body('email').isEmail().withMessage('Valid email required'),
+  body('companyName').trim().notEmpty().withMessage('Company name required'),
+  body('quantity').optional({ values: 'falsy' }).isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+  body('product').optional({ values: 'falsy' }),
+  body('productName').optional({ values: 'falsy' }),
 ];
 
 export const blogValidation = [

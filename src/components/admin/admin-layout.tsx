@@ -37,7 +37,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!ready) return <div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <AdminSidebar />
       <main className="lg:pl-64">
         <div className="p-4 pt-16 lg:p-8 lg:pt-8">{children}</div>

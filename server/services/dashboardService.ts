@@ -20,6 +20,8 @@ export const getDashboardStats = async () => {
     blogViews,
     catalogueDownloads,
     topProducts,
+    recentProducts,
+    recentBlogs,
     leadsPerMonth,
     trafficOverview,
     enquiryTrends,
@@ -36,6 +38,15 @@ export const getDashboardStats = async () => {
       .sort({ enquiryCount: -1, views: -1 })
       .limit(5)
       .select('name sku views enquiryCount images'),
+    Product.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('name sku status slug createdAt'),
+    Blog.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('author', 'name')
+      .select('title slug status views createdAt author'),
     Lead.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo } } },
       {
@@ -83,6 +94,8 @@ export const getDashboardStats = async () => {
       catalogueDownloads,
     },
     topProducts,
+    recentProducts,
+    recentBlogs,
     charts: {
       leadsPerMonth,
       trafficOverview,

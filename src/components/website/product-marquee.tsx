@@ -1,9 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { ShowcaseProduct } from '@/lib/constants';
+import type { Product } from '@/types';
 
-export function ProductMarquee({ products }: { products: ShowcaseProduct[] }) {
+interface MarqueeItem {
+  _id: string;
+  name: string;
+}
+
+export function ProductMarquee({ products }: { products: (Product | MarqueeItem)[] }) {
+  if (!products.length) return null;
   const items = [...products, ...products];
 
   return (
@@ -15,7 +21,7 @@ export function ProductMarquee({ products }: { products: ShowcaseProduct[] }) {
       >
         {items.map((p, i) => (
           <span key={`${p._id}-${i}`} className="inline-flex items-center gap-2 text-sm text-blue-100/80 shrink-0">
-            <span className="text-orange-400 font-bold">₹{p.price}</span>
+            <span className="text-orange-400 font-bold">🔬</span>
             <span>{p.name}</span>
             <span className="text-white/30">|</span>
           </span>

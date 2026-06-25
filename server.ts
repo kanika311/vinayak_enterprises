@@ -1,13 +1,11 @@
-import dotenv from 'dotenv';
-
-dotenv.config({ path: '.env.local' });
-dotenv.config();
+import './server/env';
 
 process.env.NEXT_TELEMETRY_DISABLED = '1';
 
 import { createServer } from 'http';
 import { parse } from 'url';
 import { existsSync, rmSync } from 'fs';
+import net from 'net';
 import next from 'next';
 import { connectDatabase } from './server/config/database';
 import apiApp from './server/app';
@@ -22,8 +20,26 @@ const handle = nextApp.getRequestHandler();
 const isApiRequest = (pathname: string | null | undefined) =>
   pathname === '/health' || pathname?.startsWith('/api/');
 
+const isPortAvailable = (p: number) =>
+  new Promise<boolean>((resolve) => {
+    const tester = net.createServer()
+      .once('error', () => resolve(false))
+      .once('listening', () => tester.close(() => resolve(true)))
+      .listen(p);
+  });
+
 async function main() {
   await connectDatabase();
+  console.log('> MongoDB connected');
+
+  const available = await isPortAvailable(port);
+  if (!available) {
+    console.error(`\nPort ${port} is already in use. Only one dev server can run at a time.`);
+    console.error(`  netstat -ano | findstr :${port}`);
+    console.error(`  taskkill /PID <pid> /F`);
+    console.error(`Or use another port: $env:APP_PORT=3003; npm run dev\n`);
+    process.exit(1);
+  }
 
   if (dev && existsSync('.next/trace')) {
     try {
@@ -33,6 +49,7 @@ async function main() {
     }
   }
 
+  console.log(`> Preparing Next.js on port ${port} (first start may take 1–2 minutes)...`);
   await nextApp.prepare();
 
   createServer((req, res) => {

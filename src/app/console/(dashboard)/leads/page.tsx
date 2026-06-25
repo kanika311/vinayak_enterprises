@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/admin/page-header';
 import { SearchBar } from '@/components/admin/search-bar';
 import { Pagination } from '@/components/admin/pagination';
-import { LoadingSpinner } from '@/components/admin/loading';
+import { LoadingSpinner, EmptyState } from '@/components/admin/loading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -35,7 +35,16 @@ export default function LeadsPage() {
 
   return (
     <div>
-      <PageHeader title="Lead Management" description="Contact forms, quotes, catalogue downloads, product enquiries" />
+      <PageHeader
+        title="Contact Forms"
+        description="Shows submissions from Contact Us → General Inquiry and Catalogue Request tabs"
+      />
+      <div className="mb-6 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+        <strong>Where do website forms go?</strong>{' '}
+        Contact → <em>General Inquiry</em> or <em>Catalogue Request</em> appear here.{' '}
+        Contact → <em>Request Quotation</em> and the <em>Get Quote</em> page appear under{' '}
+        <a href="/console/rfqs" className="font-semibold underline">Quote Requests</a>.
+      </div>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row">
         <SearchBar value={search} onChange={setSearch} placeholder="Search leads..." onSearch={() => setPage(1)} />
         <select className="h-10 rounded-md border px-3 text-sm" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
@@ -43,22 +52,27 @@ export default function LeadsPage() {
           {['new', 'contacted', 'qualified', 'converted', 'lost'].map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
-      {isLoading ? <LoadingSpinner /> : (
+      {isLoading ? <LoadingSpinner /> : !data?.leads?.length ? (
+        <EmptyState message="No contact form submissions yet. Try Contact Us → General Inquiry on the website." />
+      ) : (
         <>
           <div className="rounded-lg border bg-white">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead><TableHead>Company</TableHead><TableHead>Email</TableHead>
-                  <TableHead>Source</TableHead><TableHead>Status</TableHead><TableHead>Date</TableHead><TableHead>Actions</TableHead>
+                  <TableHead>Phone</TableHead><TableHead>Message</TableHead><TableHead>Form Type</TableHead>
+                  <TableHead>Status</TableHead><TableHead>Date</TableHead><TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.leads?.map((lead) => (
+                {data.leads.map((lead) => (
                   <TableRow key={lead._id}>
                     <TableCell className="font-medium">{lead.name}</TableCell>
                     <TableCell>{lead.company || '-'}</TableCell>
                     <TableCell>{lead.email}</TableCell>
+                    <TableCell>{lead.phone || '-'}</TableCell>
+                    <TableCell className="max-w-[200px] truncate" title={lead.message}>{lead.message || lead.productInterested || '-'}</TableCell>
                     <TableCell><Badge variant="outline">{lead.leadSource.replace(/_/g, ' ')}</Badge></TableCell>
                     <TableCell><Badge variant={statusColors[lead.status] || 'secondary'}>{lead.status}</Badge></TableCell>
                     <TableCell>{formatDate(lead.createdAt)}</TableCell>

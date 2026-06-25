@@ -42,11 +42,11 @@ const seed = async () => {
   const settingsCount = await Setting.countDocuments();
   if (settingsCount === 0) {
     await Setting.insertMany([
-      { key: 'companyName', value: 'Scientific Instruments Co.', group: 'company' },
-      { key: 'companyEmail', value: 'info@scientificinstruments.com', group: 'company' },
-      { key: 'companyPhone', value: '+1-800-555-0199', group: 'company' },
-      { key: 'companyAddress', value: '123 Science Park, Innovation City', group: 'company' },
-      { key: 'whatsappNumber', value: '+1234567890', group: 'social' },
+      { key: 'companyName', value: 'Vinayak Enterprises', group: 'company' },
+      { key: 'companyEmail', value: 'vilakshansharma01@gmail.com', group: 'company' },
+      { key: 'companyPhone', value: '+91 9729857068', group: 'company' },
+      { key: 'companyAddress', value: 'Ambala, Haryana, India', group: 'company' },
+      { key: 'whatsappNumber', value: '+919729857068', group: 'social' },
       { key: 'facebook', value: 'https://facebook.com/scientificinstruments', group: 'social' },
       { key: 'linkedin', value: 'https://linkedin.com/company/scientificinstruments', group: 'social' },
       { key: 'googleAnalyticsId', value: '', group: 'analytics' },

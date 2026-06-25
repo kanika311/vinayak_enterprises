@@ -73,7 +73,8 @@ export interface RFQ {
   email: string;
   phone?: string;
   companyName: string;
-  product: { _id: string; name: string; sku: string };
+  product?: { _id: string; name: string; sku: string };
+  productName?: string;
   quantity: number;
   budget?: string;
   requirements?: string;
@@ -95,6 +96,7 @@ export interface Blog {
   seoDescription?: string;
   status: 'draft' | 'published';
   views: number;
+  publishedAt?: string;
   createdAt: string;
 }
 
@@ -109,6 +111,8 @@ export interface DashboardData {
     catalogueDownloads: number;
   };
   topProducts: Product[];
+  recentProducts: Pick<Product, '_id' | 'name' | 'sku' | 'status' | 'slug' | 'createdAt'>[];
+  recentBlogs: Blog[];
   charts: {
     leadsPerMonth: { _id: { year: number; month: number }; count: number }[];
     trafficOverview: { _id: { year: number; month: number }; count: number }[];

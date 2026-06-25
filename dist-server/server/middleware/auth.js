@@ -3,10 +3,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authorize = exports.protect = void 0;
+exports.authorize = exports.protect = exports.optionalAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const helpers_1 = require("../utils/helpers");
 const Admin_1 = __importDefault(require("../models/Admin"));
+/** Sets req.user when a valid token is present; does not fail when absent. */
+const optionalAuth = async (req, _res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer '))
+        return next();
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const admin = await Admin_1.default.findById(decoded.id).select('-password');
+        if (admin?.isActive) {
+            req.user = {
+                id: admin._id.toString(),
+                email: admin.email,
+                role: admin.role,
+                permissions: admin.permissions,
+            };
+        }
+    }
+    catch {
+        // ignore invalid token on public routes
+    }
+    next();
+};
+exports.optionalAuth = optionalAuth;
 const protect = async (req, _res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {

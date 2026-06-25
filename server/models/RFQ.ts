@@ -5,7 +5,8 @@ export interface IRFQ extends Document {
   email: string;
   phone?: string;
   companyName: string;
-  product: mongoose.Types.ObjectId;
+  product?: mongoose.Types.ObjectId;
+  productName?: string;
   quantity: number;
   budget?: string;
   requirements?: string;
@@ -21,8 +22,9 @@ const rfqSchema = new Schema<IRFQ>(
     email: { type: String, required: true, lowercase: true },
     phone: String,
     companyName: { type: String, required: true },
-    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-    quantity: { type: Number, required: true, min: 1 },
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
+    productName: String,
+    quantity: { type: Number, required: true, min: 1, default: 1 },
     budget: String,
     requirements: String,
     country: String,

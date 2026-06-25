@@ -32,29 +32,25 @@ export function WebsiteHeader() {
         <div className="container mx-auto px-4 py-2 flex flex-wrap justify-between items-center gap-2">
           <motion.div variants={fadeDown} className="flex flex-wrap items-center gap-4">
             <span className="font-medium">{SITE.location}</span>
-            <span className="hidden sm:inline text-blue-200">GST No. {SITE.gst}</span>
+            <span className="hidden sm:inline text-blue-200">{SITE.workingHours}</span>
           </motion.div>
           <motion.div variants={fadeDown} className="flex flex-wrap items-center gap-4">
             <motion.a
-              href={`tel:${SITE.phone}`}
+              href={`tel:${SITE.phoneTel}`}
               className="flex items-center gap-1 font-semibold hover:text-orange-300"
               whileHover={{ scale: 1.03 }}
             >
               <Phone className="h-3.5 w-3.5" /> Call {SITE.phone}
             </motion.a>
-            <motion.span
-              className="hidden md:inline text-green-300 font-medium"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              {SITE.responseRate} Response rate
-            </motion.span>
             <motion.a
-              href={`mailto:${SITE.email}`}
-              className="hidden sm:flex items-center gap-1 hover:text-orange-300"
+              href={`mailto:${SITE.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+              className="flex items-center gap-1 hover:text-orange-300"
               whileHover={{ scale: 1.03 }}
+              title={SITE.email}
             >
-              <Mail className="h-3.5 w-3.5" /> Send Email
+              <Mail className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden md:inline">{SITE.email}</span>
+              <span className="md:hidden">Email</span>
             </motion.a>
           </motion.div>
         </div>
@@ -77,7 +73,7 @@ export function WebsiteHeader() {
                 whileHover={{ scale: 1.08, rotate: 3 }}
                 whileTap={{ scale: 0.95 }}
               >
-                SI
+                {SITE.shortName}
               </motion.div>
               <div className="hidden sm:block">
                 <p className="font-bold text-[#1a3a6b] text-lg leading-tight">{SITE.name}</p>
@@ -111,7 +107,8 @@ export function WebsiteHeader() {
             <nav className="hidden lg:flex items-center gap-1">
               {[
                 { href: '/', label: 'Home' },
-                { href: '/about', label: 'Profile' },
+                { href: '/about', label: 'About Us' },
+                { href: '/blog', label: 'Blog' },
                 { href: '/contact', label: 'Contact Us' },
               ].map((link) => (
                 <motion.div key={link.href} whileHover={{ y: -2 }}>
@@ -174,7 +171,7 @@ export function WebsiteHeader() {
                 </Button>
               </motion.div>
               <motion.a
-                href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, '')}`}
+                href={`https://wa.me/${SITE.whatsapp}`}
                 target="_blank"
                 rel="noopener"
                 className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600"

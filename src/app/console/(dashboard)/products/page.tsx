@@ -18,16 +18,23 @@ import type { Product } from '@/types';
 export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['products', page, search],
-    queryFn: () => apiGet<{ products: Product[]; total: number; pages: number; page: number }>('/products', { page, limit: 10, search }),
+    queryKey: ['products', page, search, status],
+    queryFn: () => apiGet<{ products: Product[]; total: number; pages: number; page: number }>('/products', {
+      page, limit: 10, search, status: status || undefined,
+    }),
+    refetchOnMount: 'always',
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiDelete(`/products/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['products-public'] });
+    },
   });
 
   return (
@@ -42,8 +49,17 @@ export default function ProductsPage() {
         }
       />
 
-      <div className="mb-6">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <SearchBar value={search} onChange={setSearch} placeholder="Search products by name or SKU..." onSearch={() => setPage(1)} />
+        <select
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm sm:w-40"
+          value={status}
+          onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+        >
+          <option value="">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
       </div>
 
       {isLoading ? <LoadingSpinner /> : !data?.products?.length ? (
@@ -79,7 +95,9 @@ export default function ProductsPage() {
                         <Button variant="ghost" size="icon" asChild>
                           <Link href={`${ADMIN_BASE}/products/${product._id}`}><Pencil className="h-4 w-4" /></Link>
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(product._id)}>
+                        <Button variant="ghost" size="icon" onClick={() => {
+                          if (window.confirm(`Delete "${product.name}"?`)) deleteMutation.mutate(product._id);
+                        }}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>

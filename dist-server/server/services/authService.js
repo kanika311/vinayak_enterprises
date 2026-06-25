@@ -10,6 +10,7 @@ const Admin_1 = __importDefault(require("../models/Admin"));
 const constants_1 = require("../constants");
 const helpers_1 = require("../utils/helpers");
 const email_1 = require("../config/email");
+const clientUrl_1 = require("../utils/clientUrl");
 const generateToken = (admin) => {
     const expiresIn = (process.env.JWT_EXPIRES_IN || '7d');
     return jsonwebtoken_1.default.sign({ id: admin._id, email: admin.email, role: admin.role, permissions: admin.permissions }, process.env.JWT_SECRET, { expiresIn });
@@ -51,7 +52,7 @@ const forgotPassword = async (email) => {
     admin.resetPasswordToken = crypto_1.default.createHash('sha256').update(resetToken).digest('hex');
     admin.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000);
     await admin.save();
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    const clientUrl = (0, clientUrl_1.getClientUrl)();
     const resetUrl = `${clientUrl}/console/reset-password?token=${resetToken}`;
     if ((0, email_1.isEmailConfigured)()) {
         try {
@@ -69,7 +70,8 @@ const forgotPassword = async (email) => {
         }
         catch (err) {
             console.error('Failed to send reset email:', err);
-            throw new helpers_1.AppError('Could not send email. Check SMTP settings in backend .env', 500);
+            const message = err instanceof Error ? err.message : 'Unknown email error';
+            throw new helpers_1.AppError(`Could not send email: ${message}`, 500);
         }
     }
     else if (process.env.NODE_ENV === 'development') {

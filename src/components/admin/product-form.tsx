@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/admin/page-header';
+import { ProductImageUpload, type ProductImage } from '@/components/admin/product-image-upload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,11 +17,13 @@ import type { Category, Product } from '@/types';
 
 export function ProductForm({ productId }: { productId?: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const isNew = !productId;
 
+  const [images, setImages] = useState<ProductImage[]>([]);
   const [form, setForm] = useState({
     name: '', sku: '', category: '', subcategory: '', slug: '',
-    shortDescription: '', longDescription: '', status: 'draft' as 'draft' | 'published',
+    shortDescription: '', longDescription: '', status: 'published' as 'draft' | 'published',
     features: '', seoTitle: '', seoDescription: '', metaKeywords: '',
   });
 
@@ -42,6 +45,7 @@ export function ProductForm({ productId }: { productId?: string }) {
         seoTitle: product.seoTitle || '', seoDescription: product.seoDescription || '',
         metaKeywords: product.metaKeywords?.join(', ') || '',
       });
+      setImages(product.images || []);
       return product;
     },
     enabled: !!productId,
@@ -50,7 +54,12 @@ export function ProductForm({ productId }: { productId?: string }) {
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
       isNew ? apiPost('/products', data) : apiPut(`/products/${productId}`, data),
-    onSuccess: () => router.push(`${ADMIN_BASE}/products`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      await queryClient.invalidateQueries({ queryKey: ['products-public'] });
+      if (productId) await queryClient.invalidateQueries({ queryKey: ['product', productId] });
+      router.push(`${ADMIN_BASE}/products`);
+    },
   });
 
   if (!isNew && isLoading) return <LoadingSpinner />;
@@ -62,6 +71,7 @@ export function ProductForm({ productId }: { productId?: string }) {
         e.preventDefault();
         mutation.mutate({
           ...form,
+          images,
           features: form.features.split('\n').filter(Boolean),
           metaKeywords: form.metaKeywords.split(',').map((k) => k.trim()).filter(Boolean),
         });
@@ -101,6 +111,14 @@ export function ProductForm({ productId }: { productId?: string }) {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mt-6">
+          <CardHeader><CardTitle>Product Images</CardTitle></CardHeader>
+          <CardContent>
+            <ProductImageUpload images={images} onChange={setImages} productName={form.name} />
+          </CardContent>
+        </Card>
+
         <div className="mt-6 flex gap-4">
           <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? 'Saving...' : 'Save Product'}</Button>
           <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>

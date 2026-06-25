@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import Image from 'next/image';
 import { apiGet } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import type { Blog } from '@/types';
@@ -10,6 +11,7 @@ export default function BlogPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['blogs-public'],
     queryFn: () => apiGet<{ blogs: Blog[] }>('/blogs', { status: 'published', limit: 12 }),
+    refetchOnMount: 'always',
   });
 
   return (
@@ -34,12 +36,18 @@ export default function BlogPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.blogs.map((blog) => (
               <Link key={blog._id} href={`/blog/${blog.slug}`} className="group bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-44 bg-gradient-to-br from-blue-100 to-slate-100 flex items-center justify-center text-5xl">📝</div>
+                <div className="h-44 bg-gradient-to-br from-blue-100 to-slate-100 flex items-center justify-center overflow-hidden relative">
+                  {blog.featuredImage?.url ? (
+                    <Image src={blog.featuredImage.url} alt={blog.title} fill className="object-cover" />
+                  ) : (
+                    <span className="text-5xl">📝</span>
+                  )}
+                </div>
                 <div className="p-5">
                   {blog.category && <span className="text-xs text-blue-600 font-medium">{blog.category}</span>}
                   <h2 className="font-semibold text-slate-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2">{blog.title}</h2>
                   <p className="text-sm text-slate-500 mt-2 line-clamp-2">{blog.excerpt || blog.content.slice(0, 100)}</p>
-                  <p className="text-xs text-slate-400 mt-3">{formatDate(blog.createdAt)}</p>
+                  <p className="text-xs text-slate-400 mt-3">{formatDate(blog.publishedAt || blog.createdAt)}</p>
                 </div>
               </Link>
             ))}

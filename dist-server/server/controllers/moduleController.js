@@ -33,7 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.getAnalytics = exports.trackEvent = void 0;
 const helpers_1 = require("../utils/helpers");
 const categoryService = __importStar(require("../services/categoryService"));
 const leadService = __importStar(require("../services/leadService"));
@@ -104,6 +105,14 @@ exports.getBlogs = (0, helpers_1.asyncHandler)(async (req, res) => {
 exports.getBlogBySlug = (0, helpers_1.asyncHandler)(async (req, res) => {
     const blog = await blogService.getBlogBySlug((0, helpers_1.getParam)(req.params.slug));
     (0, helpers_1.sendResponse)(res, 200, blog);
+});
+exports.getBlogById = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const blog = await blogService.getBlogById((0, helpers_1.getParam)(req.params.id));
+    (0, helpers_1.sendResponse)(res, 200, blog);
+});
+exports.getCategoryBySlug = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const category = await categoryService.getCategoryBySlug((0, helpers_1.getParam)(req.params.slug));
+    (0, helpers_1.sendResponse)(res, 200, category);
 });
 exports.createBlog = (0, helpers_1.asyncHandler)(async (req, res) => {
     const blog = await blogService.createBlog({ ...req.body, author: req.user.id });

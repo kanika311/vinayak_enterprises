@@ -32,3 +32,11 @@ export const deleteProduct = asyncHandler(async (req: AuthRequest, res: Response
   await productService.deleteProduct(getParam(req.params.id));
   sendResponse(res, 200, null, 'Product deleted');
 });
+
+export const uploadProductImage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.file) {
+    return sendResponse(res, 400, null, 'No image file provided');
+  }
+  const result = await productService.uploadProductImage(req.file);
+  sendResponse(res, 201, result, 'Image uploaded');
+});

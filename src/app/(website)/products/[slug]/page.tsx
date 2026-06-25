@@ -30,11 +30,22 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-10 bg-white rounded-2xl border p-6 lg:p-10">
-          <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden relative">
-            {product.images?.[0]?.url ? (
-              <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-8xl">🔬</div>
+          <div>
+            <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden relative">
+              {product.images?.[0]?.url ? (
+                <Image src={product.images[0].url} alt={product.name} fill className="object-cover" unoptimized={product.images[0].url.startsWith('/uploads/')} />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-8xl">🔬</div>
+              )}
+            </div>
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto">
+                {product.images.map((img, i) => (
+                  <div key={img.url} className="relative h-16 w-16 shrink-0 rounded-lg border overflow-hidden">
+                    <Image src={img.url} alt="" fill className="object-cover" unoptimized={img.url.startsWith('/uploads/')} />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

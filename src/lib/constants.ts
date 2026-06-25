@@ -1,26 +1,76 @@
 export const ADMIN_BASE = '/console';
 
 export const SITE = {
-  name: 'Scientific Instruments Traders',
-  tagline: 'Trader · Wholesaler / Distributor',
-  location: 'New Delhi, India',
-  phone: '+91-7942719473',
-  email: 'info@scientificinstruments.com',
-  whatsapp: '+917942719473',
-  gst: '07XXXXXXXXXX1ZJ',
-  responseRate: '91%',
-  address: '54, South Basti, Sadar Bazar, New Delhi - 110006, India',
-  ceo: 'Mr. Sharma (CEO)',
+  name: 'Vinayak Enterprises',
+  shortName: 'VE',
+  tagline: 'Manufacturer · Bulk Supplier · Distributor',
+  location: 'Ambala, Haryana, India',
+  address: 'Ambala, Haryana, India',
+  phone: '+91 9729857068',
+  phoneTel: '+919729857068',
+  email: 'vilakshansharma01@gmail.com',
+  whatsapp: '919729857068',
+  workingHours: 'Mon – Sat | 9:00 AM – 10:00 PM',
+  workingHoursLong: 'Monday – Saturday, 9:00 AM – 10:00 PM',
+};
+
+export const SEO = {
+  title: 'Vinayak Enterprises | Scientific Instruments Manufacturer & Laboratory Equipment Supplier',
+  description:
+    'Vinayak Enterprises is a Manufacturer, Bulk Supplier, and Distributor of Scientific Instruments, Laboratory Equipment, Human Anatomy Models, Educational Teaching Aids, and Medical Training Products based in Ambala, Haryana.',
+  keywords: [
+    'Scientific Instruments Manufacturer',
+    'Laboratory Equipment Manufacturer',
+    'Human Anatomy Models Manufacturer',
+    'Educational Teaching Aids Manufacturer',
+    'Medical Training Products Manufacturer',
+    'Scientific Instruments Supplier',
+    'Laboratory Equipment Distributor',
+    'Scientific Instruments Manufacturer in Ambala Haryana',
+    'Laboratory Equipment Bulk Supplier India',
+  ],
 };
 
 export const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Our Products' },
   { href: '/categories', label: 'Categories' },
-  { href: '/about', label: 'Profile' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About Us' },
   { href: '/catalogues', label: 'Catalogue' },
   { href: '/contact', label: 'Contact Us' },
 ];
+
+export const MANUFACTURING_HIGHLIGHTS = [
+  { title: 'Scientific Instruments Manufacturer', icon: '🔬' },
+  { title: 'Laboratory Equipment Manufacturer', icon: '⚗️' },
+  { title: 'Human Anatomy Models Manufacturer', icon: '🫀' },
+  { title: 'Educational Teaching Aids Manufacturer', icon: '📚' },
+  { title: 'Medical Training Products Manufacturer', icon: '🏥' },
+  { title: 'Bulk Supplier for Schools & Colleges', icon: '🎓' },
+  { title: 'Distributor for Hospitals & Laboratories', icon: '🏛️' },
+  { title: 'Institutional Supply Across India', icon: '🇮🇳' },
+];
+
+export const BUSINESS_INFO = [
+  { label: 'Business Type', value: 'Manufacturer, Bulk Supplier & Distributor' },
+  { label: 'Location', value: 'Ambala, Haryana, India' },
+  { label: 'We Serve', value: 'Schools, Colleges, Universities, Hospitals' },
+  { label: 'Products', value: 'Scientific & Laboratory Equipment' },
+  { label: 'Specialization', value: 'Anatomy Models & Teaching Aids' },
+  { label: 'Supply Model', value: 'B2B Institutional Supply' },
+];
+
+export const ABOUT_CONTENT = {
+  intro:
+    'Vinayak Enterprises is an Ambala-based Manufacturer, Bulk Supplier, and Distributor of Scientific Instruments, Laboratory Equipment, Human Anatomy Models, Educational Teaching Aids, and Medical Training Products.',
+  serving:
+    'We serve schools, colleges, universities, laboratories, hospitals, medical institutions, healthcare organizations, and research centers across India.',
+  focus:
+    'Our focus is on quality manufacturing, institutional supply, reliable service, and long-term customer relationships.',
+  manufacturing:
+    'We manufacture high-quality scientific and educational products and support bulk procurement requirements for educational and healthcare institutions.',
+};
 
 export const PRODUCT_CATEGORIES = [
   { slug: 'chemistry-lab-instrument', name: 'Chemistry Lab Instrument', icon: '🧪', color: 'bg-blue-50 border-blue-200 hover:border-blue-400' },
@@ -34,15 +84,6 @@ export const PRODUCT_CATEGORIES = [
 ];
 
 export const CATEGORIES_PREVIEW = PRODUCT_CATEGORIES;
-
-export const BUSINESS_INFO = [
-  { label: 'Nature of Business', value: 'Trader - Wholesaler/Distributor' },
-  { label: 'Total Employees', value: 'Upto 10 People' },
-  { label: 'GST Registration', value: '01-07-2017' },
-  { label: 'Legal Status', value: 'Proprietorship' },
-  { label: 'Annual Turnover', value: '5 - 25 Cr' },
-  { label: 'GST No.', value: SITE.gst },
-];
 
 export interface ShowcaseProduct {
   _id: string;

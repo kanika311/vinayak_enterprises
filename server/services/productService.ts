@@ -66,3 +66,5 @@ export const deleteProduct = async (id: string) => {
   if (!product) throw new AppError('Product not found', 404);
   return product;
 };
+
+export { uploadProductImage } from '../utils/fileUpload';

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategoryBySlug = exports.getCategories = void 0;
 const Category_1 = __importDefault(require("../models/Category"));
 const helpers_1 = require("../utils/helpers");
 const getCategories = async (activeOnly = false) => {
@@ -11,6 +11,13 @@ const getCategories = async (activeOnly = false) => {
     return Category_1.default.find(filter).sort({ order: 1, name: 1 });
 };
 exports.getCategories = getCategories;
+const getCategoryBySlug = async (slug) => {
+    const category = await Category_1.default.findOne({ slug, isActive: true });
+    if (!category)
+        throw new helpers_1.AppError('Category not found', 404);
+    return category;
+};
+exports.getCategoryBySlug = getCategoryBySlug;
 const createCategory = async (data) => {
     if (!data.slug)
         data.slug = (0, helpers_1.generateSlug)(data.name);

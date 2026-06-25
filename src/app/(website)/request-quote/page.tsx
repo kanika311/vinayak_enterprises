@@ -14,6 +14,7 @@ export default function RequestQuotePage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', companyName: '', product: '', quantity: 1, budget: '', requirements: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const product = new URLSearchParams(window.location.search).get('product');
@@ -23,11 +24,21 @@ export default function RequestQuotePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
-      await apiPost('/rfqs', form);
+      const { product, ...rest } = form;
+      const payload: Record<string, unknown> = { ...rest };
+      const productText = product.trim();
+      if (/^[0-9a-fA-F]{24}$/.test(productText)) {
+        payload.product = productText;
+      } else if (productText) {
+        payload.productName = productText;
+      }
+      await apiPost('/rfqs', payload);
       setSent(true);
-    } catch {
-      setSent(true);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(msg || 'Could not submit quote. Please call us or try again.');
     } finally {
       setLoading(false);
     }
@@ -37,7 +48,7 @@ export default function RequestQuotePage() {
     <div className="bg-slate-50 min-h-screen">
       <PageHeader
         title="Request a Quote"
-        subtitle="Get competitive B2B pricing for bulk orders"
+        subtitle="Get competitive B2B pricing for bulk orders from Vinayak Enterprises"
         dark
       />
 
@@ -54,38 +65,25 @@ export default function RequestQuotePage() {
                 key="success"
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
                 className="text-center py-8"
               >
-                <motion.p
-                  className="text-5xl mb-4"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 1, repeat: 2 }}
-                >
-                  📋
-                </motion.p>
+                <p className="text-5xl mb-4">📋</p>
                 <h2 className="text-xl font-bold">Quote Request Submitted!</h2>
                 <p className="text-slate-500 mt-2">Our sales team will send you a quote within 1–2 business days.</p>
               </motion.div>
             ) : (
-              <motion.form
-                key="form"
-                onSubmit={handleSubmit}
-                className="space-y-5"
-                initial="hidden"
-                animate="visible"
-                variants={staggerContainer}
-              >
+              <motion.form key="form" onSubmit={handleSubmit} className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
+                {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{error}</p>}
                 <div className="grid sm:grid-cols-2 gap-5">
                   {[
                     { key: 'name', label: 'Full Name *', type: 'text', required: true },
-                    { key: 'companyName', label: 'Company Name *', type: 'text', required: true },
+                    { key: 'companyName', label: 'Company / Institution *', type: 'text', required: true },
                     { key: 'email', label: 'Email *', type: 'email', required: true },
-                    { key: 'phone', label: 'Phone', type: 'text', required: false },
-                    { key: 'product', label: 'Product ID / Name', type: 'text', required: false, placeholder: 'Product name or SKU' },
+                    { key: 'phone', label: 'Phone *', type: 'text', required: true },
+                    { key: 'product', label: 'Product Name or ID', type: 'text', required: false, placeholder: 'Product name, SKU, or leave blank' },
                     { key: 'quantity', label: 'Quantity *', type: 'number', required: true, min: 1 },
                   ].map((field) => (
-                    <motion.div key={field.key} variants={fadeUp} className={field.key === 'product' || field.key === 'quantity' ? '' : ''}>
+                    <motion.div key={field.key} variants={fadeUp}>
                       <Label>{field.label}</Label>
                       <Input
                         required={field.required}
@@ -109,7 +107,7 @@ export default function RequestQuotePage() {
                   <Label>Requirements</Label>
                   <Textarea rows={4} value={form.requirements} onChange={(e) => setForm({ ...form, requirements: e.target.value })} placeholder="Customization, delivery timeline, etc." />
                 </motion.div>
-                <motion.div variants={fadeUp} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                <motion.div variants={fadeUp}>
                   <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
                     {loading ? 'Submitting...' : 'Submit Quote Request'}
                   </Button>

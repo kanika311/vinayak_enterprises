@@ -1,5 +1,5 @@
 import { Readable } from 'stream';
-import cloudinary from '../config/cloudinary';
+import cloudinary, { ensureCloudinaryConfigured } from '../config/cloudinary';
 
 const bufferToStream = (buffer: Buffer): Readable => {
   const stream = new Readable();
@@ -12,6 +12,10 @@ export const uploadToCloudinary = (
   file: Express.Multer.File,
   folder = 'scientific-instruments'
 ): Promise<{ url: string; publicId: string }> => {
+  if (!ensureCloudinaryConfigured()) {
+    return Promise.reject(new Error('Cloudinary is not configured'));
+  }
+
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {

@@ -14,7 +14,7 @@ const getDashboardStats = async () => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-    const [totalProducts, totalLeads, totalRFQs, totalVisitors, monthlyLeads, blogViews, catalogueDownloads, topProducts, leadsPerMonth, trafficOverview, enquiryTrends, visitorDevices,] = await Promise.all([
+    const [totalProducts, totalLeads, totalRFQs, totalVisitors, monthlyLeads, blogViews, catalogueDownloads, topProducts, recentProducts, recentBlogs, leadsPerMonth, trafficOverview, enquiryTrends, visitorDevices,] = await Promise.all([
         Product_1.default.countDocuments({ status: 'published' }),
         Lead_1.default.countDocuments(),
         RFQ_1.default.countDocuments(),
@@ -26,6 +26,15 @@ const getDashboardStats = async () => {
             .sort({ enquiryCount: -1, views: -1 })
             .limit(5)
             .select('name sku views enquiryCount images'),
+        Product_1.default.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('name sku status slug createdAt'),
+        Blog_1.default.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('author', 'name')
+            .select('title slug status views createdAt author'),
         Lead_1.default.aggregate([
             { $match: { createdAt: { $gte: sixMonthsAgo } } },
             {
@@ -72,6 +81,8 @@ const getDashboardStats = async () => {
             catalogueDownloads,
         },
         topProducts,
+        recentProducts,
+        recentBlogs,
         charts: {
             leadsPerMonth,
             trafficOverview,

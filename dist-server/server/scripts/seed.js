@@ -9,6 +9,7 @@ const Admin_1 = __importDefault(require("../models/Admin"));
 const Category_1 = __importDefault(require("../models/Category"));
 const Setting_1 = __importDefault(require("../models/Setting"));
 const constants_1 = require("../constants");
+dotenv_1.default.config({ path: '.env.local' });
 dotenv_1.default.config();
 const seed = async () => {
     await (0, database_1.connectDatabase)();
