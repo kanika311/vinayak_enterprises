@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, FolderTree, Users, BookOpen,
-  Settings, LogOut, Menu, X, ClipboardList, Plus,
+  Settings, LogOut, Menu, X, ClipboardList, Plus, Star,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -35,6 +35,12 @@ const navGroups: NavGroup[] = [
     items: [
       { href: `${ADMIN_BASE}/blogs`, label: 'All Blogs', icon: BookOpen, description: 'Manage blog posts' },
       { href: `${ADMIN_BASE}/blogs/new`, label: 'Add Blog', icon: Plus, description: 'Write a new blog post' },
+    ],
+  },
+  {
+    title: 'Content',
+    items: [
+      { href: `${ADMIN_BASE}/testimonials`, label: 'Testimonials', icon: Star, description: 'Approve client reviews' },
     ],
   },
   {

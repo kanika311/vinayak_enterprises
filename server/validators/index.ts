@@ -32,3 +32,11 @@ export const blogValidation = [
   body('title').notEmpty(),
   body('content').notEmpty(),
 ];
+
+export const testimonialValidation = [
+  body('name').trim().notEmpty().withMessage('Name required'),
+  body('company').trim().notEmpty().withMessage('Company / institution required'),
+  body('review').trim().notEmpty().withMessage('Review required'),
+  body('rating').optional({ values: 'falsy' }).isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
+  body('email').optional({ values: 'falsy' }).isEmail().withMessage('Valid email required'),
+];

@@ -11,21 +11,17 @@ import { AnimatedButton, PulseCTA } from '@/components/website/animated-button';
 import { AnimatedHeading, staggerContainer, fadeUp, slideInRight } from '@/components/website/motion';
 import { ProductMarquee } from '@/components/website/product-marquee';
 import { ManufacturingSection } from '@/components/website/manufacturing-section';
+import { Carousel } from '@/components/website/carousel';
+import { TestimonialsSection } from '@/components/website/testimonials-section';
 import { apiGet } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
-import { getCategoryStyle } from '@/lib/category-styles';
-import type { Product, Category, Blog } from '@/types';
+import type { Product, Blog } from '@/types';
 
 export default function HomePage() {
   const { data: productsData } = useQuery({
     queryKey: ['products-public', 'homepage'],
     queryFn: () => apiGet<{ products: Product[] }>('/products', { status: 'published', limit: 12, sortBy: 'createdAt', order: 'desc' }),
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ['categories-public'],
-    queryFn: () => apiGet<Category[]>('/categories', { active: true }),
   });
 
   const { data: blogsData } = useQuery({
@@ -34,21 +30,9 @@ export default function HomePage() {
   });
 
   const products = productsData?.products || [];
-  const featured = products.slice(0, 8);
+  const featured = products.slice(0, 12);
   const latest = products.slice(0, 4);
   const blogs = blogsData?.blogs || [];
-
-  const categorySections = (categories || []).slice(0, 4).map((cat, i) => {
-    const style = getCategoryStyle(cat.slug, i);
-    return {
-      ...cat,
-      icon: style.icon,
-      products: products.filter((p) => {
-        const catId = typeof p.category === 'object' ? p.category._id : p.category;
-        return catId === cat._id;
-      }).slice(0, 5),
-    };
-  }).filter((s) => s.products.length > 0);
 
   return (
     <>
@@ -96,13 +80,11 @@ export default function HomePage() {
 
       <CategoryGrid />
 
-      <ManufacturingSection />
-
-      <section className="py-14 bg-white overflow-hidden">
+      <section className="py-10 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="flex items-center justify-between mb-10 gap-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="flex items-end justify-between mb-6 gap-4">
             <AnimatedHeading title="Our Products" subtitle="Latest from our catalogue — request a quote for pricing" />
-            <motion.div variants={fadeUp} className="hidden sm:block">
+            <motion.div variants={fadeUp} className="hidden sm:block shrink-0">
               <Link href="/products" className="text-[#1a3a6b] font-semibold text-sm hover:text-orange-600 flex items-center gap-1">View Complete Range →</Link>
             </motion.div>
           </motion.div>
@@ -110,36 +92,38 @@ export default function HomePage() {
           {featured.length === 0 ? (
             <p className="text-center text-slate-500 py-12">Products coming soon. Add products from the admin console.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <Carousel itemClassName="w-[72%] sm:w-[44%] lg:w-[23.5%]">
               {featured.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
-            </div>
+            </Carousel>
           )}
 
-          <motion.div className="text-center mt-10" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <motion.div className="text-center mt-8" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <AnimatedButton href="/request-quote" variant="green" className="px-10">Get Quote for Bulk Order</AnimatedButton>
           </motion.div>
         </div>
       </section>
 
-      {blogs.length > 0 ? (
-        <section className="py-14 bg-slate-50">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-[#1a3a6b]">Latest from the Blog</h2>
-                <p className="text-slate-500 mt-1">News and insights from scientific education</p>
-              </div>
-              <Link href="/blog" className="text-sm font-semibold text-orange-600 hover:text-orange-700">View All →</Link>
+      <ManufacturingSection />
+
+      <section className="py-10 bg-slate-50 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between mb-6 gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-[#1a3a6b]">Latest from the Blog</h2>
+              <p className="text-slate-500 mt-1 text-sm">News and insights from scientific education</p>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <Link href="/blog" className="text-sm font-semibold text-orange-600 hover:text-orange-700 shrink-0">View All →</Link>
+          </div>
+          {blogs.length > 0 ? (
+            <Carousel itemClassName="w-[80%] sm:w-[48%] lg:w-[32%]">
               {blogs.map((blog) => (
-                <Link key={blog._id} href={`/blog/${blog.slug}`} className="group bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow">
+                <Link key={blog._id} href={`/blog/${blog.slug}`} className="group block h-full bg-white rounded-xl border overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                   <div className="h-40 bg-gradient-to-br from-blue-100 to-slate-100 flex items-center justify-center overflow-hidden">
                     {blog.featuredImage?.url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={blog.featuredImage.url} alt={blog.title} className="w-full h-full object-cover" />
+                      <img src={blog.featuredImage.url} alt={blog.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     ) : (
                       <span className="text-5xl">📝</span>
                     )}
@@ -151,44 +135,22 @@ export default function HomePage() {
                   </div>
                 </Link>
               ))}
+            </Carousel>
+          ) : (
+            <div className="rounded-xl border border-dashed bg-white px-6 py-10 text-center">
+              <p className="text-3xl mb-2">📝</p>
+              <p className="text-slate-500 text-sm">Articles published from the admin panel appear here.</p>
             </div>
-          </div>
-        </section>
-      ) : (
-        <section className="py-10 bg-slate-50 border-y">
-          <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-[#1a3a6b]">Blog &amp; Insights</h2>
-              <p className="text-slate-500 text-sm mt-1">Articles published from the admin panel appear here.</p>
-            </div>
-            <Link href="/blog" className="text-sm font-semibold text-orange-600 hover:text-orange-700">Visit Blog →</Link>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
+
+      <TestimonialsSection />
 
       <WelcomeSection />
       <BusinessTrustBar />
 
-      {categorySections.map((section, sIdx) => (
-        <motion.section key={section._id} className="py-12 bg-slate-50 even:bg-white overflow-hidden" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: '-80px' }}>
-          <div className="container mx-auto px-4">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="flex items-center justify-between mb-8 pb-3 border-b-2 border-[#1a3a6b]">
-              <motion.h2 variants={fadeUp} className="text-xl md:text-2xl font-bold text-[#1a3a6b] flex items-center gap-3">
-                <span className="text-3xl">{section.icon}</span>
-                {section.name}
-              </motion.h2>
-              <Link href={`/categories/${section.slug}`} className="text-sm font-semibold text-orange-600 hover:text-orange-700">View All →</Link>
-            </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {section.products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          </div>
-        </motion.section>
-      ))}
-
-      <section className="relative py-16 bg-[#1a3a6b] text-white overflow-hidden">
+      <section className="relative py-12 bg-[#1a3a6b] text-white overflow-hidden">
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.h2 className="text-2xl md:text-3xl font-bold mb-3">Get in Touch With Us for Best Deals</motion.h2>
           <motion.p className="text-blue-200 mb-8 max-w-xl mx-auto">Bulk manufacturing, institutional supply &amp; distribution for schools, colleges, hospitals &amp; laboratories.</motion.p>

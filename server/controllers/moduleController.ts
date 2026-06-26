@@ -144,6 +144,11 @@ export const createTestimonial = asyncHandler(async (req: AuthRequest, res: Resp
   sendResponse(res, 201, item);
 });
 
+export const submitTestimonial = asyncHandler(async (req: AuthRequest, res: Response) => {
+  await miscService.submitTestimonial(req.body);
+  sendResponse(res, 201, { submitted: true }, 'Thank you! Your review is awaiting approval.');
+});
+
 export const updateTestimonial = asyncHandler(async (req: AuthRequest, res: Response) => {
   const item = await miscService.updateTestimonial(getParam(req.params.id), req.body);
   sendResponse(res, 200, item);

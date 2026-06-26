@@ -10,6 +10,7 @@ import {
   leadValidation,
   rfqValidation,
   blogValidation,
+  testimonialValidation,
 } from '../validators';
 import * as authCtrl from '../controllers/authController';
 import * as productCtrl from '../controllers/productController';
@@ -61,6 +62,7 @@ router.put('/rfqs/:id', protect, authorize(PERMISSIONS.RFQS), moduleCtrl.updateR
 router.get('/rfqs/report', protect, authorize(PERMISSIONS.RFQS), moduleCtrl.getRFQReport);
 
 // Blogs
+router.post('/blogs/upload-image', protect, authorize(PERMISSIONS.BLOGS), upload.single('file'), productCtrl.uploadProductImage);
 router.get('/blogs', optionalAuth, moduleCtrl.getBlogs);
 router.get('/blogs/slug/:slug', moduleCtrl.getBlogBySlug);
 router.get('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.getBlogById);
@@ -75,7 +77,8 @@ router.post('/catalogues/:id/download', moduleCtrl.trackDownload);
 router.delete('/catalogues/:id', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.deleteCatalogue);
 
 // Testimonials
-router.get('/testimonials', moduleCtrl.getTestimonials);
+router.get('/testimonials', optionalAuth, moduleCtrl.getTestimonials);
+router.post('/testimonials/submit', testimonialValidation, validate, moduleCtrl.submitTestimonial);
 router.post('/testimonials', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.createTestimonial);
 router.put('/testimonials/:id', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.updateTestimonial);
 router.delete('/testimonials/:id', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.deleteTestimonial);

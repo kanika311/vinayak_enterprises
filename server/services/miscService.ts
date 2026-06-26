@@ -11,12 +11,31 @@ import { AppError, getPagination, buildSort } from '../utils/helpers';
 import { uploadToCloudinary, getMediaType } from './cloudinaryService';
 
 // Testimonials
-export const getTestimonials = async (activeOnly = false) => {
-  const filter = activeOnly ? { isActive: true } : {};
-  return Testimonial.find(filter).sort({ order: 1 });
+export const getTestimonials = async (publicOnly = false) => {
+  const filter = publicOnly ? { status: 'approved', isActive: true } : {};
+  const sort: Record<string, 1 | -1> = publicOnly ? { order: 1, createdAt: -1 } : { createdAt: -1 };
+  return Testimonial.find(filter).sort(sort);
 };
 
-export const createTestimonial = async (data: Record<string, unknown>) => Testimonial.create(data);
+export const createTestimonial = async (data: Record<string, unknown>) =>
+  Testimonial.create({ ...data, status: 'approved' });
+
+/** Public submission from the website — always starts as pending for admin review. */
+export const submitTestimonial = async (data: Record<string, unknown>) => {
+  const { name, company, designation, email, productName, review, rating } = data;
+  return Testimonial.create({
+    name,
+    company,
+    designation,
+    email,
+    productName,
+    review,
+    rating: rating ? Math.min(5, Math.max(1, Number(rating))) : 5,
+    status: 'pending',
+    isActive: true,
+  });
+};
+
 export const updateTestimonial = async (id: string, data: Record<string, unknown>) => {
   const item = await Testimonial.findByIdAndUpdate(id, data, { new: true });
   if (!item) throw new AppError('Testimonial not found', 404);

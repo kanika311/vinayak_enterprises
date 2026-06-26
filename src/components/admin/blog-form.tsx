@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { FeaturedImageUpload, type FeaturedImage } from '@/components/admin/featured-image-upload';
 import { apiGet, apiPost, apiPut } from '@/lib/api';
 import { ADMIN_BASE } from '@/lib/constants';
 import type { Blog } from '@/types';
@@ -29,6 +30,7 @@ export function BlogForm({ blogId }: { blogId?: string }) {
     seoDescription: '',
     status: 'draft' as 'draft' | 'published',
   });
+  const [featuredImage, setFeaturedImage] = useState<FeaturedImage | null>(null);
 
   const { isLoading } = useQuery({
     queryKey: ['blog', blogId],
@@ -44,6 +46,7 @@ export function BlogForm({ blogId }: { blogId?: string }) {
         seoDescription: blog.seoDescription || '',
         status: blog.status,
       });
+      setFeaturedImage(blog.featuredImage?.url ? blog.featuredImage : null);
       return blog;
     },
     enabled: !!blogId,
@@ -54,6 +57,7 @@ export function BlogForm({ blogId }: { blogId?: string }) {
       const payload = {
         ...form,
         tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        featuredImage: featuredImage ?? null,
       };
       return isNew ? apiPost('/blogs', payload) : apiPut(`/blogs/${blogId}`, payload);
     },
@@ -73,6 +77,11 @@ export function BlogForm({ blogId }: { blogId?: string }) {
         <CardContent className="pt-6 space-y-4">
           <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></div>
           <div><Label>Content *</Label><Textarea rows={10} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required /></div>
+          <div>
+            <Label>Featured Image</Label>
+            <p className="text-xs text-muted-foreground mb-2">Appears at the top of the post and on blog cards.</p>
+            <FeaturedImageUpload value={featuredImage} onChange={setFeaturedImage} />
+          </div>
           <div><Label>Excerpt</Label><Textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} /></div>
           <div className="grid gap-4 md:grid-cols-2">
             <div><Label>Category</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} /></div>

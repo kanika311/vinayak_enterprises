@@ -6,14 +6,14 @@ import { staggerContainer, fadeUp } from '@/components/website/motion';
 
 export function ManufacturingSection() {
   return (
-    <section className="py-14 bg-gradient-to-b from-slate-50 to-white border-y">
+    <section className="py-10 bg-gradient-to-b from-slate-50 to-white border-y">
       <div className="container mx-auto px-4">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
-          className="text-center mb-10"
+          className="text-center mb-7"
         >
           <motion.p variants={fadeUp} className="text-orange-600 font-semibold text-sm uppercase tracking-wide mb-2">
             What We Do

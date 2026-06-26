@@ -11,7 +11,7 @@ const icons = [Building2, MapPin, Users, Package, GraduationCap, Truck];
 
 export function BusinessTrustBar() {
   return (
-    <section className="bg-slate-50 py-12 border-y overflow-hidden">
+    <section className="bg-slate-50 py-8 border-y overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial="hidden"
@@ -45,7 +45,7 @@ export function BusinessTrustBar() {
 
 export function WelcomeSection() {
   return (
-    <section className="py-14 bg-white overflow-hidden">
+    <section className="py-10 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
