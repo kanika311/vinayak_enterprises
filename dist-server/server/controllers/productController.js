@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductBySlug = exports.getProduct = exports.getProducts = void 0;
+exports.uploadProductImage = exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductBySlug = exports.getProduct = exports.getProducts = void 0;
 const helpers_1 = require("../utils/helpers");
 const productService = __importStar(require("../services/productService"));
 exports.getProducts = (0, helpers_1.asyncHandler)(async (req, res) => {
@@ -59,4 +59,11 @@ exports.updateProduct = (0, helpers_1.asyncHandler)(async (req, res) => {
 exports.deleteProduct = (0, helpers_1.asyncHandler)(async (req, res) => {
     await productService.deleteProduct((0, helpers_1.getParam)(req.params.id));
     (0, helpers_1.sendResponse)(res, 200, null, 'Product deleted');
+});
+exports.uploadProductImage = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.file) {
+        return (0, helpers_1.sendResponse)(res, 400, null, 'No image file provided');
+    }
+    const result = await productService.uploadProductImage(req.file);
+    (0, helpers_1.sendResponse)(res, 201, result, 'Image uploaded');
 });

@@ -58,7 +58,7 @@ const forgotPassword = async (email) => {
         try {
             await (0, email_1.sendEmail)({
                 to: admin.email,
-                subject: 'Password Reset — Scientific Instruments Admin',
+                subject: 'Password Reset — Vinayak Enterprises Admin',
                 html: `
           <p>Hello ${admin.name},</p>
           <p>Click the link below to reset your password. It expires in 1 hour.</p>

@@ -58,6 +58,7 @@ router.get('/dashboard', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMI
 router.get('/products', productCtrl.getProducts);
 router.get('/products/slug/:slug', productCtrl.getProductBySlug);
 // Products - Admin
+router.post('/products/upload-image', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PRODUCTS), upload_1.upload.single('file'), productCtrl.uploadProductImage);
 router.get('/products/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PRODUCTS), productCtrl.getProduct);
 router.post('/products', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PRODUCTS), validators_1.productValidation, validate_1.validate, productCtrl.createProduct);
 router.put('/products/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PRODUCTS), productCtrl.updateProduct);
@@ -80,6 +81,7 @@ router.get('/rfqs', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSION
 router.put('/rfqs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.RFQS), moduleCtrl.updateRFQ);
 router.get('/rfqs/report', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.RFQS), moduleCtrl.getRFQReport);
 // Blogs
+router.post('/blogs/upload-image', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), upload_1.upload.single('file'), productCtrl.uploadProductImage);
 router.get('/blogs', auth_1.optionalAuth, moduleCtrl.getBlogs);
 router.get('/blogs/slug/:slug', moduleCtrl.getBlogBySlug);
 router.get('/blogs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.BLOGS), moduleCtrl.getBlogById);
@@ -92,7 +94,8 @@ router.post('/catalogues', auth_1.protect, (0, auth_1.authorize)(constants_1.PER
 router.post('/catalogues/:id/download', moduleCtrl.trackDownload);
 router.delete('/catalogues/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), moduleCtrl.deleteCatalogue);
 // Testimonials
-router.get('/testimonials', moduleCtrl.getTestimonials);
+router.get('/testimonials', auth_1.optionalAuth, moduleCtrl.getTestimonials);
+router.post('/testimonials/submit', validators_1.testimonialValidation, validate_1.validate, moduleCtrl.submitTestimonial);
 router.post('/testimonials', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.createTestimonial);
 router.put('/testimonials/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.updateTestimonial);
 router.delete('/testimonials/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.deleteTestimonial);
@@ -109,6 +112,13 @@ router.get('/subscribers/export', auth_1.protect, (0, auth_1.authorize)(constant
 router.post('/inquiries', moduleCtrl.createInquiry);
 router.get('/inquiries', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.INQUIRIES), moduleCtrl.getInquiries);
 router.put('/inquiries/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.INQUIRIES), moduleCtrl.updateInquiry);
+// Banners (hero looping background videos)
+router.get('/banners/public', moduleCtrl.getPublicBanners);
+router.get('/banners', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.getBanners);
+router.post('/banners/upload-video', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), upload_1.upload.single('file'), moduleCtrl.uploadBannerVideo);
+router.post('/banners', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.createBanner);
+router.put('/banners/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.updateBanner);
+router.delete('/banners/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.deleteBanner);
 // Media
 router.get('/media', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.getMedia);
 router.post('/media/upload', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), upload_1.upload.single('file'), moduleCtrl.uploadMedia);
@@ -118,6 +128,7 @@ router.get('/pages', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIO
 router.get('/pages/:slug', moduleCtrl.getPageBySlug);
 router.put('/pages/:slug', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.upsertPage);
 // Settings
+router.get('/settings/public', moduleCtrl.getPublicSettings);
 router.get('/settings', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.SETTINGS), moduleCtrl.getSettings);
 router.put('/settings', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.SETTINGS), moduleCtrl.updateSettings);
 // SEO

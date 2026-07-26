@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
-exports.getAnalytics = exports.trackEvent = void 0;
+exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.deleteBanner = exports.updateBanner = exports.createBanner = exports.uploadBannerVideo = exports.getBanners = exports.getPublicBanners = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = void 0;
 const helpers_1 = require("../utils/helpers");
 const categoryService = __importStar(require("../services/categoryService"));
 const leadService = __importStar(require("../services/leadService"));
@@ -42,6 +42,7 @@ const rfqService = __importStar(require("../services/rfqService"));
 const blogService = __importStar(require("../services/blogService"));
 const catalogueService = __importStar(require("../services/catalogueService"));
 const miscService = __importStar(require("../services/miscService"));
+const bannerService = __importStar(require("../services/bannerService"));
 // Categories
 exports.getCategories = (0, helpers_1.asyncHandler)(async (req, res) => {
     const categories = await categoryService.getCategories(req.query.active === 'true');
@@ -152,6 +153,10 @@ exports.createTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {
     const item = await miscService.createTestimonial(req.body);
     (0, helpers_1.sendResponse)(res, 201, item);
 });
+exports.submitTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {
+    await miscService.submitTestimonial(req.body);
+    (0, helpers_1.sendResponse)(res, 201, { submitted: true }, 'Thank you! Your review is awaiting approval.');
+});
 exports.updateTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {
     const item = await miscService.updateTestimonial((0, helpers_1.getParam)(req.params.id), req.body);
     (0, helpers_1.sendResponse)(res, 200, item);
@@ -205,6 +210,33 @@ exports.updateInquiry = (0, helpers_1.asyncHandler)(async (req, res) => {
     const inquiry = await miscService.updateInquiry((0, helpers_1.getParam)(req.params.id), req.body);
     (0, helpers_1.sendResponse)(res, 200, inquiry);
 });
+// Banners (hero background videos)
+exports.getPublicBanners = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const banners = await bannerService.getPublicBanners(req.query.placement || 'hero');
+    (0, helpers_1.sendResponse)(res, 200, banners);
+});
+exports.getBanners = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const banners = await bannerService.getBanners(req.query);
+    (0, helpers_1.sendResponse)(res, 200, banners);
+});
+exports.uploadBannerVideo = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.file)
+        throw new Error('No file uploaded');
+    const result = await bannerService.uploadBannerVideo(req.file);
+    (0, helpers_1.sendResponse)(res, 201, result);
+});
+exports.createBanner = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const banner = await bannerService.createBanner(req.body);
+    (0, helpers_1.sendResponse)(res, 201, banner);
+});
+exports.updateBanner = (0, helpers_1.asyncHandler)(async (req, res) => {
+    const banner = await bannerService.updateBanner((0, helpers_1.getParam)(req.params.id), req.body);
+    (0, helpers_1.sendResponse)(res, 200, banner);
+});
+exports.deleteBanner = (0, helpers_1.asyncHandler)(async (req, res) => {
+    await bannerService.deleteBanner((0, helpers_1.getParam)(req.params.id));
+    (0, helpers_1.sendResponse)(res, 200, null, 'Deleted');
+});
 // Media
 exports.getMedia = (0, helpers_1.asyncHandler)(async (req, res) => {
     const result = await miscService.getMedia(req.query);
@@ -234,13 +266,17 @@ exports.upsertPage = (0, helpers_1.asyncHandler)(async (req, res) => {
     (0, helpers_1.sendResponse)(res, 200, page);
 });
 // Settings
+exports.getPublicSettings = (0, helpers_1.asyncHandler)(async (_req, res) => {
+    const settings = await miscService.getPublicSettings();
+    (0, helpers_1.sendResponse)(res, 200, settings);
+});
 exports.getSettings = (0, helpers_1.asyncHandler)(async (req, res) => {
     const settings = await miscService.getSettings(req.query.group);
     (0, helpers_1.sendResponse)(res, 200, settings);
 });
 exports.updateSettings = (0, helpers_1.asyncHandler)(async (req, res) => {
     const settings = await miscService.updateSettings(req.body, req.query.group);
-    (0, helpers_1.sendResponse)(res, 200, settings);
+    (0, helpers_1.sendResponse)(res, 200, settings, 'Settings saved');
 });
 // SEO
 exports.getSEOEntries = (0, helpers_1.asyncHandler)(async (_req, res) => {

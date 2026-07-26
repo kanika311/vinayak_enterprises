@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductById = exports.getProductBySlug = exports.getProducts = void 0;
+exports.uploadProductImage = exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductById = exports.getProductBySlug = exports.getProducts = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
 const helpers_1 = require("../utils/helpers");
 const getProducts = async (query) => {
@@ -72,3 +72,5 @@ const deleteProduct = async (id) => {
     return product;
 };
 exports.deleteProduct = deleteProduct;
+var fileUpload_1 = require("../utils/fileUpload");
+Object.defineProperty(exports, "uploadProductImage", { enumerable: true, get: function () { return fileUpload_1.uploadProductImage; } });

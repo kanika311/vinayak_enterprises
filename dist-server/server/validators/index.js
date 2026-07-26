@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogValidation = exports.rfqValidation = exports.leadValidation = exports.productValidation = exports.loginValidation = void 0;
+exports.testimonialValidation = exports.blogValidation = exports.rfqValidation = exports.leadValidation = exports.productValidation = exports.loginValidation = void 0;
 const express_validator_1 = require("express-validator");
 exports.loginValidation = [
     (0, express_validator_1.body)('email').isEmail().withMessage('Valid email required'),
@@ -19,13 +19,21 @@ exports.leadValidation = [
     (0, express_validator_1.body)('leadSource').notEmpty().withMessage('Lead source required'),
 ];
 exports.rfqValidation = [
-    (0, express_validator_1.body)('name').notEmpty(),
-    (0, express_validator_1.body)('email').isEmail(),
-    (0, express_validator_1.body)('companyName').notEmpty(),
-    (0, express_validator_1.body)('product').notEmpty(),
-    (0, express_validator_1.body)('quantity').isInt({ min: 1 }),
+    (0, express_validator_1.body)('name').trim().notEmpty().withMessage('Name required'),
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email required'),
+    (0, express_validator_1.body)('companyName').trim().notEmpty().withMessage('Company name required'),
+    (0, express_validator_1.body)('quantity').optional({ values: 'falsy' }).isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+    (0, express_validator_1.body)('product').optional({ values: 'falsy' }),
+    (0, express_validator_1.body)('productName').optional({ values: 'falsy' }),
 ];
 exports.blogValidation = [
     (0, express_validator_1.body)('title').notEmpty(),
     (0, express_validator_1.body)('content').notEmpty(),
+];
+exports.testimonialValidation = [
+    (0, express_validator_1.body)('name').trim().notEmpty().withMessage('Name required'),
+    (0, express_validator_1.body)('company').trim().notEmpty().withMessage('Company / institution required'),
+    (0, express_validator_1.body)('review').trim().notEmpty().withMessage('Review required'),
+    (0, express_validator_1.body)('rating').optional({ values: 'falsy' }).isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
+    (0, express_validator_1.body)('email').optional({ values: 'falsy' }).isEmail().withMessage('Valid email required'),
 ];

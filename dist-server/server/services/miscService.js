@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAnalytics = exports.trackEvent = exports.generateRobotsTxt = exports.generateSitemap = exports.upsertSEO = exports.getSEOByPath = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribersCSV = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.createTestimonial = exports.getTestimonials = void 0;
+exports.getAnalytics = exports.trackEvent = exports.generateRobotsTxt = exports.generateSitemap = exports.upsertSEO = exports.getSEOByPath = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribersCSV = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = void 0;
 const Testimonial_1 = __importDefault(require("../models/Testimonial"));
 const Customer_1 = __importDefault(require("../models/Customer"));
 const Subscriber_1 = __importDefault(require("../models/Subscriber"));
@@ -49,13 +49,30 @@ const Analytics_1 = __importDefault(require("../models/Analytics"));
 const helpers_1 = require("../utils/helpers");
 const cloudinaryService_1 = require("./cloudinaryService");
 // Testimonials
-const getTestimonials = async (activeOnly = false) => {
-    const filter = activeOnly ? { isActive: true } : {};
-    return Testimonial_1.default.find(filter).sort({ order: 1 });
+const getTestimonials = async (publicOnly = false) => {
+    const filter = publicOnly ? { status: 'approved', isActive: true } : {};
+    const sort = publicOnly ? { order: 1, createdAt: -1 } : { createdAt: -1 };
+    return Testimonial_1.default.find(filter).sort(sort);
 };
 exports.getTestimonials = getTestimonials;
-const createTestimonial = async (data) => Testimonial_1.default.create(data);
+const createTestimonial = async (data) => Testimonial_1.default.create({ ...data, status: 'approved' });
 exports.createTestimonial = createTestimonial;
+/** Public submission from the website — always starts as pending for admin review. */
+const submitTestimonial = async (data) => {
+    const { name, company, designation, email, productName, review, rating } = data;
+    return Testimonial_1.default.create({
+        name,
+        company,
+        designation,
+        email,
+        productName,
+        review,
+        rating: rating ? Math.min(5, Math.max(1, Number(rating))) : 5,
+        status: 'pending',
+        isActive: true,
+    });
+};
+exports.submitTestimonial = submitTestimonial;
 const updateTestimonial = async (id, data) => {
     const item = await Testimonial_1.default.findByIdAndUpdate(id, data, { new: true });
     if (!item)
@@ -213,16 +230,48 @@ const upsertPage = async (slug, data) => {
 };
 exports.upsertPage = upsertPage;
 // Settings
+const getPublicSettings = async () => {
+    const settings = await Setting_1.default.find({
+        key: {
+            $in: [
+                'companyName',
+                'companyEmail',
+                'companyPhone',
+                'companyAddress',
+                'whatsappNumber',
+                'facebook',
+                'linkedin',
+                'workingHours',
+                'workingHoursLong',
+            ],
+        },
+    });
+    return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {});
+};
+exports.getPublicSettings = getPublicSettings;
 const getSettings = async (group) => {
     const filter = group ? { group } : {};
     const settings = await Setting_1.default.find(filter);
     return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {});
 };
 exports.getSettings = getSettings;
-const updateSettings = async (settings, group = 'general') => {
-    const ops = Object.entries(settings).map(([key, value]) => Setting_1.default.findOneAndUpdate({ key }, { key, value, group }, { upsert: true, new: true }));
+const SETTING_GROUPS = {
+    companyName: 'company',
+    companyEmail: 'company',
+    companyPhone: 'company',
+    companyAddress: 'company',
+    workingHours: 'company',
+    workingHoursLong: 'company',
+    whatsappNumber: 'social',
+    facebook: 'social',
+    linkedin: 'social',
+    googleAnalyticsId: 'analytics',
+    googleSearchConsole: 'analytics',
+};
+const updateSettings = async (settings, group) => {
+    const ops = Object.entries(settings).map(([key, value]) => Setting_1.default.findOneAndUpdate({ key }, { key, value, group: group || SETTING_GROUPS[key] || 'general' }, { upsert: true, new: true }));
     await Promise.all(ops);
-    return (0, exports.getSettings)(group);
+    return (0, exports.getSettings)();
 };
 exports.updateSettings = updateSettings;
 // SEO

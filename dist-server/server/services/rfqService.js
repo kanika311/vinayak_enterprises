@@ -19,7 +19,26 @@ const getRFQs = async (query) => {
     return { rfqs, total, page, limit, pages: Math.ceil(total / limit) };
 };
 exports.getRFQs = getRFQs;
-const createRFQ = async (data) => RFQ_1.default.create(data);
+const isObjectId = (value) => typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value.trim());
+const createRFQ = async (data) => {
+    const payload = { ...data, status: 'pending' };
+    const rawProduct = payload.product;
+    const rawProductName = payload.productName;
+    delete payload.product;
+    delete payload.productName;
+    if (isObjectId(rawProduct)) {
+        payload.product = String(rawProduct).trim();
+    }
+    else if (rawProductName && String(rawProductName).trim()) {
+        payload.productName = String(rawProductName).trim();
+    }
+    else if (rawProduct && String(rawProduct).trim()) {
+        payload.productName = String(rawProduct).trim();
+    }
+    if (!payload.quantity)
+        payload.quantity = 1;
+    return RFQ_1.default.create(payload);
+};
 exports.createRFQ = createRFQ;
 const updateRFQ = async (id, data) => {
     const rfq = await RFQ_1.default.findByIdAndUpdate(id, data, { new: true }).populate('product', 'name sku');
