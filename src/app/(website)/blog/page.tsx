@@ -72,9 +72,14 @@ export default function BlogPage() {
                   href={`/blog/${blog.slug}`}
                   className="group flex flex-col h-full bg-white rounded-2xl border overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
                 >
-                  <div className="h-44 bg-gradient-to-br from-blue-100 to-slate-100 flex items-center justify-center overflow-hidden relative">
+                  <div className="aspect-[16/10] bg-slate-100 flex items-center justify-center overflow-hidden relative">
                     {blog.featuredImage?.url ? (
-                      <Image src={blog.featuredImage.url} alt={blog.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <Image
+                        src={blog.featuredImage.url}
+                        alt={blog.title}
+                        fill
+                        className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
                     ) : (
                       <span className="text-5xl transition-transform duration-500 group-hover:scale-110">📝</span>
                     )}

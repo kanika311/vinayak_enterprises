@@ -17,7 +17,7 @@ export function CategoryGrid() {
   if (!categories?.length) return null;
 
   return (
-    <section className="bg-white py-8 border-b overflow-hidden">
+    <section className="bg-[#f7f5f2] py-10 border-b overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial="hidden"
@@ -32,11 +32,11 @@ export function CategoryGrid() {
               <motion.div key={cat._id} variants={popIn}>
                 <Link href={`/categories/${cat.slug}`} className="block">
                   <motion.div
-                    className={`flex flex-col items-center text-center p-4 rounded-xl border-2 ${style.color}`}
-                    whileHover={{ scale: 1.08, y: -6, boxShadow: '0 12px 24px -8px rgba(26,58,107,0.2)' }}
-                    whileTap={{ scale: 0.95 }}
+                    className="flex flex-col items-center text-center p-4 rounded-2xl border border-slate-200/90 bg-white shadow-sm hover:shadow-md hover:border-slate-300"
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    whileTap={{ scale: 0.96 }}
                   >
-                    <span className="text-4xl mb-2 block">{style.icon}</span>
+                    <span className="text-3xl mb-2 block opacity-90">{style.icon}</span>
                     <span className="text-xs font-semibold text-slate-700 leading-tight">{cat.name}</span>
                   </motion.div>
                 </Link>

@@ -99,6 +99,14 @@ router.post('/inquiries', moduleCtrl.createInquiry);
 router.get('/inquiries', protect, authorize(PERMISSIONS.INQUIRIES), moduleCtrl.getInquiries);
 router.put('/inquiries/:id', protect, authorize(PERMISSIONS.INQUIRIES), moduleCtrl.updateInquiry);
 
+// Banners (hero looping background videos)
+router.get('/banners/public', moduleCtrl.getPublicBanners);
+router.get('/banners', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.getBanners);
+router.post('/banners/upload-video', protect, authorize(PERMISSIONS.PAGES), upload.single('file'), moduleCtrl.uploadBannerVideo);
+router.post('/banners', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.createBanner);
+router.put('/banners/:id', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.updateBanner);
+router.delete('/banners/:id', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.deleteBanner);
+
 // Media
 router.get('/media', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.getMedia);
 router.post('/media/upload', protect, authorize(PERMISSIONS.MEDIA), upload.single('file'), moduleCtrl.uploadMedia);
@@ -110,6 +118,7 @@ router.get('/pages/:slug', moduleCtrl.getPageBySlug);
 router.put('/pages/:slug', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.upsertPage);
 
 // Settings
+router.get('/settings/public', moduleCtrl.getPublicSettings);
 router.get('/settings', protect, authorize(PERMISSIONS.SETTINGS), moduleCtrl.getSettings);
 router.put('/settings', protect, authorize(PERMISSIONS.SETTINGS), moduleCtrl.updateSettings);
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/admin/page-header';
 import { ProductImageUpload, type ProductImage } from '@/components/admin/product-image-upload';
 import { Button } from '@/components/ui/button';
@@ -64,8 +65,15 @@ export function ProductForm({ productId }: { productId?: string }) {
 
   if (!isNew && isLoading) return <LoadingSpinner />;
 
+  const goBack = () => router.push(`${ADMIN_BASE}/products`);
+
   return (
     <div>
+      <div className="mb-4">
+        <Button type="button" variant="ghost" size="sm" onClick={goBack} className="-ml-2 text-slate-600">
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to Products
+        </Button>
+      </div>
       <PageHeader title={isNew ? 'Add Product' : 'Edit Product'} />
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -121,7 +129,7 @@ export function ProductForm({ productId }: { productId?: string }) {
 
         <div className="mt-6 flex gap-4">
           <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? 'Saving...' : 'Save Product'}</Button>
-          <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
+          <Button type="button" variant="outline" onClick={goBack}>Cancel</Button>
         </div>
       </form>
     </div>

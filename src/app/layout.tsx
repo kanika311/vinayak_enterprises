@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: SEO.title,
   description: SEO.description,
   keywords: SEO.keywords,
+  metadataBase: new URL(process.env.CLIENT_URL || 'http://localhost:3002'),
   openGraph: {
     title: SEO.title,
     description: SEO.description,

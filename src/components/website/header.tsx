@@ -3,17 +3,29 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, Mail, ChevronDown, Search, MessageCircle } from 'lucide-react';
-import { SITE, NAV_LINKS, PRODUCT_CATEGORIES } from '@/lib/constants';
+import { Menu, X, Phone, Mail, ChevronDown, Search, Download } from 'lucide-react';
+import { NAV_LINKS, PRODUCT_CATEGORIES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { fadeDown, staggerFast, popIn } from '@/components/website/motion';
+import { SiteLogo } from '@/components/website/site-logo';
+import { useSiteContact } from '@/hooks/use-site-contact';
+import { apiGet } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 export function WebsiteHeader() {
+  const { site } = useSiteContact();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+
+  const { data: cataloguesData } = useQuery({
+    queryKey: ['catalogues-public'],
+    queryFn: () => apiGet<{ catalogues: { file: { url: string } }[] }>('/catalogues'),
+    staleTime: 60_000,
+  });
+  const catalogueUrl = cataloguesData?.catalogues?.[0]?.file?.url || '/catalogues';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -31,25 +43,25 @@ export function WebsiteHeader() {
       >
         <div className="container mx-auto px-4 py-2 flex flex-wrap justify-between items-center gap-2">
           <motion.div variants={fadeDown} className="flex flex-wrap items-center gap-4">
-            <span className="font-medium">{SITE.location}</span>
-            <span className="hidden sm:inline text-blue-200">{SITE.workingHours}</span>
+            <span className="font-medium">{site.location}</span>
+            <span className="hidden sm:inline text-blue-200">{site.workingHours}</span>
           </motion.div>
           <motion.div variants={fadeDown} className="flex flex-wrap items-center gap-4">
             <motion.a
-              href={`tel:${SITE.phoneTel}`}
+              href={`tel:${site.phoneTel}`}
               className="flex items-center gap-1 font-semibold hover:text-orange-300"
               whileHover={{ scale: 1.03 }}
             >
-              <Phone className="h-3.5 w-3.5" /> Call {SITE.phone}
+              <Phone className="h-3.5 w-3.5" /> Call {site.phone}
             </motion.a>
             <motion.a
-              href={`mailto:${SITE.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+              href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
               className="flex items-center gap-1 hover:text-orange-300"
               whileHover={{ scale: 1.03 }}
-              title={SITE.email}
+              title={site.email}
             >
               <Mail className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden md:inline">{SITE.email}</span>
+              <span className="hidden md:inline">{site.email}</span>
               <span className="md:hidden">Email</span>
             </motion.a>
           </motion.div>
@@ -67,19 +79,7 @@ export function WebsiteHeader() {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           <div className="flex h-full items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-3 shrink-0">
-              <motion.div
-                className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#1a3a6b] to-[#2563eb] flex items-center justify-center text-white font-bold text-lg shadow"
-                whileHover={{ scale: 1.08, rotate: 3 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {SITE.shortName}
-              </motion.div>
-              <div className="hidden sm:block">
-                <p className="font-bold text-[#1a3a6b] text-lg leading-tight">{SITE.name}</p>
-                <p className="text-xs text-slate-500">{SITE.tagline}</p>
-              </div>
-            </Link>
+            <SiteLogo variant="header" priority className="-ml-1" />
 
             <motion.div
               className="hidden md:flex flex-1 max-w-md mx-4"
@@ -109,6 +109,7 @@ export function WebsiteHeader() {
                 { href: '/', label: 'Home' },
                 { href: '/about', label: 'About Us' },
                 { href: '/blog', label: 'Blog' },
+                { href: '/catalogues', label: 'Catalogue' },
                 { href: '/contact', label: 'Contact Us' },
               ].map((link) => (
                 <motion.div key={link.href} whileHover={{ y: -2 }}>
@@ -165,22 +166,24 @@ export function WebsiteHeader() {
             </nav>
 
             <div className="flex items-center gap-2">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden md:block">
+                <Button asChild variant="outline" className="border-[#1a3a6b]/30 text-[#1a3a6b] hover:bg-blue-50 font-semibold">
+                  {catalogueUrl.startsWith('http') ? (
+                    <a href={catalogueUrl} target="_blank" rel="noopener noreferrer">
+                      <Download className="mr-1.5 h-4 w-4" /> Catalogue
+                    </a>
+                  ) : (
+                    <Link href="/catalogues">
+                      <Download className="mr-1.5 h-4 w-4" /> Catalogue
+                    </Link>
+                  )}
+                </Button>
+              </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
                 <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow">
                   <Link href="/request-quote">Get Quote</Link>
                 </Button>
               </motion.div>
-              <motion.a
-                href={`https://wa.me/${SITE.whatsapp}`}
-                target="_blank"
-                rel="noopener"
-                className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600"
-                animate={{ scale: [1, 1.08, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                whileHover={{ scale: 1.15 }}
-              >
-                <MessageCircle className="h-5 w-5" />
-              </motion.a>
               <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
                 <motion.div animate={{ rotate: mobileOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
                   {mobileOpen ? <X /> : <Menu />}
@@ -216,6 +219,27 @@ export function WebsiteHeader() {
                     </Link>
                   </motion.div>
                 ))}
+                <motion.div variants={popIn}>
+                  {catalogueUrl.startsWith('http') ? (
+                    <a
+                      href={catalogueUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[#1a3a6b] hover:bg-blue-50 rounded"
+                    >
+                      <Download className="h-4 w-4" /> Download Catalogue
+                    </a>
+                  ) : (
+                    <Link
+                      href="/catalogues"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[#1a3a6b] hover:bg-blue-50 rounded"
+                    >
+                      <Download className="h-4 w-4" /> Download Catalogue
+                    </Link>
+                  )}
+                </motion.div>
                 <motion.div variants={popIn}>
                   <Button asChild className="w-full mt-2 bg-orange-500 hover:bg-orange-600">
                     <Link href="/request-quote" onClick={() => setMobileOpen(false)}>Get Quote</Link>

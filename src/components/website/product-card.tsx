@@ -38,11 +38,16 @@ export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
       )}>
         <Link href={`/products/${product.slug}`}>
           <motion.div
-            className={cn('aspect-square relative overflow-hidden', isDark ? 'bg-slate-800' : 'bg-gradient-to-br from-slate-50 to-blue-50')}
-            whileHover={{ scale: 1.02 }}
+            className={cn('aspect-[4/3] relative overflow-hidden', isDark ? 'bg-slate-800' : 'bg-slate-100')}
+            whileHover={{ scale: 1.01 }}
           >
             {imageUrl ? (
-              <Image src={imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+              <Image
+                src={imageUrl}
+                alt={product.name}
+                fill
+                className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
+              />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-7xl">
                 <motion.span

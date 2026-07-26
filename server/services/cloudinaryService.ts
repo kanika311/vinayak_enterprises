@@ -31,8 +31,8 @@ export const uploadToCloudinary = (
   });
 };
 
-export const deleteFromCloudinary = async (publicId: string) => {
-  await cloudinary.uploader.destroy(publicId);
+export const deleteFromCloudinary = async (publicId: string, resourceType: 'image' | 'video' | 'raw' | 'auto' = 'auto') => {
+  await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
 };
 
 export const getMediaType = (mimetype: string): 'image' | 'video' | 'pdf' | 'document' => {

@@ -7,6 +7,7 @@ import * as rfqService from '../services/rfqService';
 import * as blogService from '../services/blogService';
 import * as catalogueService from '../services/catalogueService';
 import * as miscService from '../services/miscService';
+import * as bannerService from '../services/bannerService';
 
 // Categories
 export const getCategories = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -214,6 +215,38 @@ export const updateInquiry = asyncHandler(async (req: AuthRequest, res: Response
   sendResponse(res, 200, inquiry);
 });
 
+// Banners (hero background videos)
+export const getPublicBanners = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const banners = await bannerService.getPublicBanners((req.query.placement as string) || 'hero');
+  sendResponse(res, 200, banners);
+});
+
+export const getBanners = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const banners = await bannerService.getBanners(req.query as Record<string, string>);
+  sendResponse(res, 200, banners);
+});
+
+export const uploadBannerVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.file) throw new Error('No file uploaded');
+  const result = await bannerService.uploadBannerVideo(req.file);
+  sendResponse(res, 201, result);
+});
+
+export const createBanner = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const banner = await bannerService.createBanner(req.body);
+  sendResponse(res, 201, banner);
+});
+
+export const updateBanner = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const banner = await bannerService.updateBanner(getParam(req.params.id), req.body);
+  sendResponse(res, 200, banner);
+});
+
+export const deleteBanner = asyncHandler(async (req: AuthRequest, res: Response) => {
+  await bannerService.deleteBanner(getParam(req.params.id));
+  sendResponse(res, 200, null, 'Deleted');
+});
+
 // Media
 export const getMedia = asyncHandler(async (req: AuthRequest, res: Response) => {
   const result = await miscService.getMedia(req.query as Record<string, string>);
@@ -248,14 +281,19 @@ export const upsertPage = asyncHandler(async (req: AuthRequest, res: Response) =
 });
 
 // Settings
+export const getPublicSettings = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  const settings = await miscService.getPublicSettings();
+  sendResponse(res, 200, settings);
+});
+
 export const getSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
   const settings = await miscService.getSettings(req.query.group as string);
   sendResponse(res, 200, settings);
 });
 
 export const updateSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const settings = await miscService.updateSettings(req.body, req.query.group as string);
-  sendResponse(res, 200, settings);
+  const settings = await miscService.updateSettings(req.body, req.query.group as string | undefined);
+  sendResponse(res, 200, settings, 'Settings saved');
 });
 
 // SEO

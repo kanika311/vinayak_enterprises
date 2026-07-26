@@ -6,6 +6,7 @@ import { BUSINESS_INFO, SITE } from '@/lib/constants';
 import { Building2, MapPin, Users, Package, GraduationCap, Truck } from 'lucide-react';
 import { staggerContainer, fadeUp, scaleIn } from '@/components/website/motion';
 import { AnimatedButton } from '@/components/website/animated-button';
+import { useSiteContact } from '@/hooks/use-site-contact';
 
 const icons = [Building2, MapPin, Users, Package, GraduationCap, Truck];
 
@@ -44,6 +45,8 @@ export function BusinessTrustBar() {
 }
 
 export function WelcomeSection() {
+  const { site } = useSiteContact();
+
   return (
     <section className="py-10 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
@@ -53,7 +56,7 @@ export function WelcomeSection() {
               Welcome To
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-bold text-[#1a3a6b] mb-4">
-              {SITE.name}
+              {site.name || SITE.name}
             </motion.h2>
             <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-4">
               We are a Manufacturer, Bulk Supplier, and Distributor of scientific instruments, laboratory equipment,
@@ -76,17 +79,21 @@ export function WelcomeSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[#1a3a6b] to-[#2563eb] rounded-2xl p-8 text-white shadow-2xl shadow-blue-900/30"
+            className="relative rounded-2xl p-8 text-white shadow-2xl shadow-slate-900/25 overflow-hidden"
           >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#3b5f8f_0%,_#1a3a6b_55%,_#122845_100%)]" aria-hidden />
+            <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23fff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 40L40 0H20L0 20M40 40V20L20 40\'/%3E%3C/g%3E%3C/svg%3E')]" aria-hidden />
+            <div className="relative z-10">
             <h3 className="text-xl font-bold mb-4">Get in Touch for Bulk Orders</h3>
-            <p className="text-blue-100 text-sm mb-6">Institutional pricing, bulk supply &amp; distribution enquiries welcome.</p>
+            <p className="text-slate-200 text-sm mb-6">Institutional pricing, bulk supply &amp; distribution enquiries welcome.</p>
             <div className="space-y-3 text-sm">
-              <p>Phone: <a href={`tel:${SITE.phoneTel}`} className="hover:text-orange-300">{SITE.phone}</a></p>
-              <p>Email: <a href={`mailto:${SITE.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`} className="hover:text-orange-300 break-all">{SITE.email}</a></p>
-              <p>Hours: {SITE.workingHoursLong}</p>
+              <p>Phone: <a href={`tel:${site.phoneTel}`} className="hover:text-orange-300">{site.phone}</a></p>
+              <p>Email: <a href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`} className="hover:text-orange-300 break-all">{site.email}</a></p>
+              <p>Hours: {site.workingHoursLong}</p>
             </div>
             <div className="mt-6">
               <AnimatedButton href="/contact" variant="primary">Contact Us</AnimatedButton>
+            </div>
             </div>
           </motion.div>
         </div>

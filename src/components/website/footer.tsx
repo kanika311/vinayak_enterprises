@@ -3,10 +3,14 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
-import { SITE, PRODUCT_CATEGORIES } from '@/lib/constants';
+import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
+import { SiteLogo } from '@/components/website/site-logo';
+import { useSiteContact } from '@/hooks/use-site-contact';
 
 export function WebsiteFooter() {
+  const { site } = useSiteContact();
+
   return (
     <footer className="bg-[#0f2744] text-slate-300 overflow-hidden">
       <div className="container mx-auto px-4 py-12">
@@ -18,18 +22,7 @@ export function WebsiteFooter() {
           className="grid gap-8 md:grid-cols-2 lg:grid-cols-4"
         >
           <motion.div variants={fadeUp}>
-            <div className="flex items-center gap-2 mb-4">
-              <motion.div
-                className="h-10 w-10 rounded-lg bg-[#2563eb] flex items-center justify-center text-white font-bold"
-                whileHover={{ rotate: 10, scale: 1.1 }}
-              >
-                {SITE.shortName}
-              </motion.div>
-              <div>
-                <span className="font-bold text-white block">{SITE.name}</span>
-                <span className="text-xs text-slate-400">{SITE.location}</span>
-              </div>
-            </div>
+            <SiteLogo variant="footer" className="mb-4" />
             <p className="text-sm leading-relaxed mb-3">
               Manufacturer, Bulk Supplier &amp; Distributor of Scientific Instruments, Laboratory Equipment,
               Human Anatomy Models, Educational Teaching Aids, and Medical Training Products.
@@ -74,24 +67,24 @@ export function WebsiteFooter() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-orange-400" />
-                <span>{SITE.address}</span>
+                <span>{site.address}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 shrink-0 text-orange-400" />
-                <a href={`tel:${SITE.phoneTel}`} className="hover:text-white">{SITE.phone}</a>
+                <a href={`tel:${site.phoneTel}`} className="hover:text-white">{site.phone}</a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-orange-400" />
                 <a
-                  href={`mailto:${SITE.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+                  href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
                   className="hover:text-white break-all"
                 >
-                  {SITE.email}
+                  {site.email}
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <Clock className="h-4 w-4 mt-0.5 shrink-0 text-orange-400" />
-                <span>{SITE.workingHours}</span>
+                <span>{site.workingHours}</span>
               </li>
             </ul>
           </motion.div>

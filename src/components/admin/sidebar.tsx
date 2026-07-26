@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, FolderTree, Users, BookOpen,
-  Settings, LogOut, Menu, X, ClipboardList, Plus, Star,
+  Settings, LogOut, Menu, X, ClipboardList, Star, Video,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,21 +25,15 @@ const navGroups: NavGroup[] = [
   {
     title: 'Products',
     items: [
-      { href: `${ADMIN_BASE}/products`, label: 'All Products', icon: Package, description: 'Manage product catalogue' },
-      { href: `${ADMIN_BASE}/products/new`, label: 'Add Product', icon: Plus, description: 'Create a new product' },
+      { href: `${ADMIN_BASE}/products`, label: 'Products', icon: Package, description: 'Manage product catalogue' },
       { href: `${ADMIN_BASE}/categories`, label: 'Categories', icon: FolderTree, description: 'Product categories' },
-    ],
-  },
-  {
-    title: 'Blogs',
-    items: [
-      { href: `${ADMIN_BASE}/blogs`, label: 'All Blogs', icon: BookOpen, description: 'Manage blog posts' },
-      { href: `${ADMIN_BASE}/blogs/new`, label: 'Add Blog', icon: Plus, description: 'Write a new blog post' },
     ],
   },
   {
     title: 'Content',
     items: [
+      { href: `${ADMIN_BASE}/blogs`, label: 'Blogs', icon: BookOpen, description: 'Manage blog posts' },
+      { href: `${ADMIN_BASE}/banners`, label: 'Banner Videos', icon: Video, description: 'Homepage hero looping background videos' },
       { href: `${ADMIN_BASE}/testimonials`, label: 'Testimonials', icon: Star, description: 'Approve client reviews' },
     ],
   },
@@ -70,12 +64,9 @@ export function AdminSidebar() {
     router.push(`${ADMIN_BASE}/login`);
   };
 
-  const isActive = (href: string) => {
-    if (href === `${ADMIN_BASE}/products` || href === `${ADMIN_BASE}/blogs`) {
-      return pathname === href;
-    }
-    return pathname === href || pathname.startsWith(href + '/');
-  };
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+
 
   const NavContent = () => (
     <>

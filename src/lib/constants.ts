@@ -6,10 +6,10 @@ export const SITE = {
   tagline: 'Manufacturer · Bulk Supplier · Distributor',
   location: 'Ambala, Haryana, India',
   address: 'Ambala, Haryana, India',
-  phone: '+91 9729857068',
-  phoneTel: '+919729857068',
-  email: 'vilakshansharma01@gmail.com',
-  whatsapp: '919729857068',
+  phone: '+91 94160-29492',
+  phoneTel: '+919416029492',
+  email: 'vinayakenterprises52@gmail.com',
+  whatsapp: '919416029492',
   workingHours: 'Mon – Sat | 9:00 AM – 10:00 PM',
   workingHoursLong: 'Monday – Saturday, 9:00 AM – 10:00 PM',
 };
@@ -34,22 +34,87 @@ export const SEO = {
 export const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Our Products' },
-  { href: '/categories', label: 'Categories' },
+  { href: '/catalogues', label: 'Download Catalogue' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About Us' },
-  { href: '/catalogues', label: 'Catalogue' },
   { href: '/contact', label: 'Contact Us' },
 ];
 
 export const MANUFACTURING_HIGHLIGHTS = [
-  { title: 'Scientific Instruments Manufacturer', icon: '🔬' },
-  { title: 'Laboratory Equipment Manufacturer', icon: '⚗️' },
-  { title: 'Human Anatomy Models Manufacturer', icon: '🫀' },
-  { title: 'Educational Teaching Aids Manufacturer', icon: '📚' },
-  { title: 'Medical Training Products Manufacturer', icon: '🏥' },
-  { title: 'Bulk Supplier for Schools & Colleges', icon: '🎓' },
-  { title: 'Distributor for Hospitals & Laboratories', icon: '🏛️' },
-  { title: 'Institutional Supply Across India', icon: '🇮🇳' },
+  {
+    title: 'Scientific Instruments Manufacturer',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785065986/products/catalog/tljlusfoz45gowdaxczk.jpg',
+    alt: 'Student microscope manufactured by Vinayak Enterprises',
+    href: '/categories/microscopes',
+  },
+  {
+    title: 'Laboratory Equipment Manufacturer',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785065996/products/catalog/wzxhkjaupvrvipcy8fep.jpg',
+    alt: 'Binocular research microscope for laboratories',
+    href: '/categories/laboratory-equipment',
+  },
+  {
+    title: 'Human Anatomy Models Manufacturer',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785066000/products/catalog/hyvmsc0zmm5cdar6jg4z.jpg',
+    alt: 'Anatomical human skull model for medical colleges',
+    href: '/categories/human-anatomy-models',
+  },
+  {
+    title: 'Educational Teaching Aids Manufacturer',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785066009/products/catalog/p6ebvhn3rqcrlzlyfy92.jpg',
+    alt: 'Human circulatory system teaching aid',
+    href: '/categories/educational-scientific-instruments',
+  },
+  {
+    title: 'Medical Training Products Manufacturer',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785065974/products/catalog/l4zckbklllzijum1ehbq.jpg',
+    alt: 'CPR training manikin for nursing and medical training',
+    href: '/categories/cpr-training-manikins',
+  },
+  {
+    title: 'Bulk Supplier for Schools & Colleges',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785066019/products/catalog/lxxelvpjghsnrslqvkbv.jpg',
+    alt: 'Life-size human skeleton model for schools and colleges',
+    href: '/categories/human-skeleton-models',
+  },
+  {
+    title: 'Distributor for Hospitals & Laboratories',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785066014/products/catalog/fng8fr7vhlxf7cfgg9aw.jpg',
+    alt: 'Human eye anatomical model for hospitals and labs',
+    href: '/products',
+  },
+  {
+    title: 'Institutional Supply Across India',
+    image: 'https://res.cloudinary.com/dd29usied/image/upload/v1785066011/products/catalog/rgzpkzzmbdx9ifdmwcgk.jpg',
+    alt: 'Human digestive system model for institutional supply',
+    href: '/request-quote',
+  },
+];
+
+export const HOME_STATS = [
+  { value: '20+', label: 'Years Manufacturing' },
+  { value: '500+', label: 'Institutions Served' },
+  { value: '100+', label: 'Product Variants' },
+  { value: 'Pan-India', label: 'Supply Network' },
+];
+
+export const WHY_CHOOSE_US = [
+  {
+    title: 'In-house Manufacturing',
+    description: 'Factory-direct quality from Ambala Cantt — India\'s hub for scientific instruments.',
+  },
+  {
+    title: 'Institutional Bulk Supply',
+    description: 'Competitive quotes for schools, colleges, hospitals, nursing institutes and distributors.',
+  },
+  {
+    title: 'Custom Solutions',
+    description: 'Product modifications and custom training models as per your tender or syllabus needs.',
+  },
+  {
+    title: 'Reliable Delivery',
+    description: 'Secure packing, documented quality checks and dependable pan-India logistics.',
+  },
 ];
 
 export const BUSINESS_INFO = [

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { WebsiteHeader } from '@/components/website/header';
 import { WebsiteFooter } from '@/components/website/footer';
 import { PageTransition } from '@/components/website/page-transition';
+import { WhatsAppFloat } from '@/components/website/whatsapp-float';
 import { SEO } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
         <PageTransition>{children}</PageTransition>
       </main>
       <WebsiteFooter />
+      <WhatsAppFloat />
     </div>
   );
 }

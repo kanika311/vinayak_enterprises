@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/admin/page-header';
 import { LoadingSpinner } from '@/components/admin/loading';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,8 @@ export function BlogForm({ blogId }: { blogId?: string }) {
   });
   const [featuredImage, setFeaturedImage] = useState<FeaturedImage | null>(null);
 
+  const goBack = () => router.push(`${ADMIN_BASE}/blogs`);
+
   const { isLoading } = useQuery({
     queryKey: ['blog', blogId],
     queryFn: async () => {
@@ -41,15 +44,15 @@ export function BlogForm({ blogId }: { blogId?: string }) {
         content: blog.content,
         excerpt: blog.excerpt || '',
         category: blog.category || '',
-        tags: blog.tags?.join(', ') || '',
+        tags: (blog.tags || []).join(', '),
         seoTitle: blog.seoTitle || '',
         seoDescription: blog.seoDescription || '',
         status: blog.status,
       });
-      setFeaturedImage(blog.featuredImage?.url ? blog.featuredImage : null);
+      setFeaturedImage(blog.featuredImage || null);
       return blog;
     },
-    enabled: !!blogId,
+    enabled: !isNew,
   });
 
   const mutation = useMutation({
@@ -64,7 +67,7 @@ export function BlogForm({ blogId }: { blogId?: string }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['blogs'] });
       await queryClient.invalidateQueries({ queryKey: ['blogs-public'] });
-      router.push(`${ADMIN_BASE}/blogs`);
+      goBack();
     },
   });
 
@@ -72,7 +75,15 @@ export function BlogForm({ blogId }: { blogId?: string }) {
 
   return (
     <div>
-      <PageHeader title={isNew ? 'New Blog Post' : 'Edit Blog Post'} />
+      <div className="mb-4">
+        <Button type="button" variant="ghost" size="sm" onClick={goBack} className="-ml-2 text-slate-600">
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to Blogs
+        </Button>
+      </div>
+      <PageHeader
+        title={isNew ? 'New Blog Post' : 'Edit Blog Post'}
+        description={isNew ? 'Write and publish a new post' : 'Update this blog post'}
+      />
       <Card>
         <CardContent className="pt-6 space-y-4">
           <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></div>
@@ -104,7 +115,7 @@ export function BlogForm({ blogId }: { blogId?: string }) {
             <Button type="button" onClick={() => mutation.mutate()} disabled={mutation.isPending || !form.title || !form.content}>
               {mutation.isPending ? 'Saving...' : isNew ? 'Create Post' : 'Save Changes'}
             </Button>
-            <Button type="button" variant="outline" onClick={() => router.push(`${ADMIN_BASE}/blogs`)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={goBack}>Cancel</Button>
           </div>
         </CardContent>
       </Card>

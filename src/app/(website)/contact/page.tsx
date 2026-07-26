@@ -7,28 +7,29 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiPost } from '@/lib/api';
-import { SITE } from '@/lib/constants';
 import { PageHeader } from '@/components/website/page-header';
 import { ContactActions } from '@/components/website/contact-actions';
 import { fadeUp, staggerContainer, scaleIn } from '@/components/website/motion';
 import { Phone, Mail, MapPin, Clock, Building2 } from 'lucide-react';
+import { useSiteContact } from '@/hooks/use-site-contact';
 
 type FormType = 'inquiry' | 'quote' | 'catalogue';
 
-const contactItems = [
-  { icon: Building2, label: 'Business Name', value: SITE.name },
-  { icon: MapPin, label: 'Location', value: SITE.location },
-  { icon: Phone, label: 'Phone', value: SITE.phone, href: `tel:${SITE.phoneTel}` },
-  { icon: Mail, label: 'Email', value: SITE.email, href: `mailto:${SITE.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}` },
-  { icon: Clock, label: 'Business Hours', value: SITE.workingHoursLong },
-];
-
 export default function ContactPage() {
+  const { site } = useSiteContact();
   const [formType, setFormType] = useState<FormType>('inquiry');
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const contactItems = [
+    { icon: Building2, label: 'Business Name', value: site.name },
+    { icon: MapPin, label: 'Location', value: site.location },
+    { icon: Phone, label: 'Phone', value: site.phone, href: `tel:${site.phoneTel}` },
+    { icon: Mail, label: 'Email', value: site.email, href: `mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}` },
+    { icon: Clock, label: 'Business Hours', value: site.workingHoursLong },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +127,7 @@ export default function ContactPage() {
                 <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-10">
                   <p className="text-5xl mb-4">✅</p>
                   <h2 className="text-xl font-bold text-slate-900">Request Submitted!</h2>
-                  <p className="text-slate-500 mt-2">Our team will contact you at {SITE.phone} or {SITE.email} shortly.</p>
+                  <p className="text-slate-500 mt-2">Our team will contact you at {site.phone} or {site.email} shortly.</p>
                 </motion.div>
               ) : (
                 <motion.form key={formType} onSubmit={handleSubmit} className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>

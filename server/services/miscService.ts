@@ -174,6 +174,28 @@ export const upsertPage = async (slug: string, data: Record<string, unknown>) =>
 };
 
 // Settings
+export const getPublicSettings = async () => {
+  const settings = await Setting.find({
+    key: {
+      $in: [
+        'companyName',
+        'companyEmail',
+        'companyPhone',
+        'companyAddress',
+        'whatsappNumber',
+        'facebook',
+        'linkedin',
+        'workingHours',
+        'workingHoursLong',
+      ],
+    },
+  });
+  return settings.reduce(
+    (acc, s) => ({ ...acc, [s.key]: s.value }),
+    {} as Record<string, unknown>
+  );
+};
+
 export const getSettings = async (group?: string) => {
   const filter = group ? { group } : {};
   const settings = await Setting.find(filter);
@@ -183,12 +205,30 @@ export const getSettings = async (group?: string) => {
   );
 };
 
-export const updateSettings = async (settings: Record<string, unknown>, group = 'general') => {
+const SETTING_GROUPS: Record<string, string> = {
+  companyName: 'company',
+  companyEmail: 'company',
+  companyPhone: 'company',
+  companyAddress: 'company',
+  workingHours: 'company',
+  workingHoursLong: 'company',
+  whatsappNumber: 'social',
+  facebook: 'social',
+  linkedin: 'social',
+  googleAnalyticsId: 'analytics',
+  googleSearchConsole: 'analytics',
+};
+
+export const updateSettings = async (settings: Record<string, unknown>, group?: string) => {
   const ops = Object.entries(settings).map(([key, value]) =>
-    Setting.findOneAndUpdate({ key }, { key, value, group }, { upsert: true, new: true })
+    Setting.findOneAndUpdate(
+      { key },
+      { key, value, group: group || SETTING_GROUPS[key] || 'general' },
+      { upsert: true, new: true }
+    )
   );
   await Promise.all(ops);
-  return getSettings(group);
+  return getSettings();
 };
 
 // SEO

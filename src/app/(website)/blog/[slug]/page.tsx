@@ -70,13 +70,12 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         >
           {blog.featuredImage?.url && (
             <motion.div
-              className="relative h-60 md:h-80"
-              initial={{ scale: 1.06, opacity: 0 }}
+              className="relative aspect-[16/9] bg-slate-100"
+              initial={{ scale: 1.02, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Image src={blog.featuredImage.url} alt={blog.title} fill className="object-cover" priority />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              <Image src={blog.featuredImage.url} alt={blog.title} fill className="object-contain p-4" priority />
             </motion.div>
           )}
 
