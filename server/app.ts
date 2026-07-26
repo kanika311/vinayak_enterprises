@@ -14,22 +14,32 @@ const app = express();
 const clientOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'http://localhost:3002',
+  'http://127.0.0.1:3002',
   ...(process.env.CLIENT_URL || '').split(',').map((o) => o.trim()).filter(Boolean),
   ...(process.env.CLIENT_URLS || '').split(',').map((o) => o.trim()).filter(Boolean),
+  ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
 ];
+
+const isAllowedOrigin = (origin: string) => {
+  if (clientOrigins.includes(origin)) return true;
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  // Vercel production + preview deployments
+  try {
+    const host = new URL(origin).hostname;
+    if (host.endsWith('.vercel.app')) return true;
+  } catch {
+    return false;
+  }
+  return false;
+};
 
 app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-
-      if (clientOrigins.includes(origin)) return callback(null, true);
-
-      if (process.env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-        return callback(null, true);
-      }
-
+      if (isAllowedOrigin(origin)) return callback(null, true);
       callback(null, false);
     },
     credentials: true,

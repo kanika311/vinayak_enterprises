@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "src/pages/api/v1/[[...path]].ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  }
+}
