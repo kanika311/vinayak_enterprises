@@ -65,7 +65,7 @@ export function AdminSidebar() {
   };
 
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href || !!pathname?.startsWith(`${href}/`);
 
 
   const NavContent = () => (
