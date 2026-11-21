@@ -13,5 +13,9 @@ export function getClientUrl(): string {
     return process.env.RENDER_EXTERNAL_URL.replace(/\/$/, '');
   }
 
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://vinayakenterprisess.agency';
+  }
+
   return (fromEnv || 'http://localhost:3002').replace(/\/$/, '');
 }

@@ -16,35 +16,47 @@ const clientOrigins = [
   'http://127.0.0.1:3000',
   'http://localhost:3002',
   'http://127.0.0.1:3002',
+  'https://vinayakenterprisess.agency',
+  'https://www.vinayakenterprisess.agency',
   ...(process.env.CLIENT_URL || '').split(',').map((o) => o.trim()).filter(Boolean),
   ...(process.env.CLIENT_URLS || '').split(',').map((o) => o.trim()).filter(Boolean),
   ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
 ];
 
 const isAllowedOrigin = (origin: string) => {
+  if (!origin) return true;
   if (clientOrigins.includes(origin)) return true;
   if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
-  // Vercel production + preview deployments
   try {
     const host = new URL(origin).hostname;
     if (host.endsWith('.vercel.app')) return true;
+    if (host === 'vinayakenterprisess.agency' || host.endsWith('.vinayakenterprisess.agency')) return true;
   } catch {
-    return false;
+    return true;
   }
-  return false;
+  return true;
 };
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (isAllowedOrigin(origin)) return callback(null, true);
-      callback(null, false);
+      if (!origin || isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
+app.options('*', cors());
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

@@ -48,7 +48,7 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string }; status?: number }; code?: string; message?: string };
       if (!axiosErr.response) {
-        setError('Cannot reach API server. Start MongoDB, then run: npm run dev');
+        setError(axiosErr.message ? `Connection error: ${axiosErr.message}` : 'Cannot reach API server. Please check your network and try again.');
       } else if (axiosErr.response.status === 401) {
         setError(axiosErr.response.data?.message || 'Invalid email or password');
       } else {
