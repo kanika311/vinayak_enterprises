@@ -12,7 +12,7 @@
     "postinstall": "node scripts/postinstall-build.mjs"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
