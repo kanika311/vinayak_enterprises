@@ -72,6 +72,7 @@ export default function ProductsPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>SKU</TableHead>
+                  <TableHead>Price (Single)</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Views</TableHead>
@@ -83,6 +84,16 @@ export default function ProductsPage() {
                   <TableRow key={product._id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.sku}</TableCell>
+                    <TableCell className="font-semibold text-slate-800">
+                      {product.price ? (
+                        <span>
+                          ₹{Number(product.price).toLocaleString('en-IN')}
+                          <span className="text-xs text-slate-500 font-normal">/{product.priceUnit || 'pc'}</span>
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-normal">On Request</span>
+                      )}
+                    </TableCell>
                     <TableCell>{typeof product.category === 'object' ? product.category.name : '-'}</TableCell>
                     <TableCell>
                       <Badge variant={product.status === 'published' ? 'success' : 'secondary'}>

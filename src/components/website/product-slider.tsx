@@ -15,6 +15,9 @@ interface ProductSliderProps {
     slug: string;
     sku?: string;
     shortDescription: string;
+    price?: number;
+    mrp?: number;
+    priceUnit?: string;
     images?: { url: string; alt?: string }[];
     category?: { name: string; slug: string } | string;
   }[];

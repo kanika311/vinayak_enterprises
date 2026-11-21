@@ -24,6 +24,9 @@ export interface Product {
   slug: string;
   shortDescription: string;
   longDescription: string;
+  price?: number;
+  mrp?: number;
+  priceUnit?: string;
   features: string[];
   specifications: { key: string; value: string }[];
   images: { url: string; alt?: string }[];

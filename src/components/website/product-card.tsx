@@ -13,6 +13,9 @@ interface ProductCardProps {
     slug: string;
     sku?: string;
     shortDescription: string;
+    price?: number;
+    mrp?: number;
+    priceUnit?: string;
     images?: { url: string; alt?: string }[];
     category?: { name: string; slug: string } | string;
   };
@@ -80,8 +83,43 @@ export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
             <p className={cn('text-sm mt-2 line-clamp-2 leading-relaxed', isDark ? 'text-slate-400' : 'text-slate-500')}>
               {product.shortDescription}
             </p>
-            <div className={cn('mt-4 pt-4 border-t flex items-center justify-between', isDark ? 'border-slate-700' : 'border-slate-100')}>
-              <span className="text-sm font-bold text-green-600">Get Quote →</span>
+
+            {/* Price for Single Product & Bulk Order Callout */}
+            <div className={cn('mt-3 pt-3 border-t', isDark ? 'border-slate-800' : 'border-slate-100')}>
+              {product.price ? (
+                <div>
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <span className={cn('text-lg font-bold', isDark ? 'text-amber-400' : 'text-[#1a3a6b]')}>
+                      ₹{Number(product.price).toLocaleString('en-IN')}
+                    </span>
+                    <span className={cn('text-xs font-medium', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                      / {product.priceUnit || 'Piece'}
+                    </span>
+                    {product.mrp && product.mrp > product.price && (
+                      <span className="text-xs line-through text-slate-400">
+                        ₹{Number(product.mrp).toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+                  <p className={cn('text-[11px] font-medium mt-1 flex items-center gap-1', isDark ? 'text-teal-400' : 'text-blue-700')}>
+                    <span>📦</span>
+                    <span>Bulk order? Contact for discount</span>
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between text-xs">
+                  <span className={cn('font-semibold', isDark ? 'text-slate-400' : 'text-slate-600')}>
+                    Price on Request
+                  </span>
+                  <span className="text-[11px] text-green-600 font-medium">Bulk supply available</span>
+                </div>
+              )}
+            </div>
+
+            <div className={cn('mt-3 pt-3 border-t flex items-center justify-between', isDark ? 'border-slate-700' : 'border-slate-100')}>
+              <span className="text-xs font-bold text-green-600">
+                {product.price ? 'View / Bulk Quote →' : 'Get Quote →'}
+              </span>
               <motion.span
                 className={cn('h-8 w-8 rounded-full flex items-center justify-center', isDark ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-50 text-[#1a3a6b]')}
                 whileHover={{ rotate: 90, backgroundColor: '#f97316', color: '#fff' }}

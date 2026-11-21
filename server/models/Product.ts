@@ -8,6 +8,9 @@ export interface IProduct extends Document {
   slug: string;
   shortDescription: string;
   longDescription: string;
+  price?: number;
+  mrp?: number;
+  priceUnit?: string;
   features: string[];
   specifications: { key: string; value: string }[];
   images: { url: string; publicId?: string; alt?: string }[];
@@ -31,6 +34,9 @@ const productSchema = new Schema<IProduct>(
     slug: { type: String, required: true, unique: true },
     shortDescription: { type: String, required: true },
     longDescription: { type: String, required: true },
+    price: { type: Number, min: 0 },
+    mrp: { type: Number, min: 0 },
+    priceUnit: { type: String, default: 'Piece' },
     features: [String],
     specifications: [{ key: String, value: String }],
     images: [{ url: String, publicId: String, alt: String }],
