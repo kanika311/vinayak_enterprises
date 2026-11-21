@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 160" width="650" height="160">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&amp;display=swap');
+      .brand-title { font-family: 'Montserrat', Arial, sans-serif; font-size: 36px; font-weight: 800; fill: #1f3f73; letter-spacing: 0.5px; }
+      .brand-tag { font-family: 'Montserrat', Arial, sans-serif; font-size: 14.5px; font-weight: 600; fill: #1f3f73; letter-spacing: 1.5px; }
+      .ink { fill: #1f3f73; }
+      .accent { fill: #f26b21; }
+      .cutout { stroke: #ffffff; stroke-width: 3; paint-order: stroke; }
+      .arm { fill: none; stroke: #1f3f73; stroke-width: 8; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- MARK (V + E + Microscope) -->
+  <g transform="translate(10, 0)">
+    <!-- Letter V -->
+    <polygon class="ink" points="0,20 44,20 70,118 96,30 118,30 84,150 56,150"/>
+    <!-- Three bars of E -->
+    <rect class="ink" x="118" y="20" width="84" height="14"/>
+    <rect class="ink" x="118" y="88" width="84" height="14"/>
+    <rect class="ink" x="84" y="134" width="118" height="16"/>
+    <!-- Microscope -->
+    <g transform="rotate(12, 150, 128)">
+      <path class="arm cutout" d="M158 26 C186 44 186 104 150 122"/>
+      <path class="arm cutout" d="M122 124 Q150 146 178 124" style="stroke-width:7"/>
+      <rect class="ink cutout" x="138" y="74" width="24" height="6" rx="2"/>
+      <rect class="ink cutout" x="145" y="64" width="10" height="12" rx="2"/>
+      <rect class="ink cutout" x="139" y="14" width="18" height="52" rx="4"/>
+      <rect class="ink cutout" x="143" y="4" width="10" height="12" rx="2"/>
+      <circle class="accent" cx="148" cy="40" r="5.5"/>
+    </g>
+  </g>
+
+  <!-- TYPOGRAPHY -->
+  <g transform="translate(230, 0)">
+    <text x="0" y="72" class="brand-title">VINAYAK ENTERPRISES</text>
+    <rect x="0" y="88" width="410" height="3" class="accent" rx="1.5"/>
+    <text x="0" y="118" class="brand-tag">MANUFACTURER  <tspan class="accent">•</tspan>  BULK SUPPLIER  <tspan class="accent">•</tspan>  DISTRIBUTOR</text>
+  </g>
+</svg>

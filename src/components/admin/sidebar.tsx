@@ -70,9 +70,25 @@ export function AdminSidebar() {
 
   const NavContent = () => (
     <>
-      <div className="flex h-16 items-center border-b px-6 bg-[#1a3a6b]">
-        <div className="h-9 w-9 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-sm">
-          {SITE.shortName}
+      <div className="flex h-16 items-center border-b px-5 bg-[#1a3a6b]">
+        <div className="w-10 h-8 relative shrink-0">
+          <svg viewBox="0 0 210 160" aria-hidden="true" className="w-full h-full">
+            <polygon fill="#ffffff" points="0,20 44,20 70,118 96,30 118,30 84,150 56,150" />
+            <rect fill="#ffffff" x="118" y="20" width="84" height="14" />
+            <rect fill="#ffffff" x="118" y="88" width="84" height="14" />
+            <rect fill="#ffffff" x="84" y="134" width="118" height="16" />
+            <g transform="rotate(12, 150, 128)">
+              <path d="M158 26 C186 44 186 104 150 122" fill="none" stroke="#1a3a6b" strokeWidth={12} strokeLinecap="round" />
+              <path d="M158 26 C186 44 186 104 150 122" fill="none" stroke="#ffffff" strokeWidth={8} strokeLinecap="round" />
+              <path d="M122 124 Q150 146 178 124" fill="none" stroke="#1a3a6b" strokeWidth={11} strokeLinecap="round" />
+              <path d="M122 124 Q150 146 178 124" fill="none" stroke="#ffffff" strokeWidth={7} strokeLinecap="round" />
+              <rect fill="#ffffff" stroke="#1a3a6b" strokeWidth={2} x="138" y="74" width="24" height="6" rx="2" />
+              <rect fill="#ffffff" stroke="#1a3a6b" strokeWidth={2} x="145" y="64" width="10" height="12" rx="2" />
+              <rect fill="#ffffff" stroke="#1a3a6b" strokeWidth={2} x="139" y="14" width="18" height="52" rx="4" />
+              <rect fill="#ffffff" stroke="#1a3a6b" strokeWidth={2} x="143" y="4" width="10" height="12" rx="2" />
+              <circle cx="148" cy="40" r="5.5" fill="#f26b21" />
+            </g>
+          </svg>
         </div>
         <div className="ml-3">
           <p className="text-sm font-bold leading-tight text-white">{SITE.name}</p>
