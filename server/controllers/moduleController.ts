@@ -119,6 +119,14 @@ export const getCatalogues = asyncHandler(async (req: AuthRequest, res: Response
   sendResponse(res, 200, result);
 });
 
+export const uploadCatalogueFile = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.file) {
+    return sendResponse(res, 400, null, 'No file uploaded');
+  }
+  const catalogue = await catalogueService.uploadCatalogue(req.file, req.body?.title);
+  sendResponse(res, 201, catalogue, 'Catalogue uploaded successfully');
+});
+
 export const createCatalogue = asyncHandler(async (req: AuthRequest, res: Response) => {
   const catalogue = await catalogueService.createCatalogue(req.body);
   sendResponse(res, 201, catalogue);
