@@ -11,6 +11,14 @@ export const metadata: Metadata = {
   description: SEO.description,
   keywords: SEO.keywords,
   metadataBase: new URL(process.env.CLIENT_URL || 'http://localhost:3002'),
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: {
     title: SEO.title,
     description: SEO.description,
