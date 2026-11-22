@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
 import { SiteLogo } from '@/components/website/site-logo';
 import { useSiteContact } from '@/hooks/use-site-contact';
+import { whatsappChatUrl } from '@/lib/site-contact';
 
 export function WebsiteFooter() {
   const { site } = useSiteContact();
@@ -25,10 +26,50 @@ export function WebsiteFooter() {
         >
           <motion.div variants={fadeUp}>
             <SiteLogo variant="footer" className="mb-4" />
-            <p className="text-sm leading-relaxed mb-3">
+            <p className="text-sm leading-relaxed mb-4">
               Manufacturer, Bulk Supplier &amp; Distributor of Scientific Instruments, Laboratory Equipment,
               Human Anatomy Models, Educational Teaching Aids, and Medical Training Products.
             </p>
+
+            {/* Social Links */}
+            <div className="pt-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
+                Connect With Us
+              </p>
+              <div className="flex items-center gap-2.5">
+                {site.facebook && (
+                  <a
+                    href={site.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow Vinayak Enterprises on Facebook"
+                    className="w-9 h-9 rounded-full bg-slate-800 hover:bg-[#1877F2] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110"
+                  >
+                    <Facebook className="w-4 h-4" />
+                  </a>
+                )}
+                {site.instagram && (
+                  <a
+                    href={site.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow Vinayak Enterprises on Instagram"
+                    className="w-9 h-9 rounded-full bg-slate-800 hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110"
+                  >
+                    <Instagram className="w-4 h-4" />
+                  </a>
+                )}
+                <a
+                  href={whatsappChatUrl(site.whatsapp)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat with Vinayak Enterprises on WhatsApp"
+                  className="w-9 h-9 rounded-full bg-slate-800 hover:bg-[#25D366] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div variants={fadeUp}>
@@ -75,12 +116,24 @@ export function WebsiteFooter() {
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-orange-400" />
                 <span className="leading-snug">Ambala Cantt, Ambala, Haryana 133001, India</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-orange-400" />
-                <a href={`tel:${site.phoneTel}`} className="hover:text-white font-medium">
-                  {site.phone}
-                </a>
-              </li>
+              {site.phones.map((phoneItem, idx) => (
+                <li key={idx} className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 shrink-0 text-orange-400" />
+                  <a href={`tel:${phoneItem.tel}`} className="hover:text-white font-medium">
+                    {phoneItem.display}
+                  </a>
+                  {idx === 0 && site.phones.length > 1 && (
+                    <span className="text-[10px] bg-blue-900/80 text-blue-200 px-1.5 py-0.5 rounded">
+                      Primary
+                    </span>
+                  )}
+                  {idx === 1 && (
+                    <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">
+                      Alt
+                    </span>
+                  )}
+                </li>
+              ))}
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-orange-400" />
                 {emailRevealed ? (

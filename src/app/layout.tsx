@@ -116,7 +116,7 @@ const rootStructuredData = {
         'Biology Lab Apparatus',
       ],
       sameAs: [
-        // TODO: Provide verified official social profile URLs (e.g. LinkedIn, YouTube, Facebook, Twitter) once registered
+        'https://www.facebook.com/profile.php?id=61596718377937&sk=about',
       ],
     },
     {

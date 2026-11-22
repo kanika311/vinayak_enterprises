@@ -10,8 +10,9 @@ import { apiPost } from '@/lib/api';
 import { PageHeader } from '@/components/website/page-header';
 import { ContactActions } from '@/components/website/contact-actions';
 import { fadeUp, staggerContainer, scaleIn } from '@/components/website/motion';
-import { Phone, Mail, MapPin, Clock, Building2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Building2, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { useSiteContact } from '@/hooks/use-site-contact';
+import { whatsappChatUrl } from '@/lib/site-contact';
 
 type FormType = 'inquiry' | 'quote' | 'catalogue';
 
@@ -26,8 +27,28 @@ export function ContactClient() {
   const contactItems = [
     { icon: Building2, label: 'Business Name', value: site.name },
     { icon: MapPin, label: 'Factory & Registered Office', value: 'Ambala Cantt, Ambala, Haryana 133001, India' },
-    { icon: Phone, label: 'Phone', value: site.phone, href: `tel:${site.phoneTel}` },
-    { icon: Mail, label: 'Email Desk', value: site.email, href: `mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}` },
+    {
+      icon: Phone,
+      label: site.phones.length > 1 ? 'Primary Contact Phone' : 'Phone',
+      value: site.phone,
+      href: `tel:${site.phoneTel}`,
+    },
+    ...(site.phoneSecondary
+      ? [
+          {
+            icon: Phone,
+            label: 'Secondary Contact Phone',
+            value: site.phoneSecondary,
+            href: `tel:${site.phoneSecondaryTel}`,
+          },
+        ]
+      : []),
+    {
+      icon: Mail,
+      label: 'Email Desk',
+      value: site.email,
+      href: `mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`,
+    },
     { icon: Clock, label: 'Business Hours', value: site.workingHoursLong },
   ];
 
@@ -100,6 +121,50 @@ export function ContactClient() {
                 </div>
               </motion.div>
             ))}
+
+            {/* Social Media & Instant Connect */}
+            {(site.facebook || site.instagram || site.whatsapp) && (
+              <motion.div
+                variants={scaleIn}
+                whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
+                className="bg-white rounded-xl border p-5"
+              >
+                <p className="font-medium text-slate-900 mb-1">Follow &amp; Connect Online</p>
+                <p className="text-xs text-slate-500 mb-3.5">
+                  Follow our official channels for product releases, equipment updates and institutional support:
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {site.facebook && (
+                    <a
+                      href={site.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-50 text-[#1877F2] hover:bg-[#1877F2] hover:text-white text-xs font-semibold transition-all border border-blue-200 shadow-sm"
+                    >
+                      <Facebook className="w-3.5 h-3.5" /> Facebook Page
+                    </a>
+                  )}
+                  {site.instagram && (
+                    <a
+                      href={site.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-pink-50 text-[#E4405F] hover:bg-[#E4405F] hover:text-white text-xs font-semibold transition-all border border-pink-200 shadow-sm"
+                    >
+                      <Instagram className="w-3.5 h-3.5" /> Instagram
+                    </a>
+                  )}
+                  <a
+                    href={whatsappChatUrl(site.whatsapp)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 text-[#25D366] hover:bg-[#25D366] hover:text-white text-xs font-semibold transition-all border border-emerald-200 shadow-sm"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> WhatsApp Desk
+                  </a>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           <motion.div

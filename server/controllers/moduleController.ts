@@ -350,7 +350,7 @@ export const upsertPage = asyncHandler(async (req: AuthRequest, res: Response) =
 
 // Settings
 export const getPublicSettings = asyncHandler(async (_req: AuthRequest, res: Response) => {
-  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   const settings = await miscService.getPublicSettings();
   sendResponse(res, 200, settings);
 });

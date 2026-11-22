@@ -327,7 +327,7 @@ exports.upsertPage = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Settings
 exports.getPublicSettings = (0, helpers_1.asyncHandler)(async (_req, res) => {
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     const settings = await miscService.getPublicSettings();
     (0, helpers_1.sendResponse)(res, 200, settings);
 });

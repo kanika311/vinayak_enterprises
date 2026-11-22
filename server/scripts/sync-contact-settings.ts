@@ -9,8 +9,10 @@ const updates = [
   { key: 'companyName', value: 'Vinayak Enterprises', group: 'company' },
   { key: 'companyEmail', value: 'vinayakenterprises52@gmail.com', group: 'company' },
   { key: 'companyPhone', value: '94160-29492', group: 'company' },
-  { key: 'companyAddress', value: 'Ambala, Haryana, India', group: 'company' },
-  { key: 'whatsappNumber', value: '94160-29492', group: 'social' },
+  { key: 'companyPhoneSecondary', value: '62801-28618', group: 'company' },
+  { key: 'companyAddress', value: 'Ambala Cantt, Ambala, Haryana 133001, India', group: 'company' },
+  { key: 'whatsappNumber', value: '9416029492', group: 'social' },
+  { key: 'facebook', value: 'https://www.facebook.com/profile.php?id=61596718377937&sk=about', group: 'social' },
   { key: 'workingHours', value: 'Mon – Sat | 9:00 AM – 10:00 PM', group: 'company' },
 ];
 

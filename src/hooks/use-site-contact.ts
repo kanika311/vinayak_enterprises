@@ -8,7 +8,8 @@ export function useSiteContact() {
   const { data, isLoading } = useQuery({
     queryKey: ['settings-public'],
     queryFn: () => apiGet<Record<string, string>>('/settings/public'),
-    staleTime: 30_000,
+    staleTime: 5_000,
+    refetchOnMount: 'always',
   });
 
   const site: SiteContact = mapSettingsToSite(data);

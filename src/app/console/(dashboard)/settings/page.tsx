@@ -40,12 +40,14 @@ export default function SettingsPage() {
   const fields = [
     { key: 'companyName', label: 'Company Name', group: 'Company' },
     { key: 'companyEmail', label: 'Company Email (Gmail)', group: 'Company' },
-    { key: 'companyPhone', label: 'Company Phone', group: 'Company' },
+    { key: 'companyPhone', label: 'Primary Contact Phone', group: 'Company' },
+    { key: 'companyPhoneSecondary', label: 'Secondary Contact Phone (Optional)', group: 'Company' },
     { key: 'companyAddress', label: 'Company Address', group: 'Company' },
     { key: 'workingHours', label: 'Working Hours (short)', group: 'Company' },
     { key: 'whatsappNumber', label: 'WhatsApp Number', group: 'Social' },
-    { key: 'facebook', label: 'Facebook URL', group: 'Social' },
-    { key: 'linkedin', label: 'LinkedIn URL', group: 'Social' },
+    { key: 'facebook', label: 'Facebook Page URL', group: 'Social' },
+    { key: 'instagram', label: 'Instagram Profile URL', group: 'Social' },
+    { key: 'linkedin', label: 'LinkedIn Profile URL', group: 'Social' },
     { key: 'googleAnalyticsId', label: 'Google Analytics ID', group: 'Analytics' },
     { key: 'googleSearchConsole', label: 'Google Search Console', group: 'Analytics' },
   ];
@@ -83,10 +85,18 @@ export default function SettingsPage() {
                     onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
                     placeholder={
                       field.key === 'companyEmail'
-                        ? 'you@gmail.com'
-                        : field.key === 'companyPhone' || field.key === 'whatsappNumber'
-                          ? '9416029492'
-                          : undefined
+                        ? 'vinayakenterprises52@gmail.com'
+                        : field.key === 'companyPhone'
+                          ? '94160-29492'
+                          : field.key === 'companyPhoneSecondary'
+                            ? '62801-28618'
+                            : field.key === 'whatsappNumber'
+                              ? '9416029492'
+                              : field.key === 'facebook'
+                                ? 'https://www.facebook.com/profile.php?id=...'
+                                : field.key === 'instagram'
+                                  ? 'https://www.instagram.com/yourhandle'
+                                  : undefined
                     }
                   />
                 </div>
