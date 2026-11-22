@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDashboard = exports.updateAdmin = exports.getAdmins = exports.createAdmin = exports.getMe = exports.resetPassword = exports.forgotPassword = exports.login = void 0;
+exports.getDashboardNotifications = exports.getDashboard = exports.updateAdmin = exports.getAdmins = exports.createAdmin = exports.getMe = exports.resetPassword = exports.forgotPassword = exports.login = void 0;
 const helpers_1 = require("../utils/helpers");
 const authService = __importStar(require("../services/authService"));
 const dashboardService = __importStar(require("../services/dashboardService"));
@@ -78,5 +78,9 @@ exports.updateAdmin = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 exports.getDashboard = (0, helpers_1.asyncHandler)(async (_req, res) => {
     const data = await dashboardService.getDashboardStats();
+    (0, helpers_1.sendResponse)(res, 200, data);
+});
+exports.getDashboardNotifications = (0, helpers_1.asyncHandler)(async (_req, res) => {
+    const data = await dashboardService.getDashboardNotifications();
     (0, helpers_1.sendResponse)(res, 200, data);
 });

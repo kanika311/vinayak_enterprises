@@ -121,6 +121,44 @@ export interface ShowcaseVideo {
   updatedAt?: string;
 }
 
+export interface DashboardNotificationItem {
+  id: string;
+  type: 'lead' | 'rfq' | 'testimonial';
+  title: string;
+  subtitle: string;
+  createdAt: string;
+  link: string;
+  status: string;
+}
+
+export interface DashboardNotificationsData {
+  counts: {
+    newLeads: number;
+    pendingRFQs: number;
+    pendingTestimonials: number;
+    totalUnread: number;
+  };
+  latestNotifications: DashboardNotificationItem[];
+  pendingTestimonials: {
+    _id: string;
+    name: string;
+    company: string;
+    rating: number;
+    review: string;
+    createdAt: string;
+  }[];
+  recentLeads: {
+    _id: string;
+    name: string;
+    company?: string;
+    email: string;
+    phone?: string;
+    productInterested?: string;
+    status: string;
+    createdAt: string;
+  }[];
+}
+
 export interface DashboardData {
   stats: {
     totalProducts: number;
@@ -131,9 +169,33 @@ export interface DashboardData {
     blogViews: number;
     catalogueDownloads: number;
   };
+  attention?: {
+    newLeads: number;
+    pendingRFQs: number;
+    pendingTestimonials: number;
+    total: number;
+  };
   topProducts: Product[];
   recentProducts: Pick<Product, '_id' | 'name' | 'sku' | 'status' | 'slug' | 'createdAt'>[];
   recentBlogs: Blog[];
+  recentLeads?: {
+    _id: string;
+    name: string;
+    company?: string;
+    email: string;
+    phone?: string;
+    productInterested?: string;
+    status: string;
+    createdAt: string;
+  }[];
+  pendingTestimonials?: {
+    _id: string;
+    name: string;
+    company: string;
+    rating: number;
+    review: string;
+    createdAt: string;
+  }[];
   charts: {
     leadsPerMonth: { _id: { year: number; month: number }; count: number }[];
     trafficOverview: { _id: { year: number; month: number }; count: number }[];

@@ -54,6 +54,7 @@ router.post('/admins', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISS
 router.put('/admins/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.USERS), authCtrl.updateAdmin);
 // Dashboard
 router.get('/dashboard', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.DASHBOARD), authCtrl.getDashboard);
+router.get('/dashboard/notifications', auth_1.protect, authCtrl.getDashboardNotifications);
 // Products - Public
 router.get('/products', productCtrl.getProducts);
 router.get('/products/slug/:slug', productCtrl.getProductBySlug);

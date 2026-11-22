@@ -51,3 +51,8 @@ export const getDashboard = asyncHandler(async (_req: AuthRequest, res: Response
   const data = await dashboardService.getDashboardStats();
   sendResponse(res, 200, data);
 });
+
+export const getDashboardNotifications = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  const data = await dashboardService.getDashboardNotifications();
+  sendResponse(res, 200, data);
+});

@@ -7,12 +7,15 @@ import {
   Settings, LogOut, Menu, X, ClipboardList, Star, Video, PlaySquare,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { ADMIN_BASE, SITE } from '@/lib/constants';
+import { apiGet } from '@/lib/api';
 import type { LucideIcon } from 'lucide-react';
+import type { DashboardNotificationsData } from '@/types';
 
 type NavItem = { href: string; label: string; icon: LucideIcon; description: string };
 type NavGroup = { title: string; items: NavItem[] };
@@ -68,6 +71,25 @@ export function AdminSidebar() {
   const isActive = (href: string) =>
     pathname === href || !!pathname?.startsWith(`${href}/`);
 
+  const { data: notifData } = useQuery({
+    queryKey: ['admin-notifications'],
+    queryFn: () => apiGet<DashboardNotificationsData>('/dashboard/notifications'),
+    refetchInterval: 20_000,
+  });
+
+  const getBadge = (href: string) => {
+    if (href.endsWith('/leads') && (notifData?.counts?.newLeads || 0) > 0) {
+      return { count: notifData!.counts.newLeads, bg: 'bg-emerald-600' };
+    }
+    if (href.endsWith('/rfqs') && (notifData?.counts?.pendingRFQs || 0) > 0) {
+      return { count: notifData!.counts.pendingRFQs, bg: 'bg-blue-600' };
+    }
+    if (href.endsWith('/testimonials') && (notifData?.counts?.pendingTestimonials || 0) > 0) {
+      return { count: notifData!.counts.pendingTestimonials, bg: 'bg-amber-600' };
+    }
+    return null;
+  };
+
 
   const NavContent = () => (
     <>
@@ -104,6 +126,7 @@ export function AdminSidebar() {
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
+                const badge = getBadge(item.href);
                 return (
                   <Link
                     key={item.href}
@@ -118,7 +141,12 @@ export function AdminSidebar() {
                     )}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
-                    <span>{item.label}</span>
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {badge && (
+                      <span className={cn('text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full leading-none shrink-0', badge.bg)}>
+                        {badge.count}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

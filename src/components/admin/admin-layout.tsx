@@ -7,6 +7,7 @@ import { setCredentials } from '@/store/slices/authSlice';
 import { apiGet } from '@/lib/api';
 import { ADMIN_BASE } from '@/lib/constants';
 import { AdminSidebar } from '@/components/admin/sidebar';
+import { AdminHeader } from '@/components/admin/admin-header';
 import { LoadingSpinner } from '@/components/admin/loading';
 import type { Admin } from '@/types';
 
@@ -39,8 +40,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <AdminSidebar />
-      <main className="lg:pl-64">
-        <div className="p-4 pt-16 lg:p-8 lg:pt-8">{children}</div>
+      <main className="lg:pl-64 flex flex-col min-h-screen">
+        <AdminHeader />
+        <div className="flex-1 p-4 lg:p-8">{children}</div>
       </main>
     </div>
   );

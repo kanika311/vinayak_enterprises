@@ -29,6 +29,7 @@ router.put('/admins/:id', protect, authorize(PERMISSIONS.USERS), authCtrl.update
 
 // Dashboard
 router.get('/dashboard', protect, authorize(PERMISSIONS.DASHBOARD), authCtrl.getDashboard);
+router.get('/dashboard/notifications', protect, authCtrl.getDashboardNotifications);
 
 // Products - Public
 router.get('/products', productCtrl.getProducts);
