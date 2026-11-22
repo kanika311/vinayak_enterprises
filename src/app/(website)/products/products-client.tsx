@@ -9,23 +9,62 @@ import { apiGet } from '@/lib/api';
 import { FEATURED_PRODUCTS } from '@/lib/constants';
 import { ProductQuoteCard } from '@/components/website/product-quote-card';
 import { fadeUp, staggerContainer } from '@/components/website/motion';
+import { PRODUCT_CATEGORIES } from '@/lib/constants';
+import { FALLBACK_PRODUCTS } from '@/lib/fallback-data';
 import type { Product, Category } from '@/types';
 
-export function ProductsClient() {
+export function ProductsClient({
+  initialProducts,
+  initialCategories,
+}: {
+  initialProducts?: Product[];
+  initialCategories?: Category[];
+} = {}) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
-  const { data: categories } = useQuery({
+  const { data: categories = initialCategories } = useQuery({
     queryKey: ['categories-public'],
     queryFn: () => apiGet<Category[]>('/categories', { active: true }),
+    initialData: initialCategories,
   });
+
+  const categoryList =
+    categories && categories.length > 0
+      ? categories
+      : PRODUCT_CATEGORIES.map((c) => ({
+          _id: c.slug,
+          name: c.name,
+          slug: c.slug,
+          isActive: true,
+          order: 0,
+          subcategories: [],
+        }));
 
   const { data, isLoading } = useQuery({
     queryKey: ['products-public', search, category],
-    queryFn: () => apiGet<{ products: Product[] }>('/products', { status: 'published', limit: 24, search, category }),
+    queryFn: () =>
+      apiGet<{ products: Product[] }>('/products', {
+        status: 'published',
+        limit: 24,
+        search,
+        category,
+      }),
+    initialData:
+      !search && !category && initialProducts?.length
+        ? { products: initialProducts }
+        : undefined,
   });
 
-  const apiProducts = data?.products || [];
+  const rawProducts = data?.products || [];
+  const apiProducts =
+    rawProducts.length > 0
+      ? rawProducts
+      : !search && !category
+      ? initialProducts?.length
+        ? initialProducts
+        : FALLBACK_PRODUCTS
+      : [];
   const useFallback = !isLoading && apiProducts.length === 0 && !search && !category;
   const fallbackProducts = FEATURED_PRODUCTS.filter((p) =>
     !search || p.name.toLowerCase().includes(search.toLowerCase())
@@ -57,7 +96,7 @@ export function ProductsClient() {
               >
                 All Products
               </motion.button>
-              {categories?.map((cat, i) => (
+              {categoryList.map((cat, i) => (
                 <motion.button
                   key={cat._id}
                   initial={{ opacity: 0, x: -10 }}

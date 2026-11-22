@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { BlogReader } from '@/components/website/blog-reader';
+import { connectDatabase } from '../../../../server/config/database';
+import BlogModel from '../../../../server/models/Blog';
+import type { Blog } from '@/types';
 
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+export const revalidate = 1800; // 30 minutes
+
+const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 export const metadata: Metadata = {
   title: 'Science Education & Lab Equipment Blog | Vinayak Enterprises',
@@ -45,14 +50,29 @@ const breadcrumbData = {
   ],
 };
 
-export default function BlogPage() {
+async function getBlogsData() {
+  try {
+    await connectDatabase();
+    const docs = await BlogModel.find({ status: 'published' })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .lean();
+    return JSON.parse(JSON.stringify(docs)) as Blog[];
+  } catch (err) {
+    console.warn('Could not load blogs SSR data:', err);
+    return [];
+  }
+}
+
+export default async function BlogPage() {
+  const blogs = await getBlogsData();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-      <BlogReader />
+      <BlogReader initialBlogs={blogs} />
     </>
   );
 }

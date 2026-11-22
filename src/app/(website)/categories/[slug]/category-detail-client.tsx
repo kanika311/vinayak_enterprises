@@ -13,9 +13,11 @@ import type { Category, Product } from '@/types';
 export function CategoryDetailClient({
   slug,
   initialCategory,
+  initialProducts,
 }: {
   slug: string;
   initialCategory?: Category | null;
+  initialProducts?: Product[];
 }) {
   const { data: category = initialCategory, isLoading: catLoading } = useQuery({
     queryKey: ['category', slug],
@@ -32,6 +34,7 @@ export function CategoryDetailClient({
         limit: 24,
       }),
     enabled: !!category?._id,
+    initialData: initialProducts?.length ? { products: initialProducts } : undefined,
   });
 
   const style = getCategoryStyle(slug);

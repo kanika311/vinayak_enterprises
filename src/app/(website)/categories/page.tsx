@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { CategoriesClient } from './categories-client';
+import { connectDatabase } from '../../../../server/config/database';
+import CategoryModel from '../../../../server/models/Category';
+import type { Category } from '@/types';
 
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+export const revalidate = 1800; // 30 minutes
+
+const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 export const metadata: Metadata = {
   title: 'Product Categories | Laboratory Equipment & Anatomy Models Manufacturer',
@@ -45,14 +50,29 @@ const breadcrumbData = {
   ],
 };
 
-export default function CategoriesPage() {
+async function getCategoriesData() {
+  try {
+    await connectDatabase();
+    const cats = await CategoryModel.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
+    return JSON.parse(JSON.stringify(cats)) as Category[];
+  } catch (err) {
+    console.warn('Could not load categories SSR data:', err);
+    return [];
+  }
+}
+
+export default async function CategoriesPage() {
+  const categories = await getCategoriesData();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-      <CategoriesClient />
+      <CategoriesClient initialCategories={categories} />
     </>
   );
 }

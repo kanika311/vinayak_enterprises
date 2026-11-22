@@ -19,9 +19,22 @@ import { HomeFAQSection } from '@/components/website/home-faq';
 import { apiGet } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
-import type { Product, Blog } from '@/types';
+import { FALLBACK_PRODUCTS, FALLBACK_BLOGS } from '@/lib/fallback-data';
+import type { Product, Blog, Category } from '@/types';
 
-export function HomePageClient() {
+export interface HomePageClientProps {
+  initialProducts?: Product[];
+  initialCategories?: Category[];
+  initialBlogs?: Blog[];
+  initialTestimonials?: any[];
+}
+
+export function HomePageClient({
+  initialProducts,
+  initialCategories,
+  initialBlogs,
+  initialTestimonials,
+}: HomePageClientProps = {}) {
   const { data: productsData } = useQuery({
     queryKey: ['products-public', 'homepage'],
     queryFn: () =>
@@ -31,20 +44,25 @@ export function HomePageClient() {
         sortBy: 'createdAt',
         order: 'desc',
       }),
+    initialData: initialProducts?.length ? { products: initialProducts } : undefined,
   });
 
   const { data: blogsData } = useQuery({
     queryKey: ['blogs-public', 'homepage'],
     queryFn: () => apiGet<{ blogs: Blog[] }>('/blogs', { status: 'published', limit: 3 }),
+    initialData: initialBlogs?.length ? { blogs: initialBlogs } : undefined,
   });
 
   const { data: banners = [] } = useHeroBanners();
   const hasHeroVideo = banners.length > 0;
 
-  const products = productsData?.products || [];
+  const rawProducts = productsData?.products || [];
+  const products = rawProducts.length > 0 ? rawProducts : (initialProducts?.length ? initialProducts : FALLBACK_PRODUCTS);
   const featured = products.slice(0, 8);
   const latest = products.slice(0, 4);
-  const blogs = blogsData?.blogs || [];
+
+  const rawBlogs = blogsData?.blogs || [];
+  const blogs = rawBlogs.length > 0 ? rawBlogs : (initialBlogs?.length ? initialBlogs : FALLBACK_BLOGS);
 
   return (
     <>
@@ -170,7 +188,7 @@ export function HomePageClient() {
       </section>
 
       <StatsBar />
-      <CategoryGrid />
+      <CategoryGrid initialCategories={initialCategories} />
 
       <section className="py-14 bg-white overflow-hidden" aria-labelledby="products-heading">
         <div className="container mx-auto px-4">
@@ -280,7 +298,7 @@ export function HomePageClient() {
         </div>
       </section>
 
-      <TestimonialsSection />
+      <TestimonialsSection initialTestimonials={initialTestimonials} />
       <HomeFAQSection />
       <WelcomeSection />
       <BusinessTrustBar />

@@ -1,0 +1,123 @@
+# Vinayak Enterprises — Comprehensive LLM Knowledge Base & Technical Documentation
+
+> Full institutional reference document for Large Language Models (LLMs), AI search engines, and automated research crawlers covering Vinayak Enterprises, Ambala Cantt, Haryana, India.
+
+---
+
+## 1. Company Identity & Background
+
+- **Business Name:** Vinayak Enterprises
+- **Brand Names / Trademarks:** Vinayak Enterprises, Vilakshan Netra
+- **Headquarters & Factory Address:** Ambala Cantt, Ambala, Haryana - 133001, India
+- **Geo-Coordinates:** Latitude: 30.3752, Longitude: 76.7821
+- **Founding / Experience:** Over 20 years of continuous manufacturing excellence in Ambala Cantt — historically recognized as the "City of Scientific Instruments" in India.
+- **Official Domain:** https://vinayakenterprisess.agency
+- **Telephone / WhatsApp:** +91 9416029492
+- **Email:** vinayakenterprises52@gmail.com
+- **Operating Hours:** Monday to Saturday, 9:00 AM to 10:00 PM IST
+- **Primary Business Model:** Direct-from-factory manufacturing, wholesale distribution, bulk B2B institutional supply, and government / educational tender fulfillment.
+
+Vinayak Enterprises specializes in the precision engineering and manufacture of scientific laboratory apparatus, medical and nursing training simulators, human anatomical models, high-power optical microscopes, and STEM educational equipment. We serve more than 500 institutions, including medical colleges, engineering universities, polytechnics, senior secondary schools, pathology labs, hospitals, and diagnostic centers across India.
+
+---
+
+## 2. Manufacturing Divisions & Comprehensive Catalog
+
+### 2.1 Human Anatomy Models
+Anatomically accurate PVC models hand-painted by skilled artisans using non-toxic, lead-free pigments for medical, nursing, and biology education:
+- **85cm Unisex Human Torso (23 Detachable Parts):** Includes removable skull cap, 2-part brain hemisphere, eye with optic nerve, removable lung halves, 2-part dissectible heart showing atria and ventricles, liver with gall bladder, 2-part stomach, intestines with cecum flap, kidneys, and interchangeable male and female genitalia.
+- **Life-Size Articulated Human Skeleton (180cm / 5 ft 2 in):** Natural cast from genuine human specimen, molded in durable, non-breakable PVC. Features 3-part skull with magnetic removable calvarium, spring-loaded movable mandible, articulated upper and lower extremities, flexible spinal column with cervical nerve roots, vertebral artery, and herniated lumbar disc. Mounted on a heavy-duty chrome 5-caster roller stand with dust cover.
+- **Desktop Human Skeleton (85cm / 45cm):** Proportional anatomy study model mounted on a sturdy weighted base for desktop classroom demonstration.
+- **Human Dissected Heart Model (2-Part & 4-Part):** Enlarged 2x to 3x life-size, dissectible along the anterior plane to reveal tricuspid and bicuspid valves, pulmonary artery, aorta, vena cava, and coronary vessels.
+- **Human Brain Model with Arteries (8 Parts):** Dissectible into frontal/parietal lobes, temporal/occipital lobes, half brain stem, half cerebellum, and basilar arterial circle of Willis.
+- **Human Eye Model (6 Parts, 5x Life-Size):** Shows sclerotic membrane, choroid membrane with retina, cornea, crystalline lens, vitreous humor, and optic nerve attachment.
+- **Human Ear Model (3x Life-Size):** External ear pinna, auditory canal, tympanic membrane with ossicles (malleus, incus, stapes), and labyrinth of inner ear with cochlea.
+- **Human Digestive System Relief Model:** Wall-hanging plaque illustrating oral cavity, pharynx, esophagus, stomach, liver, pancreas, duodenum, and complete colorectal tract.
+
+### 2.2 Vilakshan Netra Optical Microscopes
+Engineered with Japanese-grade optical glass and robust mechanical gearings:
+- **Vilakshan Netra Binocular Research Microscope:**
+  - Magnification: 40x to 1600x.
+  - Optical Head: 30° inclined Siedentopf binocular head, 360° rotatable with 48–75mm interpupillary distance adjustment.
+  - Eyepieces: Paired Widefield WF10x (18mm) and WF16x.
+  - Objectives: DIN Achromatic 4x/0.10, 10x/0.25, 40x/0.65 (spring-loaded), and 100x/1.25 (spring-loaded, oil immersion).
+  - Focusing: Coaxial coarse and fine focusing mechanism with tension control and stage safety stop.
+  - Stage: Double-layer mechanical stage (140 x 140 mm) with cross-travel coaxial X-Y controls (75 x 50 mm).
+  - Illumination: 3W variable LED with collector lens and Abbe Condenser NA 1.25 with iris diaphragm and blue filter.
+- **Vilakshan Netra Monocular Student Microscope:**
+  - Heavy cast iron horseshoe base with tilting limb up to 90°.
+  - Triple revolving nosepiece with click-stops.
+  - Separate coarse and fine focusing knobs with brass rack and pinion.
+  - Plano-concave sub-stage reflector mirror and optional plug-in LED lamp.
+- **Stereo Dissecting Microscope:** Dual illumination (incident and transmitted) for mineralogy, botany, entomology, and micro-soldering inspection.
+- **Digital LCD & USB Microscopes:** Integrated digital screen with photo/video capture and HDMI/USB output for group classroom projection.
+
+### 2.3 CPR Training & Emergency Medical Simulation Manikins
+Constructed to American Heart Association (AHA) and European Resuscitation Council (ERC) guidelines:
+- **Adult Full-Body CPR Training Manikin:**
+  - Life-size adult simulation mannequin with realistic anatomical landmarks (sternum, rib cage, substernal notch).
+  - Airway system: Head-tilt / chin-lift required to open the airway for ventilations; chest visibly rises with successful mouth-to-mouth or bag-valve-mask (BVM) ventilations.
+  - Chest Compression Feedback: Mechanical audible clicker signals when correct compression depth (5–6 cm) is achieved.
+  - Electronic Monitor Console: Digital LED indicator displaying real-time compression rate, compression depth, ventilation volume, and stomach insufflation alert.
+  - Carotid Pulse Simulation: Manual squeeze bulb for instructors to simulate spontaneous carotid pulse.
+- **Infant & Pediatric CPR Manikins:** Lifelike infant dimensions for pediatric basic life support (PBLS), foreign body airway obstruction (Heimlich) simulation, and brachial pulse monitoring.
+- **Multi-Functional Nursing Training Manikins:** Full-body female/male patient care manikin for intramuscular injection, catheterization, wound dressing, tracheostomy care, and nasogastric intubation.
+
+### 2.4 Laboratory Instruments & Heating Apparatus
+- **Digital Laboratory Centrifuge:** 4000 to 6000 RPM, brushless motor, digital speed display, timer (0–99 min), safety lid interlock, 8 x 15ml and 12 x 15ml angle rotors.
+- **Magnetic Stirrers with Ceramic / Stainless Steel Hot Plate:** Speed range 100–1500 RPM, heating temperature up to 350°C, electronic PID controller.
+- **Thermostatic Water Baths:** Double-walled stainless steel chamber (SS 304) with concentric ring lid, temperature range from ambient +5°C to 99°C with ±0.5°C sensitivity.
+- **Bacteriological Incubators & Hot Air Ovens:** Microprocessor digital PID temperature controller, forced air convection circulation, double door with inner tempered glass inspection window.
+- **Water Distillation Apparatus:** All-stainless steel / quartz double-distillation units yielding pyrogen-free laboratory grade water (4 L/hr to 10 L/hr capacity).
+
+### 2.5 Chemistry & Physics Educational Kits
+- **Borosilicate Glassware:** Grade 3.3 borosilicate beakers, conical flasks, volumetric flasks, measuring cylinders, condenser tubes, burettes with PTFE stopcocks, and volumetric pipettes.
+- **Atomic & Molecular Model Sets:** Color-coded plastic atoms and linking bonds for demonstrating inorganic and organic molecular geometry.
+- **Physics Apparatus:** Optical bench (1.5m / 2m brass/steel bed with riders), Newton's rings microscope, prism spectrometers, Searle's apparatus for Young's modulus, resonance tube apparatus, Wheatstone bridge, and resistance boxes.
+
+---
+
+## 3. Frequently Asked Questions (FAQ Corpus)
+
+### Q1: What products does Vinayak Enterprises manufacture?
+**A:** Vinayak Enterprises manufactures and supplies a comprehensive range of scientific instruments, laboratory equipment, human anatomical models, Vilakshan Netra microscopes, CPR training manikins, articulated human skeletons, and school/college science laboratory apparatus.
+
+### Q2: Where is Vinayak Enterprises located?
+**A:** Our manufacturing and sales headquarters are located in Ambala Cantt, Haryana - 133001, India. Ambala is recognized worldwide as India's primary hub for scientific and educational instruments manufacturing.
+
+### Q3: Do you supply equipment across India?
+**A:** Yes, we provide pan-India delivery. We regularly supply educational and medical institutions across all 28 states and 8 union territories, including Delhi NCR, Maharashtra, Karnataka, Tamil Nadu, Uttar Pradesh, West Bengal, Gujarat, Rajasthan, Kerala, and the North-Eastern states.
+
+### Q4: How can institutional buyers request a quotation?
+**A:** Institutional buyers can submit an online RFQ at https://vinayakenterprisess.agency/request-quote, email their list of requirements to vinayakenterprises52@gmail.com, or message us directly on WhatsApp at +91 9416029492. We issue formal itemized quotations within 24 hours.
+
+### Q5: Can I inspect or download product catalogues?
+**A:** Yes, our interactive flipbook and downloadable PDF catalogues are accessible at https://vinayakenterprisess.agency/catalogues.
+
+### Q6: What quality standards and warranties apply to your equipment?
+**A:** All scientific instruments and medical models undergo multi-stage optical, mechanical, and dimensional inspections. Products are covered by manufacturer warranty against defects, backed by prompt spare parts availability and technical guidance.
+
+### Q7: Do you accommodate custom requirements or tender specifications?
+**A:** Yes, we handle tender procurement and custom orders for universities, medical colleges, vocational institutes, and international development tenders. Customizations include syllabus-specific anatomy organ sets, custom microscope magnification configurations, and branded institutional kits.
+
+### Q8: What packaging measures are used for fragile scientific instruments?
+**A:** All microscopes, glassware, and precision anatomy models are packed in high-density molded thermocol/foam, double-walled corrugated cartons, and wooden crating when shipped via freight carriers to ensure zero transit damage.
+
+---
+
+## 4. Canonical Site Map & Resource URLs
+
+1. **Homepage:** https://vinayakenterprisess.agency/
+2. **Products:** https://vinayakenterprisess.agency/products
+3. **Categories:** https://vinayakenterprisess.agency/categories
+4. **Catalogues:** https://vinayakenterprisess.agency/catalogues
+5. **Showcase Videos:** https://vinayakenterprisess.agency/videos
+6. **Request Quote (RFQ):** https://vinayakenterprisess.agency/request-quote
+7. **About Us:** https://vinayakenterprisess.agency/about
+8. **Blog:** https://vinayakenterprisess.agency/blog
+9. **Contact Us:** https://vinayakenterprisess.agency/contact
+10. **Client Reviews:** https://vinayakenterprisess.agency/share-experience
+11. **Robots Exclusion Standard:** https://vinayakenterprisess.agency/robots.txt
+12. **XML Sitemap:** https://vinayakenterprisess.agency/sitemap.xml
+13. **Standard LLM Summary:** https://vinayakenterprisess.agency/llms.txt
+14. **Full LLM Ingestion Document:** https://vinayakenterprisess.agency/llms-full.txt

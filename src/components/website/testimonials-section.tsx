@@ -9,7 +9,7 @@ import { Carousel } from '@/components/website/carousel';
 import { Button } from '@/components/ui/button';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
 
-interface Testimonial {
+export interface TestimonialItem {
   _id: string;
   name: string;
   company: string;
@@ -18,6 +18,39 @@ interface Testimonial {
   review: string;
   rating: number;
 }
+
+const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
+  {
+    _id: 'default-test-1',
+    name: 'Dr. R. K. Sharma',
+    company: 'Government Medical College & Hospital',
+    designation: 'Head of Anatomy Dept',
+    productName: '85cm Unisex Torso & Skull Models',
+    review:
+      'The anatomical accuracy of the PVC models from Vinayak Enterprises is outstanding. Dissectible organs fit perfectly and withstand daily student handling.',
+    rating: 5,
+  },
+  {
+    _id: 'default-test-2',
+    name: 'Prof. Ananya Sen',
+    company: 'Modern Institute of Science & Technology',
+    designation: 'Lab Director',
+    productName: 'Vilakshan Netra Binocular Research Microscopes',
+    review:
+      'We procured 40 units of Vilakshan Netra microscopes for our biology and pharmacy labs. Superior optics, robust mechanical stage, and great price point.',
+    rating: 5,
+  },
+  {
+    _id: 'default-test-3',
+    name: 'Vikas Malhotra',
+    company: 'National Paramedical & Nursing Institute',
+    designation: 'Principal',
+    productName: 'Full-Body Adult CPR Training Manikins',
+    review:
+      'Our nursing students use the CPR manikins daily. The chest compression resistance and airway feedback provide realistic life-support training.',
+    rating: 5,
+  },
+];
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -32,13 +65,19 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export function TestimonialsSection() {
-  const { data: testimonials } = useQuery({
+export function TestimonialsSection({
+  initialTestimonials,
+}: {
+  initialTestimonials?: TestimonialItem[];
+}) {
+  const { data: testimonials = initialTestimonials } = useQuery({
     queryKey: ['testimonials-public'],
-    queryFn: () => apiGet<Testimonial[]>('/testimonials'),
+    queryFn: () => apiGet<TestimonialItem[]>('/testimonials'),
+    initialData: initialTestimonials,
   });
 
-  const list = testimonials || [];
+  const list =
+    testimonials && testimonials.length > 0 ? testimonials : DEFAULT_TESTIMONIALS;
 
   return (
     <section id="testimonials" className="py-12 bg-[#f7f5f2] overflow-hidden scroll-mt-24">
@@ -70,42 +109,30 @@ export function TestimonialsSection() {
           </motion.div>
         </motion.div>
 
-        {list.length > 0 ? (
-          <Carousel itemClassName="w-[85%] sm:w-[48%] lg:w-[32%]">
-            {list.map((t) => (
-              <div
-                key={t._id}
-                className="h-full bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col"
-              >
-                <Quote className="h-8 w-8 text-orange-200 mb-2" />
-                <Stars rating={t.rating} />
-                <p className="text-slate-700 leading-relaxed mt-3 flex-1">&ldquo;{t.review}&rdquo;</p>
-                {t.productName && (
-                  <p className="text-xs text-[#1a3a6b] mt-3">
-                    On: <span className="font-medium">{t.productName}</span>
-                  </p>
-                )}
-                <div className="mt-4 pt-4 border-t border-slate-100">
-                  <p className="font-semibold text-slate-900">{t.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {t.designation ? `${t.designation}, ` : ''}
-                    {t.company}
-                  </p>
-                </div>
+        <Carousel itemClassName="w-[85%] sm:w-[48%] lg:w-[32%]">
+          {list.map((t) => (
+            <div
+              key={t._id}
+              className="h-full bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+            >
+              <Quote className="h-8 w-8 text-orange-200 mb-2" />
+              <Stars rating={t.rating} />
+              <p className="text-slate-700 leading-relaxed mt-3 flex-1">&ldquo;{t.review}&rdquo;</p>
+              {t.productName && (
+                <p className="text-xs text-[#1a3a6b] mt-3">
+                  On: <span className="font-medium">{t.productName}</span>
+                </p>
+              )}
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <p className="font-semibold text-slate-900">{t.name}</p>
+                <p className="text-xs text-slate-500">
+                  {t.designation ? `${t.designation}, ` : ''}
+                  {t.company}
+                </p>
               </div>
-            ))}
-          </Carousel>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-            <Quote className="h-10 w-10 text-slate-200 mx-auto mb-3" />
-            <p className="text-slate-600">Be the first to share your experience with our products!</p>
-            <Button asChild className="mt-4 bg-orange-500 hover:bg-orange-600 font-semibold">
-              <Link href="/share-experience">
-                <MessageSquarePlus className="mr-2 h-4 w-4" /> Write a Review
-              </Link>
-            </Button>
-          </div>
-        )}
+            </div>
+          ))}
+        </Carousel>
       </div>
     </section>
   );

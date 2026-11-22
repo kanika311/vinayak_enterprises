@@ -139,6 +139,11 @@ export default async function BlogPostPage({
     ],
   };
 
+  const allBlogsDoc = await BlogModel.find({ status: 'published' })
+    .sort({ publishedAt: -1, createdAt: -1 })
+    .lean();
+  const allBlogs = JSON.parse(JSON.stringify(allBlogsDoc)) as Blog[];
+
   return (
     <>
       <script
@@ -149,7 +154,7 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <BlogReader initialSlug={slug} />
+      <BlogReader initialSlug={slug} initialBlogs={allBlogs} />
     </>
   );
 }

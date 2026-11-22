@@ -118,9 +118,10 @@ function readingTime(text: string) {
 
 interface BlogReaderProps {
   initialSlug?: string;
+  initialBlogs?: Blog[];
 }
 
-export function BlogReader({ initialSlug }: BlogReaderProps) {
+export function BlogReader({ initialSlug, initialBlogs }: BlogReaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFullWindow, setIsFullWindow] = useState(false);
   const [mobileTopicsOpen, setMobileTopicsOpen] = useState(false);
@@ -132,6 +133,7 @@ export function BlogReader({ initialSlug }: BlogReaderProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['blogs-public', 'reader'],
     queryFn: () => apiGet<{ blogs: Blog[] }>('/blogs', { status: 'published', limit: 50 }),
+    initialData: initialBlogs?.length ? { blogs: initialBlogs } : undefined,
     refetchOnMount: 'always',
   });
 

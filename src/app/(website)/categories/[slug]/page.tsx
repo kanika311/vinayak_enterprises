@@ -2,20 +2,36 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { connectDatabase } from '../../../../../server/config/database';
 import CategoryModel from '../../../../../server/models/Category';
+import ProductModel from '../../../../../server/models/Product';
 import { CategoryDetailClient } from './category-detail-client';
-import type { Category } from '@/types';
+import type { Category, Product } from '@/types';
+
+export const revalidate = 1800; // 30 minutes
 
 const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
-async function getCategoryBySlug(slug: string): Promise<Category | null> {
+async function getCategoryAndProductsBySlug(slug: string): Promise<{ category: Category | null; products: Product[] }> {
   try {
     await connectDatabase();
     const doc = await CategoryModel.findOne({ slug, isActive: true }).lean();
-    if (!doc) return null;
-    return JSON.parse(JSON.stringify(doc)) as Category;
+    if (!doc) return { category: null, products: [] };
+    const category = JSON.parse(JSON.stringify(doc)) as Category;
+
+    const productDocs = await ProductModel.find({
+      category: doc._id,
+      status: 'published',
+    })
+      .sort({ createdAt: -1 })
+      .limit(24)
+      .lean();
+
+    return {
+      category,
+      products: JSON.parse(JSON.stringify(productDocs)) as Product[],
+    };
   } catch (err) {
-    console.warn(`Failed to fetch category for slug ${slug}:`, err);
-    return null;
+    console.warn(`Failed to fetch category & products for slug ${slug}:`, err);
+    return { category: null, products: [] };
   }
 }
 
@@ -25,7 +41,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const { category } = await getCategoryAndProductsBySlug(slug);
 
   if (!category) {
     return {
@@ -71,7 +87,7 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const { category, products } = await getCategoryAndProductsBySlug(slug);
 
   if (!category) {
     return notFound();
@@ -120,7 +136,7 @@ export default async function CategoryPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      <CategoryDetailClient slug={slug} initialCategory={category} />
+      <CategoryDetailClient slug={slug} initialCategory={category} initialProducts={products} />
     </>
   );
 }
