@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, Upload, Video, Play, Eye, EyeOff, Film, Link as LinkIcon,
@@ -42,6 +43,7 @@ export default function ShowcaseVideosPage() {
   const [videoPublicId, setVideoPublicId] = useState<string | undefined>();
   const [posterUrl, setPosterUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0);
   const [error, setError] = useState('');
 
   // Active filter
@@ -108,38 +110,99 @@ export default function ShowcaseVideosPage() {
     setVideoUrl('');
     setVideoPublicId(undefined);
     setPosterUrl('');
+    setUploadPercent(0);
     setError('');
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('video/') && !file.name.match(/\.(mp4|webm|mov|mkv|avi|m4v)$/i)) {
+      setError('Please select a valid video file (MP4, WebM, MOV)');
+      return;
+    }
+
     setError('');
     setUploading(true);
-    try {
-      const result = await apiUpload<{ url: string; publicId?: string; posterUrl?: string }>(
-        '/videos/upload',
-        file,
-        'showcase_videos'
+    setUploadPercent(0);
+
+    if (!title) {
+      setTitle(
+        file.name
+          .replace(/\.[^.]+$/, '')
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase())
       );
-      setVideoUrl(result.url);
-      setVideoPublicId(result.publicId);
-      if (result.posterUrl) {
-        setPosterUrl(result.posterUrl);
-      } else {
-        setPosterUrl(getWebpPosterUrl(result.url));
+    }
+
+    try {
+      // 1. Direct-to-Cloudinary signed upload (handles large HD videos bypassing Vercel 4.5MB limit)
+      let uploadSuccess = false;
+      try {
+        const sig = await apiGet<{
+          signature: string;
+          timestamp: number;
+          apiKey: string;
+          cloudName: string;
+          folder: string;
+        }>('/videos/signature');
+
+        if (sig?.signature && sig?.cloudName) {
+          const fd = new FormData();
+          fd.append('file', file);
+          fd.append('api_key', sig.apiKey);
+          fd.append('timestamp', String(sig.timestamp));
+          fd.append('signature', sig.signature);
+          fd.append('folder', sig.folder);
+
+          const cdnRes = await axios.post(
+            `https://api.cloudinary.com/v1_1/${sig.cloudName}/video/upload`,
+            fd,
+            {
+              onUploadProgress: (progressEvent) => {
+                const total = progressEvent.total || file.size;
+                const percent = Math.min(99, Math.round((progressEvent.loaded * 100) / total));
+                setUploadPercent(percent);
+              },
+            }
+          );
+
+          if (cdnRes.data?.secure_url) {
+            setUploadPercent(100);
+            setVideoUrl(cdnRes.data.secure_url);
+            setVideoPublicId(cdnRes.data.public_id);
+            setPosterUrl(getWebpPosterUrl(cdnRes.data.secure_url));
+            uploadSuccess = true;
+          }
+        }
+      } catch (directErr) {
+        console.warn('Direct Cloudinary signed upload failed, falling back to server upload:', directErr);
       }
-      if (!title) {
-        setTitle(
-          file.name
-            .replace(/\.[^.]+$/, '')
-            .replace(/[-_]/g, ' ')
-            .replace(/\b\w/g, (c) => c.toUpperCase())
+
+      // 2. Server upload fallback (for smaller files or local development)
+      if (!uploadSuccess) {
+        if (file.size > 4.5 * 1024 * 1024) {
+          throw new Error(
+            `Video size is ${(file.size / (1024 * 1024)).toFixed(1)}MB. Cloudinary direct upload was blocked by browser or network. Please retry or paste a video/YouTube URL.`
+          );
+        }
+        const result = await apiUpload<{ url: string; publicId?: string; posterUrl?: string }>(
+          '/videos/upload',
+          file,
+          'showcase_videos'
         );
+        setVideoUrl(result.url);
+        setVideoPublicId(result.publicId);
+        setPosterUrl(result.posterUrl || getWebpPosterUrl(result.url));
       }
     } catch (err: unknown) {
+      console.error('Video upload error:', err);
       const msg =
+        (err as { response?: { data?: { error?: { message?: string }; message?: string } } })?.response?.data?.error?.message ||
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
         'Failed to upload video';
       setError(msg);
     } finally {
@@ -230,27 +293,47 @@ export default function ShowcaseVideosPage() {
             {uploadMode === 'file' ? (
               <div>
                 <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">
-                  Select Video File (MP4, WebM &mdash; Auto-converted with WebP Thumbnail)
+                  Select Video File (MP4, WebM, MOV &mdash; Direct CDN Upload with Auto WebP Thumbnail)
                 </Label>
                 <input
                   ref={fileRef}
                   type="file"
-                  accept="video/mp4,video/webm"
+                  accept="video/*"
                   onChange={handleFileUpload}
                   className="hidden"
                 />
                 <div
-                  onClick={() => fileRef.current?.click()}
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
-                    videoUrl
-                      ? 'border-emerald-300 bg-emerald-50/40'
-                      : 'border-slate-300 hover:border-[#1a3a6b] bg-white'
+                  onClick={() => !uploading && fileRef.current?.click()}
+                  className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+                    uploading
+                      ? 'border-blue-300 bg-blue-50/30 cursor-wait'
+                      : videoUrl
+                      ? 'border-emerald-300 bg-emerald-50/40 cursor-pointer'
+                      : 'border-slate-300 hover:border-[#1a3a6b] bg-white cursor-pointer'
                   }`}
                 >
                   {uploading ? (
-                    <div className="flex flex-col items-center gap-2 text-slate-500">
+                    <div className="flex flex-col items-center gap-2.5 text-slate-600 max-w-sm mx-auto">
                       <LoadingSpinner />
-                      <p className="text-sm font-medium">Uploading video &amp; generating WebP poster...</p>
+                      <div className="w-full">
+                        <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                          <span>
+                            {uploadPercent > 0 && uploadPercent < 100
+                              ? 'Uploading HD video...'
+                              : 'Generating WebP thumbnail poster...'}
+                          </span>
+                          <span className="text-[#1a3a6b]">{uploadPercent > 0 ? `${uploadPercent}%` : 'Starting...'}</span>
+                        </div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.max(8, uploadPercent)}%` }}
+                          />
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        Direct-to-CDN upload active. HD equipment videos of any size supported.
+                      </p>
                     </div>
                   ) : videoUrl ? (
                     <div className="flex flex-col items-center gap-1.5 text-emerald-700">
@@ -262,8 +345,8 @@ export default function ShowcaseVideosPage() {
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-slate-500">
                       <Upload className="w-8 h-8 text-slate-400" />
-                      <p className="text-sm font-medium">Click to choose or drag an MP4/WebM video</p>
-                      <p className="text-xs text-slate-400">Microscope walk-throughs, anatomy assembly, CPR tutorials</p>
+                      <p className="text-sm font-medium">Click to choose or drag an MP4, WebM or MOV video</p>
+                      <p className="text-xs text-slate-400">Microscope walkthroughs, anatomy assembly, CPR tutorials (any size)</p>
                     </div>
                   )}
                 </div>

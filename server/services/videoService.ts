@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 import ShowcaseVideo, { IShowcaseVideo } from '../models/ShowcaseVideo';
 import { AppError } from '../utils/helpers';
 import { isCloudinaryConfigured } from '../config/cloudinary';
-import { uploadToCloudinary, deleteFromCloudinary } from './cloudinaryService';
+import { uploadToCloudinary, deleteFromCloudinary, getCloudinarySignature } from './cloudinaryService';
 
 const EXT_BY_MIME: Record<string, string> = {
   'video/mp4': '.mp4',
@@ -72,6 +72,11 @@ const saveLocalVideo = (file: Express.Multer.File, folder: string) => {
     url: `/uploads/${folder}/${filename}`,
     posterUrl: '',
   };
+};
+
+/** Generate direct Cloudinary upload signature for client-side uploads (bypasses 4.5MB Vercel limit) */
+export const getUploadSignature = (folder = 'showcase_videos') => {
+  return getCloudinarySignature(folder);
 };
 
 /** Upload a video file via Multer (MP4 or WebM) and generate its WebP poster */

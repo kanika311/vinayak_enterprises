@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createShowcaseVideo = exports.uploadShowcaseVideo = exports.getShowcaseVideos = exports.getPublicVideos = exports.deleteBanner = exports.updateBanner = exports.createBanner = exports.uploadBannerVideo = exports.getBanners = exports.getPublicBanners = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.uploadCatalogueFile = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
-exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.trackVideoView = exports.deleteShowcaseVideo = exports.updateShowcaseVideo = void 0;
+exports.uploadShowcaseVideo = exports.getVideoUploadSignature = exports.getShowcaseVideos = exports.getPublicVideos = exports.deleteBanner = exports.updateBanner = exports.createBanner = exports.uploadBannerVideo = exports.getBanners = exports.getPublicBanners = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.createCatalogue = exports.uploadCatalogueFile = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.trackVideoView = exports.deleteShowcaseVideo = exports.updateShowcaseVideo = exports.createShowcaseVideo = void 0;
 const helpers_1 = require("../utils/helpers");
 const categoryService = __importStar(require("../services/categoryService"));
 const leadService = __importStar(require("../services/leadService"));
@@ -270,6 +270,10 @@ exports.getPublicVideos = (0, helpers_1.asyncHandler)(async (req, res) => {
 exports.getShowcaseVideos = (0, helpers_1.asyncHandler)(async (req, res) => {
     const videos = await videoService.getVideos(req.query);
     (0, helpers_1.sendResponse)(res, 200, videos);
+});
+exports.getVideoUploadSignature = (0, helpers_1.asyncHandler)(async (_req, res) => {
+    const sig = videoService.getUploadSignature();
+    (0, helpers_1.sendResponse)(res, 200, sig);
 });
 exports.uploadShowcaseVideo = (0, helpers_1.asyncHandler)(async (req, res) => {
     if (!req.file)

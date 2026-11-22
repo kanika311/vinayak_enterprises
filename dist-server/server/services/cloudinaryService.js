@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toWebpUrl = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
+exports.toWebpUrl = exports.getCloudinarySignature = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
 const stream_1 = require("stream");
 const cloudinary_1 = __importStar(require("../config/cloudinary"));
 const bufferToStream = (buffer) => {
@@ -73,6 +73,26 @@ const getMediaType = (mimetype) => {
     return 'document';
 };
 exports.getMediaType = getMediaType;
+/** Generate signed upload parameters so the browser can upload large videos directly to Cloudinary */
+const getCloudinarySignature = (folder = 'showcase_videos') => {
+    if (!(0, cloudinary_1.ensureCloudinaryConfigured)()) {
+        throw new Error('Cloudinary is not configured');
+    }
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const paramsToSign = {
+        folder,
+        timestamp,
+    };
+    const signature = cloudinary_1.default.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET);
+    return {
+        signature,
+        timestamp,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        folder,
+    };
+};
+exports.getCloudinarySignature = getCloudinarySignature;
 /** Convert any Cloudinary image to WebP with auto quality */
 const toWebpUrl = (url) => {
     if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/'))

@@ -284,6 +284,11 @@ export const getShowcaseVideos = asyncHandler(async (req: AuthRequest, res: Resp
   sendResponse(res, 200, videos);
 });
 
+export const getVideoUploadSignature = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  const sig = videoService.getUploadSignature();
+  sendResponse(res, 200, sig);
+});
+
 export const uploadShowcaseVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
   if (!req.file) throw new Error('No video file uploaded');
   const result = await videoService.uploadShowcaseVideoFile(req.file);

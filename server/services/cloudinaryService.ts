@@ -42,6 +42,29 @@ export const getMediaType = (mimetype: string): 'image' | 'video' | 'pdf' | 'doc
   return 'document';
 };
 
+/** Generate signed upload parameters so the browser can upload large videos directly to Cloudinary */
+export const getCloudinarySignature = (folder = 'showcase_videos') => {
+  if (!ensureCloudinaryConfigured()) {
+    throw new Error('Cloudinary is not configured');
+  }
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const paramsToSign: Record<string, string | number> = {
+    folder,
+    timestamp,
+  };
+  const signature = cloudinary.utils.api_sign_request(
+    paramsToSign,
+    process.env.CLOUDINARY_API_SECRET!
+  );
+  return {
+    signature,
+    timestamp,
+    apiKey: process.env.CLOUDINARY_API_KEY!,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
+    folder,
+  };
+};
+
 /** Convert any Cloudinary image to WebP with auto quality */
 export const toWebpUrl = (url: string): string => {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;

@@ -111,6 +111,7 @@ router.delete('/banners/:id', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.
 
 // Showcase Videos (Equipment Demos & Lab Tutorials)
 router.get('/videos/public', moduleCtrl.getPublicVideos);
+router.get('/videos/signature', protect, moduleCtrl.getVideoUploadSignature);
 router.post('/videos/:id/view', moduleCtrl.trackVideoView);
 router.get('/videos', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.getShowcaseVideos);
 router.post('/videos/upload', protect, authorize(PERMISSIONS.MEDIA), upload.single('file'), moduleCtrl.uploadShowcaseVideo);
