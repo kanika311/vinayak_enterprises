@@ -51,5 +51,4 @@ const blogSchema = new mongoose_1.Schema({
 }, { timestamps: true });
 blogSchema.index({ title: 'text', content: 'text' });
 blogSchema.index({ status: 1, publishedAt: -1, createdAt: -1 });
-blogSchema.index({ slug: 1 });
 exports.default = mongoose_1.default.model('Blog', blogSchema);

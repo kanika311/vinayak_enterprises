@@ -101,6 +101,7 @@ export interface Blog {
   views: number;
   publishedAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface DashboardData {

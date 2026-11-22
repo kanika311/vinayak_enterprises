@@ -14,6 +14,7 @@ import { ProductMarquee } from '@/components/website/product-marquee';
 import { ManufacturingSection } from '@/components/website/manufacturing-section';
 import { StatsBar, WhyChooseUsSection } from '@/components/website/home-credibility';
 import { TestimonialsSection } from '@/components/website/testimonials-section';
+import { HomeFAQSection } from '@/components/website/home-faq';
 import { apiGet } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
@@ -278,6 +279,7 @@ export function HomePageClient() {
       </section>
 
       <TestimonialsSection />
+      <HomeFAQSection />
       <WelcomeSection />
       <BusinessTrustBar />
 

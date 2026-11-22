@@ -52,5 +52,4 @@ const categorySchema = new mongoose_1.Schema({
     seoDescription: String,
 }, { timestamps: true });
 categorySchema.index({ isActive: 1, order: 1 });
-categorySchema.index({ slug: 1 });
 exports.default = mongoose_1.default.model('Category', categorySchema);

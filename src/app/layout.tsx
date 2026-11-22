@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   description: SEO.description,
   keywords: SEO.keywords,
   metadataBase: new URL(process.env.CLIENT_URL || 'https://vinayakenterprisess.agency'),
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -23,14 +26,111 @@ export const metadata: Metadata = {
   openGraph: {
     title: SEO.title,
     description: SEO.description,
+    url: 'https://vinayakenterprisess.agency',
+    siteName: 'Vinayak Enterprises',
+    locale: 'en_IN',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Vinayak Enterprises - Scientific Instruments & Laboratory Equipment Manufacturer',
+      },
+    ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: SEO.title,
+    description: SEO.description,
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+const rootStructuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['Organization', 'LocalBusiness'],
+      '@id': 'https://vinayakenterprisess.agency/#organization',
+      name: 'Vinayak Enterprises',
+      alternateName: ['Vinayak Enterprises Ambala', 'VE Scientific Instruments'],
+      url: 'https://vinayakenterprisess.agency',
+      logo: 'https://vinayakenterprisess.agency/logo.png',
+      image: 'https://vinayakenterprisess.agency/logo.png',
+      description:
+        'Premier manufacturer, bulk supplier & distributor of scientific instruments, laboratory equipment, anatomical models, microscopes, and medical training products based in Ambala, Haryana, India.',
+      telephone: '+919416029492',
+      email: 'vinayakenterprises52@gmail.com',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Ambala Cantt',
+        addressLocality: 'Ambala',
+        addressRegion: 'Haryana',
+        postalCode: '133001',
+        addressCountry: 'IN',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: '30.3752',
+        longitude: '76.7821',
+      },
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        opens: '09:00',
+        closes: '22:00',
+      },
+      priceRange: '₹₹ - ₹₹₹₹',
+      currenciesAccepted: 'INR',
+      paymentAccepted: 'Cash, Credit Card, Bank Transfer, UPI, Cheque',
+      areaServed: [{ '@type': 'Country', name: 'India' }],
+      knowsAbout: [
+        'Scientific Instruments',
+        'Laboratory Equipment',
+        'Anatomical Models',
+        'Medical Training Manikins',
+        'CPR Manikins',
+        'Microscopes',
+        'Biology Lab Apparatus',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://vinayakenterprisess.agency/#website',
+      url: 'https://vinayakenterprisess.agency',
+      name: 'Vinayak Enterprises',
+      publisher: {
+        '@id': 'https://vinayakenterprisess.agency/#organization',
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://vinayakenterprisess.agency/products?search={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootStructuredData) }}
+        />
         {/* Google Tag Manager */}
         <Script
           id="google-tag-manager"

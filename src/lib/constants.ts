@@ -15,19 +15,25 @@ export const SITE = {
 };
 
 export const SEO = {
-  title: 'Vinayak Enterprises | Scientific Instruments Manufacturer & Laboratory Equipment Supplier',
+  title: 'Vinayak Enterprises | Scientific Instruments & Lab Equipment',
   description:
-    'Vinayak Enterprises is a Manufacturer, Bulk Supplier, and Distributor of Scientific Instruments, Laboratory Equipment, Human Anatomy Models, Educational Teaching Aids, and Medical Training Products based in Ambala, Haryana.',
+    'Vinayak Enterprises: Leading manufacturer & bulk supplier of laboratory equipment, anatomical models, microscopes & CPR manikins in Ambala, Haryana, India.',
   keywords: [
-    'Scientific Instruments Manufacturer',
-    'Laboratory Equipment Manufacturer',
-    'Human Anatomy Models Manufacturer',
-    'Educational Teaching Aids Manufacturer',
-    'Medical Training Products Manufacturer',
+    'Anatomical Models Manufacturer in India',
+    'Laboratory Equipment Supplier in India',
     'Scientific Instruments Supplier',
-    'Laboratory Equipment Distributor',
-    'Scientific Instruments Manufacturer in Ambala Haryana',
-    'Laboratory Equipment Bulk Supplier India',
+    'Educational Equipment Manufacturer',
+    'Medical Training Models Supplier',
+    'Anatomy Models Supplier',
+    'Microscope Supplier in India',
+    'Biology Lab Equipment',
+    'Science Laboratory Equipment',
+    'Laboratory Equipment Supplier in Ambala',
+    'Anatomical Models Manufacturer in Haryana',
+    'Scientific Equipment Supplier in India',
+    'Medical Equipment Supplier in Ambala',
+    'Scientific Instruments Manufacturer',
+    'CPR Training Manikins Manufacturer',
   ],
 };
 

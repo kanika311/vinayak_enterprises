@@ -47,8 +47,9 @@ export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
             {imageUrl ? (
               <Image
                 src={imageUrl}
-                alt={product.name}
+                alt={product.images?.[0]?.alt || `${product.name} - Scientific Lab Equipment Vinayak Enterprises`}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
               />
             ) : (

@@ -94,9 +94,12 @@ export function WebsiteFooter() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="border-t border-slate-700 mt-10 pt-6 text-center text-xs text-slate-500"
+          className="border-t border-slate-700/80 mt-10 pt-6 text-center text-xs text-slate-400 space-y-1"
         >
-          <p>© 2025 Vinayak Enterprises. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} Vinayak Enterprises. All Rights Reserved.</p>
+          <p className="text-slate-500">
+            Manufacturer &amp; Bulk Institutional Supplier of Scientific Instruments &amp; Laboratory Equipment in Ambala, Haryana, India.
+          </p>
         </motion.div>
       </div>
     </footer>
