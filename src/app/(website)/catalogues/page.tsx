@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { CataloguesClient } from './catalogues-client';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Download Product Catalogue PDF | Vinayak Enterprises Ambala',
@@ -15,14 +14,26 @@ export const metadata: Metadata = {
     'Vinayak Enterprises Catalogue',
   ],
   alternates: {
-    canonical: `${BASE_URL}/catalogues`,
+    canonical: `${SITE_URL}/catalogues`,
+    languages: {
+      'en-IN': `${SITE_URL}/catalogues`,
+      'x-default': `${SITE_URL}/catalogues`,
+    },
   },
   openGraph: {
     title: 'Download Product Catalogue PDF | Vinayak Enterprises Ambala',
     description:
       'Browse and download interactive product catalogues for microscopes, anatomical models, CPR training manikins & laboratory instruments from Vinayak Enterprises.',
-    url: `${BASE_URL}/catalogues`,
+    url: `${SITE_URL}/catalogues`,
     type: 'website',
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'Vinayak Enterprises Product Catalogues' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Download Product Catalogue PDF | Vinayak Enterprises Ambala',
+    description:
+      'Browse and download interactive product catalogues for microscopes, anatomical models, CPR training manikins & laboratory instruments from Vinayak Enterprises.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -34,13 +45,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'Product Catalogues',
-      item: `${BASE_URL}/catalogues`,
+      item: `${SITE_URL}/catalogues`,
     },
   ],
 };

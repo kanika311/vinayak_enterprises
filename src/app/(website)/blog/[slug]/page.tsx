@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation';
 import { connectDatabase } from '../../../../../server/config/database';
 import BlogModel from '../../../../../server/models/Blog';
 import { BlogReader } from '@/components/website/blog-reader';
+import { SITE_URL } from '@/lib/site-url';
 import type { Blog } from '@/types';
-
-const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 async function getBlogBySlug(slug: string): Promise<Blog | null> {
   try {
@@ -39,13 +38,19 @@ export async function generateMetadata({
     blog.excerpt?.slice(0, 155) ||
     blog.content?.slice(0, 155) ||
     `${blog.title} - Articles and insights on scientific instruments and laboratory education from Vinayak Enterprises.`;
-  const canonical = `${BASE_URL}/blog/${blog.slug}`;
-  const imageUrl = blog.featuredImage?.url || `${BASE_URL}/logo.png`;
+  const canonical = `${SITE_URL}/blog/${blog.slug}`;
+  const imageUrl = blog.featuredImage?.url || `${SITE_URL}/og-image.png`;
 
   return {
     title,
     description,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      languages: {
+        'en-IN': canonical,
+        'x-default': canonical,
+      },
+    },
     keywords: [
       blog.title,
       blog.category || 'Science Education',
@@ -60,8 +65,8 @@ export async function generateMetadata({
       images: [
         {
           url: imageUrl,
-          width: 800,
-          height: 500,
+          width: 1200,
+          height: 630,
           alt: blog.title,
         },
       ],
@@ -75,7 +80,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPostPage({
+export default async function BlogDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -87,30 +92,40 @@ export default async function BlogPostPage({
     return notFound();
   }
 
+  const authorName =
+    blog.author?.name && blog.author?.name !== 'Super Admin'
+      ? blog.author.name
+      : 'Technical Team, Vinayak Enterprises';
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: blog.title,
     description: blog.excerpt || blog.content?.slice(0, 155),
-    image: blog.featuredImage?.url ? [blog.featuredImage.url] : [`${BASE_URL}/logo.png`],
+    image: blog.featuredImage?.url ? [blog.featuredImage.url] : [`${SITE_URL}/og-image.png`],
     datePublished: blog.publishedAt || blog.createdAt,
     dateModified: blog.updatedAt || blog.publishedAt || blog.createdAt,
     author: {
-      '@type': 'Organization',
-      name: 'Vinayak Enterprises',
-      url: BASE_URL,
+      '@type': 'Person',
+      name: authorName,
+      jobTitle: 'Educational Laboratory & Scientific Instruments Specialist',
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Vinayak Enterprises',
+        url: SITE_URL,
+      },
     },
     publisher: {
       '@type': 'Organization',
       name: 'Vinayak Enterprises',
       logo: {
         '@type': 'ImageObject',
-        url: `${BASE_URL}/logo.png`,
+        url: `${SITE_URL}/logo.png`,
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${BASE_URL}/blog/${blog.slug}`,
+      '@id': `${SITE_URL}/blog/${blog.slug}`,
     },
   };
 
@@ -122,19 +137,19 @@ export default async function BlogPostPage({
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: `${BASE_URL}/`,
+        item: `${SITE_URL}/`,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: `${BASE_URL}/blog`,
+        item: `${SITE_URL}/blog`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: blog.title,
-        item: `${BASE_URL}/blog/${blog.slug}`,
+        item: `${SITE_URL}/blog/${blog.slug}`,
       },
     ],
   };

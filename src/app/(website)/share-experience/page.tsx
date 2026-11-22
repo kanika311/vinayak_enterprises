@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { ShareExperienceClient } from './share-experience-client';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Customer Feedback & Reviews | Vinayak Enterprises Ambala',
@@ -13,14 +12,25 @@ export const metadata: Metadata = {
     'Laboratory Equipment Supplier Reviews',
   ],
   alternates: {
-    canonical: `${BASE_URL}/share-experience`,
+    canonical: `${SITE_URL}/share-experience`,
+    languages: {
+      'en-IN': `${SITE_URL}/share-experience`,
+    },
   },
   openGraph: {
     title: 'Customer Feedback & Reviews | Vinayak Enterprises Ambala',
     description:
       'Share your experience with scientific instruments and laboratory models from Vinayak Enterprises. We value reviews from institutions and educators across India.',
-    url: `${BASE_URL}/share-experience`,
+    url: `${SITE_URL}/share-experience`,
     type: 'website',
+    images: [`${SITE_URL}/og-image.png`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Customer Feedback & Reviews | Vinayak Enterprises Ambala',
+    description:
+      'Share your experience with scientific instruments and laboratory models from Vinayak Enterprises. We value reviews from institutions and educators across India.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -32,13 +42,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'Share Experience',
-      item: `${BASE_URL}/share-experience`,
+      item: `${SITE_URL}/share-experience`,
     },
   ],
 };

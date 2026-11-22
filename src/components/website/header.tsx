@@ -97,8 +97,12 @@ export function WebsiteHeader() {
                   className="flex-1 px-4 py-2 text-sm outline-none"
                 />
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link href={`/products?search=${searchQuery}`} className="bg-[#1a3a6b] text-white px-4 h-full flex items-center hover:bg-[#15305a]">
-                    <Search className="h-4 w-4" />
+                  <Link
+                    href={`/products?search=${searchQuery}`}
+                    aria-label="Search products"
+                    className="bg-[#1a3a6b] text-white px-4 h-full flex items-center hover:bg-[#15305a]"
+                  >
+                    <Search className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </motion.div>
               </div>

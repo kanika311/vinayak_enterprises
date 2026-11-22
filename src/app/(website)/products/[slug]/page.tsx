@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation';
 import { connectDatabase } from '../../../../../server/config/database';
 import ProductModel from '../../../../../server/models/Product';
 import { ProductDetailClient } from './product-detail-client';
+import { SITE_URL } from '@/lib/site-url';
 import type { Product } from '@/types';
-
-const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
@@ -40,13 +39,18 @@ export async function generateMetadata({
   const description =
     product.shortDescription?.slice(0, 155) ||
     `${product.name} manufactured by Vinayak Enterprises in Ambala, Haryana. High-grade scientific instruments & institutional lab supplies.`;
-  const canonical = `${BASE_URL}/products/${product.slug}`;
-  const imageUrl = product.images?.[0]?.url || `${BASE_URL}/logo.png`;
+  const canonical = `${SITE_URL}/products/${product.slug}`;
+  const imageUrl = product.images?.[0]?.url || `${SITE_URL}/og-image.png`;
 
   return {
     title,
     description,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      languages: {
+        'en-IN': canonical,
+      },
+    },
     keywords: [
       product.name,
       product.sku,
@@ -96,7 +100,7 @@ export default async function ProductDetailPage({
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    image: product.images?.map((img) => img.url) || [`${BASE_URL}/logo.png`],
+    image: product.images?.map((img) => img.url) || [`${SITE_URL}/og-image.png`],
     description: product.shortDescription || product.longDescription,
     sku: product.sku,
     brand: {
@@ -106,7 +110,7 @@ export default async function ProductDetailPage({
     manufacturer: {
       '@type': 'Organization',
       name: 'Vinayak Enterprises',
-      url: BASE_URL,
+      url: SITE_URL,
     },
     category: categoryName || 'Scientific Instruments',
     offers: {
@@ -115,7 +119,7 @@ export default async function ProductDetailPage({
       price: product.price ? product.price : 0,
       priceValidUntil: '2027-12-31',
       availability: 'https://schema.org/InStock',
-      url: `${BASE_URL}/products/${product.slug}`,
+      url: `${SITE_URL}/products/${product.slug}`,
       itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
@@ -132,13 +136,13 @@ export default async function ProductDetailPage({
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: `${BASE_URL}/`,
+        item: `${SITE_URL}/`,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Products',
-        item: `${BASE_URL}/products`,
+        item: `${SITE_URL}/products`,
       },
       ...(categoryName
         ? [
@@ -146,13 +150,13 @@ export default async function ProductDetailPage({
               '@type': 'ListItem',
               position: 3,
               name: categoryName,
-              item: `${BASE_URL}/categories/${categorySlug}`,
+              item: `${SITE_URL}/categories/${categorySlug}`,
             },
             {
               '@type': 'ListItem',
               position: 4,
               name: product.name,
-              item: `${BASE_URL}/products/${product.slug}`,
+              item: `${SITE_URL}/products/${product.slug}`,
             },
           ]
         : [
@@ -160,7 +164,7 @@ export default async function ProductDetailPage({
               '@type': 'ListItem',
               position: 3,
               name: product.name,
-              item: `${BASE_URL}/products/${product.slug}`,
+              item: `${SITE_URL}/products/${product.slug}`,
             },
           ]),
     ],

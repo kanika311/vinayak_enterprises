@@ -1,19 +1,29 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { GoogleAnalyticsRouteTracker } from '@/components/analytics/google-analytics';
 import { SEO } from '@/lib/constants';
+import { SITE_URL } from '@/lib/site-url';
 
-const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-montserrat',
+});
 
 export const metadata: Metadata = {
   title: SEO.title,
   description: SEO.description,
   keywords: SEO.keywords,
-  metadataBase: new URL(process.env.CLIENT_URL || 'https://vinayakenterprisess.agency'),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: '/',
+    canonical: SITE_URL,
+    languages: {
+      'en-IN': SITE_URL,
+      'x-default': SITE_URL,
+    },
   },
   icons: {
     icon: [
@@ -26,13 +36,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: SEO.title,
     description: SEO.description,
-    url: 'https://vinayakenterprisess.agency',
+    url: SITE_URL,
     siteName: 'Vinayak Enterprises',
     locale: 'en_IN',
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'Vinayak Enterprises - Scientific Instruments & Laboratory Equipment Manufacturer',
@@ -43,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SEO.title,
     description: SEO.description,
-    images: ['/logo.png'],
+    images: [`${SITE_URL}/og-image.png`],
   },
   robots: {
     index: true,
@@ -63,14 +73,14 @@ const rootStructuredData = {
   '@graph': [
     {
       '@type': ['Organization', 'LocalBusiness'],
-      '@id': 'https://vinayakenterprisess.agency/#organization',
+      '@id': `${SITE_URL}/#organization`,
       name: 'Vinayak Enterprises',
-      alternateName: ['Vinayak Enterprises Ambala', 'VE Scientific Instruments'],
-      url: 'https://vinayakenterprisess.agency',
-      logo: 'https://vinayakenterprisess.agency/logo.png',
-      image: 'https://vinayakenterprisess.agency/logo.png',
+      alternateName: ['Vinayak Enterprises Ambala', 'VE Scientific Instruments', 'Vilakshan Netra'],
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+      image: `${SITE_URL}/og-image.png`,
       description:
-        'Premier manufacturer, bulk supplier & distributor of scientific instruments, laboratory equipment, anatomical models, microscopes, and medical training products based in Ambala, Haryana, India.',
+        'Premier manufacturer, bulk supplier & distributor of scientific instruments, laboratory equipment, anatomical models, microscopes, and medical training products based in Ambala Cantt, Haryana, India.',
       telephone: '+919416029492',
       email: 'vinayakenterprises52@gmail.com',
       address: {
@@ -105,18 +115,21 @@ const rootStructuredData = {
         'Microscopes',
         'Biology Lab Apparatus',
       ],
+      sameAs: [
+        // TODO: Provide verified official social profile URLs (e.g. LinkedIn, YouTube, Facebook, Twitter) once registered
+      ],
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://vinayakenterprisess.agency/#website',
-      url: 'https://vinayakenterprisess.agency',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
       name: 'Vinayak Enterprises',
       publisher: {
-        '@id': 'https://vinayakenterprisess.agency/#organization',
+        '@id': `${SITE_URL}/#organization`,
       },
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://vinayakenterprisess.agency/products?search={search_term_string}',
+        target: `${SITE_URL}/products?search={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
     },
@@ -125,7 +138,7 @@ const rootStructuredData = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-IN" className={montserrat.variable}>
       <head>
         {/* Google tag (gtag.js) */}
         <script
@@ -163,7 +176,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           dangerouslySetInnerHTML={{ __html: JSON.stringify(rootStructuredData) }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={montserrat.className}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

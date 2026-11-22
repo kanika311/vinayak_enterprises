@@ -29,8 +29,7 @@ function ResetPasswordForm() {
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Request a new password reset from the login page. Use the link on the same device where you open the site
-            (localhost links only work on your PC).
+            Request a new password reset from the login page. Use the link on the same device where you open the site.
           </p>
           <Button asChild className="w-full">
             <Link href={`${ADMIN_BASE}/forgot-password`}>Request new link</Link>

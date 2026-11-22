@@ -10,7 +10,30 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
-  serverExternalPackages: ['mongoose', 'express', 'multer', 'bcryptjs', 'jsonwebtoken', 'nodemailer', 'cloudinary'],
+  serverExternalPackages: [
+    'mongoose',
+    'express',
+    'multer',
+    'bcryptjs',
+    'jsonwebtoken',
+    'nodemailer',
+    'cloudinary',
+  ],
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'vinayakenterprisess.agency',
+          },
+        ],
+        destination: 'https://www.vinayakenterprisess.agency/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -2,40 +2,42 @@
 
 import { motion, type Variants, type Transition } from 'framer-motion';
 
+const isServer = typeof window === 'undefined';
+
 export const spring: Transition = { type: 'spring', stiffness: 300, damping: 24 };
 
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: isServer ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export const fadeDown: Variants = {
-  hidden: { opacity: 0, y: -24 },
+  hidden: isServer ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 export const fadeIn: Variants = {
-  hidden: { opacity: 0 },
+  hidden: isServer ? { opacity: 1 } : { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.5 } },
 };
 
 export const slideInLeft: Variants = {
-  hidden: { opacity: 0, x: -50 },
+  hidden: isServer ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 50 },
+  hidden: isServer ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.85 },
+  hidden: isServer ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: spring },
 };
 
 export const popIn: Variants = {
-  hidden: { opacity: 0, scale: 0.5 },
+  hidden: isServer ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 18 } },
 };
 
@@ -50,7 +52,7 @@ export const staggerFast: Variants = {
 };
 
 export const listItem: Variants = {
-  hidden: { opacity: 0, x: -16 },
+  hidden: isServer ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
 };
 
@@ -67,7 +69,7 @@ export function MotionSection({
 }) {
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: '-60px' }}
       variants={variant}
@@ -175,7 +177,7 @@ export function AnimatedHeading({
   return (
     <motion.div
       className={className}
-      initial="hidden"
+      initial={isServer ? false : 'hidden'}
       whileInView="visible"
       viewport={{ once: true }}
       variants={staggerContainer}

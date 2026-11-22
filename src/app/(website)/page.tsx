@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { HomePageClient } from '@/components/website/home-page-client';
 import { SEO, SITE } from '@/lib/constants';
 import { HOME_FAQS } from '@/lib/faqs';
+import { SITE_URL } from '@/lib/site-url';
 import { connectDatabase } from '../../../server/config/database';
 import ProductModel from '../../../server/models/Product';
 import CategoryModel from '../../../server/models/Category';
@@ -10,29 +11,33 @@ import TestimonialModel from '../../../server/models/Testimonial';
 import type { Product, Category, Blog } from '@/types';
 import type { TestimonialItem } from '@/components/website/testimonials-section';
 
-export const revalidate = 1800; // Revalidate every 30 minutes
-
-const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
+export const revalidate = 1800; // 30 minutes
 
 export const metadata: Metadata = {
   title: SEO.title,
   description: SEO.description,
   keywords: SEO.keywords,
-  alternates: { canonical: BASE_URL },
+  alternates: {
+    canonical: SITE_URL,
+    languages: {
+      'en-IN': SITE_URL,
+      'x-default': SITE_URL,
+    },
+  },
   openGraph: {
     title: SEO.title,
     description: SEO.description,
-    url: BASE_URL,
+    url: SITE_URL,
     type: 'website',
     locale: 'en_IN',
     siteName: SITE.name,
-    images: [{ url: '/logo.png', width: 1200, height: 630, alt: SITE.name }],
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: SITE.name }],
   },
   twitter: {
     card: 'summary_large_image',
     title: SEO.title,
     description: SEO.description,
-    images: ['/logo.png'],
+    images: [`${SITE_URL}/og-image.png`],
   },
   robots: {
     index: true,
@@ -86,17 +91,59 @@ async function getHomePageData() {
   }
 }
 
-function JsonLd() {
+function JsonLd({ products }: { products: Product[] }) {
+  const productItems = products.length > 0
+    ? products.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Product',
+          name: p.name,
+          url: `${SITE_URL}/products/${p.slug}`,
+          image: p.images?.[0]?.url || `${SITE_URL}/og-image.png`,
+          description: p.shortDescription || `${p.name} manufactured by Vinayak Enterprises in Ambala.`,
+          sku: p.sku || `VE-${p.slug}`,
+          brand: {
+            '@type': 'Brand',
+            name: 'Vinayak Enterprises',
+          },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'INR',
+            price: p.price || 1500,
+            availability: 'https://schema.org/InStock',
+            url: `${SITE_URL}/products/${p.slug}`,
+            seller: {
+              '@type': 'Organization',
+              name: 'Vinayak Enterprises',
+            },
+          },
+        },
+      }))
+    : [
+        'Vilakshan Netra Binocular Research Microscope',
+        '85cm Unisex Human Torso (23 Detachable Parts)',
+        'Full-Body Adult CPR Training Simulation Manikin',
+        '180cm Life-Size Articulated Human Skeleton Model',
+        'Digital Laboratory Centrifuge (4000 RPM)',
+        'Borosilicate Laboratory Glassware Setup',
+      ].map((name, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+      }));
+
   const data = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': ['Organization', 'LocalBusiness'],
-        '@id': `${BASE_URL}/#organization`,
+        '@id': `${SITE_URL}/#organization`,
         name: SITE.name,
         alternateName: ['Vinayak Enterprises Ambala', 'VE Scientific Instruments', 'Vilakshan Netra'],
-        url: BASE_URL,
-        logo: `${BASE_URL}/logo.png`,
+        url: SITE_URL,
+        logo: `${SITE_URL}/logo.png`,
+        image: `${SITE_URL}/og-image.png`,
         email: SITE.email,
         telephone: SITE.phoneTel,
         address: {
@@ -113,21 +160,24 @@ function JsonLd() {
           longitude: '76.7821',
         },
         description: SEO.description,
+        sameAs: [
+          // TODO: Provide verified official social profile URLs (e.g. LinkedIn, YouTube, Facebook, Twitter) once registered
+        ],
       },
       {
         '@type': 'WebSite',
-        '@id': `${BASE_URL}/#website`,
+        '@id': `${SITE_URL}/#website`,
         name: SITE.name,
-        url: BASE_URL,
+        url: SITE_URL,
         potentialAction: {
           '@type': 'SearchAction',
-          target: `${BASE_URL}/products?search={search_term_string}`,
+          target: `${SITE_URL}/products?search={search_term_string}`,
           'query-input': 'required name=search_term_string',
         },
       },
       {
         '@type': 'FAQPage',
-        '@id': `${BASE_URL}/#faq`,
+        '@id': `${SITE_URL}/#faq`,
         mainEntity: HOME_FAQS.map((faq) => ({
           '@type': 'Question',
           name: faq.question,
@@ -139,21 +189,9 @@ function JsonLd() {
       },
       {
         '@type': 'ItemList',
-        name: 'Product Categories',
-        itemListElement: [
-          'Scientific Instruments',
-          'Laboratory Equipment',
-          'Human Anatomy Models',
-          'Educational Teaching Aids',
-          'Medical Training Products',
-          'CPR Training Manikins',
-          'Human Skeleton Models',
-          'Microscopes',
-        ].map((name, i) => ({
-          '@type': 'ListItem',
-          position: i + 1,
-          name,
-        })),
+        '@id': `${SITE_URL}/#featured-products`,
+        name: 'Scientific Instruments & Laboratory Equipment Range',
+        itemListElement: productItems,
       },
     ],
   };
@@ -171,7 +209,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd />
+      <JsonLd products={products} />
       <HomePageClient
         initialProducts={products}
         initialCategories={categories}
@@ -181,7 +219,7 @@ export default async function HomePage() {
 
       {/* Semantic LLM & Search Engine Overview Section */}
       <section className="sr-only" aria-label="Vinayak Enterprises Institutional Directory">
-        <h2>Vinayak Enterprises — Manufacturer of Scientific Instruments & Medical Training Models</h2>
+        <h2>Vinayak Enterprises — Manufacturer of Scientific Instruments &amp; Medical Training Models</h2>
         <p>
           Vinayak Enterprises is a leading manufacturer, bulk supplier, and institutional distributor of scientific
           laboratory equipment, human anatomical models, CPR training simulators, Vilakshan Netra microscopes, and
@@ -198,7 +236,7 @@ export default async function HomePage() {
           <li>Laboratory Apparatus: Centrifuges, hot plates, magnetic stirrers, distillation units, and borosilicate glassware.</li>
         </ul>
         <p>
-          Official documentation for LLMs and AI crawlers is available at <a href={`${BASE_URL}/llms.txt`}>llms.txt</a> and <a href={`${BASE_URL}/llms-full.txt`}>llms-full.txt</a>.
+          Official documentation for LLMs and AI crawlers is available at <a href={`${SITE_URL}/llms.txt`}>llms.txt</a> and <a href={`${SITE_URL}/llms-full.txt`}>llms-full.txt</a>.
         </p>
       </section>
     </>

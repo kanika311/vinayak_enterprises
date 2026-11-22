@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { WebsiteHeader } from '@/components/website/header';
 import { WebsiteFooter } from '@/components/website/footer';
 import { PageTransition } from '@/components/website/page-transition';
-import { WhatsAppFloat } from '@/components/website/whatsapp-float';
 import { SEO } from '@/lib/constants';
+
+const WhatsAppFloat = dynamic(
+  () => import('@/components/website/whatsapp-float').then((m) => m.WhatsAppFloat)
+);
 
 export const metadata: Metadata = {
   title: SEO.title,

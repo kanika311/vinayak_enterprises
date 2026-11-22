@@ -140,6 +140,7 @@ export default function ShowcaseVideosPage() {
     try {
       // 1. Direct-to-Cloudinary signed upload (handles large HD videos bypassing Vercel 4.5MB limit)
       let uploadSuccess = false;
+      let signatureError = '';
       try {
         const sig = await apiGet<{
           signature: string;
@@ -177,15 +178,21 @@ export default function ShowcaseVideosPage() {
             uploadSuccess = true;
           }
         }
-      } catch (directErr) {
+      } catch (directErr: unknown) {
+        signatureError =
+          (directErr as { response?: { data?: { message?: string; error?: { message?: string } } } })?.response?.data?.message ||
+          (directErr as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message ||
+          (directErr as Error)?.message ||
+          '';
         console.warn('Direct Cloudinary signed upload failed, falling back to server upload:', directErr);
       }
 
       // 2. Server upload fallback (for smaller files or local development)
       if (!uploadSuccess) {
         if (file.size > 4.5 * 1024 * 1024) {
+          const reason = signatureError ? ` (${signatureError})` : '';
           throw new Error(
-            `Video size is ${(file.size / (1024 * 1024)).toFixed(1)}MB. Cloudinary direct upload was blocked by browser or network. Please retry or paste a video/YouTube URL.`
+            `Video size is ${(file.size / (1024 * 1024)).toFixed(1)}MB, exceeding Vercel's 4.5MB server limit. Direct CDN upload could not proceed${reason}. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in your Vercel Project Settings, OR switch to the "Video / YouTube URL" tab above to paste a YouTube link instantly.`
           );
         }
         const result = await apiUpload<{ url: string; publicId?: string; posterUrl?: string }>(
@@ -203,7 +210,7 @@ export default function ShowcaseVideosPage() {
         (err as { response?: { data?: { error?: { message?: string }; message?: string } } })?.response?.data?.error?.message ||
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
         (err as Error)?.message ||
-        'Failed to upload video';
+        'Failed to upload video. Please ensure Cloudinary credentials are set on Vercel or use a YouTube link.';
       setError(msg);
     } finally {
       setUploading(false);
@@ -350,6 +357,17 @@ export default function ShowcaseVideosPage() {
                     </div>
                   )}
                 </div>
+                <p className="text-xs text-slate-500 mt-2 flex items-center justify-center gap-1.5">
+                  💡 Need to publish a video right now? Switch to{' '}
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode('url')}
+                    className="text-[#1a3a6b] font-semibold underline hover:text-orange-600"
+                  >
+                    Video / YouTube URL
+                  </button>{' '}
+                  to paste any YouTube link with auto-generated WebP poster!
+                </p>
               </div>
             ) : (
               <div>

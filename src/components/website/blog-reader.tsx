@@ -38,7 +38,7 @@ const FALLBACK_BLOGS: Blog[] = [
     slug: 'importance-of-human-anatomy-models-in-medical-education',
     category: 'Human Anatomy Model',
     tags: ['Anatomy', 'Medical Education', 'Colleges', 'Skeleton Models'],
-    author: { name: 'Super Admin' },
+    author: { name: 'Vinayak Enterprises Editorial & Technical Team' },
     views: 142,
     createdAt: '2026-11-19T10:00:00.000Z',
     publishedAt: '2026-11-19T10:00:00.000Z',
@@ -65,7 +65,7 @@ Investing in durable, anatomically precise models elevates educational outcomes 
     slug: 'how-to-choose-the-right-microscope-for-educational-and-research-labs',
     category: 'Microscopes',
     tags: ['Microscopes', 'Laboratory Equipment', 'Research', 'School Labs'],
-    author: { name: 'Super Admin' },
+    author: { name: 'Vinayak Enterprises Editorial & Technical Team' },
     views: 98,
     createdAt: '2026-11-14T10:00:00.000Z',
     publishedAt: '2026-11-14T10:00:00.000Z',
@@ -91,7 +91,7 @@ Modern classrooms benefit tremendously from digital microscopes featuring HDMI o
     slug: 'standard-safety-guidelines-for-chemistry-laboratories',
     category: 'Laboratory Equipment',
     tags: ['Chemistry', 'Safety', 'Lab Equipment', 'Guidelines'],
-    author: { name: 'Super Admin' },
+    author: { name: 'Vinayak Enterprises Editorial & Technical Team' },
     views: 76,
     createdAt: '2026-11-11T10:00:00.000Z',
     publishedAt: '2026-11-11T10:00:00.000Z',
@@ -620,7 +620,7 @@ export function BlogReader({ initialSlug, initialBlogs }: BlogReaderProps) {
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <User className="h-4 w-4 text-blue-600" />
-                          By {activeBlog.author?.name || 'Super Admin'}
+                          By {activeBlog.author?.name && activeBlog.author.name !== 'Super Admin' ? activeBlog.author.name : 'Vinayak Enterprises Editorial & Technical Team'}
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <Clock className="h-4 w-4 text-blue-600" />
@@ -697,6 +697,26 @@ export function BlogReader({ initialSlug, initialBlogs }: BlogReaderProps) {
                       ))}
                     </div>
                   )}
+
+                  {/* Author Credentials & Verification Card */}
+                  <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-blue-50/70 border border-blue-100 flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                    <div className="w-12 h-12 rounded-full bg-[#1a3a6b] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow">
+                      VE
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                        <h4 className="font-bold text-slate-900 text-sm sm:text-base">
+                          Vinayak Enterprises Editorial &amp; Technical Team
+                        </h4>
+                        <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                          Verified Industry Specialist
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Authored and fact-checked by the scientific instrument engineers and anatomy model specialists at Vinayak Enterprises (Ambala Cantt, Haryana). Reviewing equipment durability, anatomical accuracy, and lab safety protocols for Indian educational institutions.
+                      </p>
+                    </div>
+                  </div>
 
                   {/* Bottom Next/Prev Card Navigation */}
                   <div className="grid sm:grid-cols-2 gap-4 mt-10 pt-8 border-t border-slate-100">

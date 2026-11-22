@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.toWebpUrl = exports.getCloudinarySignature = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
 const stream_1 = require("stream");
 const cloudinary_1 = __importStar(require("../config/cloudinary"));
+const helpers_1 = require("../utils/helpers");
 const bufferToStream = (buffer) => {
     const stream = new stream_1.Readable();
     stream.push(buffer);
@@ -76,7 +77,7 @@ exports.getMediaType = getMediaType;
 /** Generate signed upload parameters so the browser can upload large videos directly to Cloudinary */
 const getCloudinarySignature = (folder = 'showcase_videos') => {
     if (!(0, cloudinary_1.ensureCloudinaryConfigured)()) {
-        throw new Error('Cloudinary is not configured');
+        throw new helpers_1.AppError('Cloudinary is not configured. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Vercel Project Settings.', 400);
     }
     const timestamp = Math.round(new Date().getTime() / 1000);
     const paramsToSign = {

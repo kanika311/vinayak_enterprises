@@ -25,9 +25,9 @@ export function ContactClient() {
 
   const contactItems = [
     { icon: Building2, label: 'Business Name', value: site.name },
-    { icon: MapPin, label: 'Location', value: site.location },
+    { icon: MapPin, label: 'Factory & Registered Office', value: 'Ambala Cantt, Ambala, Haryana 133001, India' },
     { icon: Phone, label: 'Phone', value: site.phone, href: `tel:${site.phoneTel}` },
-    { icon: Mail, label: 'Email', value: site.email, href: `mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}` },
+    { icon: Mail, label: 'Email Desk', value: site.email, href: `mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}` },
     { icon: Clock, label: 'Business Hours', value: site.workingHoursLong },
   ];
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { VideoShowcaseSection } from '@/components/website/video-showcase-section';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Equipment Demonstration & Laboratory Videos | Vinayak Enterprises',
@@ -16,14 +15,25 @@ export const metadata: Metadata = {
     'Vinayak Enterprises Video Showcase',
   ],
   alternates: {
-    canonical: `${BASE_URL}/videos`,
+    canonical: `${SITE_URL}/videos`,
+    languages: {
+      'en-IN': `${SITE_URL}/videos`,
+    },
   },
   openGraph: {
     title: 'Equipment Demonstration & Laboratory Videos | Vinayak Enterprises',
     description:
       'Watch video demonstrations of microscopes, human anatomical models, CPR training manikins, and laboratory equipment manufactured by Vinayak Enterprises Ambala.',
-    url: `${BASE_URL}/videos`,
+    url: `${SITE_URL}/videos`,
     type: 'video.other',
+    images: [`${SITE_URL}/og-image.png`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Equipment Demonstration & Laboratory Videos | Vinayak Enterprises',
+    description:
+      'Watch video demonstrations of microscopes, human anatomical models, CPR training manikins, and laboratory equipment manufactured by Vinayak Enterprises Ambala.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -35,13 +45,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'Equipment Videos',
-      item: `${BASE_URL}/videos`,
+      item: `${SITE_URL}/videos`,
     },
   ],
 };

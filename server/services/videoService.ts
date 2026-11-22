@@ -63,6 +63,12 @@ export const optimizeCloudinaryVideo = (url: string): string => {
 
 /** Save video file locally if Cloudinary is not configured */
 const saveLocalVideo = (file: Express.Multer.File, folder: string) => {
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    throw new AppError(
+      'Cloudinary is not configured on Vercel. Please configure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Vercel Project Settings, or switch to the "Video / YouTube URL" tab.',
+      400
+    );
+  }
   const ext = EXT_BY_MIME[file.mimetype] || path.extname(file.originalname) || '.mp4';
   const filename = `${Date.now()}-${randomBytes(6).toString('hex')}${ext}`;
   const dir = path.join(process.cwd(), 'public', 'uploads', folder);

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { RequestQuoteClient } from './quote-client';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Request Bulk Quote | Institutional Lab Supply | Vinayak Enterprises',
@@ -14,14 +13,25 @@ export const metadata: Metadata = {
     'Vinayak Enterprises Ambala RFQ',
   ],
   alternates: {
-    canonical: `${BASE_URL}/request-quote`,
+    canonical: `${SITE_URL}/request-quote`,
+    languages: {
+      'en-IN': `${SITE_URL}/request-quote`,
+    },
   },
   openGraph: {
     title: 'Request Bulk Quote | Institutional Lab Supply | Vinayak Enterprises',
     description:
       'Request competitive bulk pricing and quotation for school, college, hospital or research laboratory equipment from Vinayak Enterprises, Ambala, Haryana.',
-    url: `${BASE_URL}/request-quote`,
+    url: `${SITE_URL}/request-quote`,
     type: 'website',
+    images: [`${SITE_URL}/og-image.png`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Request Bulk Quote | Institutional Lab Supply | Vinayak Enterprises',
+    description:
+      'Request competitive bulk pricing and quotation for school, college, hospital or research laboratory equipment from Vinayak Enterprises, Ambala, Haryana.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -33,13 +43,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'Request Quote',
-      item: `${BASE_URL}/request-quote`,
+      item: `${SITE_URL}/request-quote`,
     },
   ],
 };

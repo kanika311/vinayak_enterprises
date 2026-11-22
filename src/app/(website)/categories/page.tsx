@@ -2,11 +2,10 @@ import type { Metadata } from 'next';
 import { CategoriesClient } from './categories-client';
 import { connectDatabase } from '../../../../server/config/database';
 import CategoryModel from '../../../../server/models/Category';
+import { SITE_URL } from '@/lib/site-url';
 import type { Category } from '@/types';
 
 export const revalidate = 1800; // 30 minutes
-
-const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 export const metadata: Metadata = {
   title: 'Product Categories | Laboratory Equipment & Anatomy Models Manufacturer',
@@ -20,14 +19,26 @@ export const metadata: Metadata = {
     'CPR Training Manikins Manufacturer',
   ],
   alternates: {
-    canonical: `${BASE_URL}/categories`,
+    canonical: `${SITE_URL}/categories`,
+    languages: {
+      'en-IN': `${SITE_URL}/categories`,
+      'x-default': `${SITE_URL}/categories`,
+    },
   },
   openGraph: {
     title: 'Product Categories | Laboratory Equipment & Anatomy Models Manufacturer',
     description:
       'Explore product categories from Vinayak Enterprises: Microscopes, Human Anatomy Models, CPR Manikins, Biology Lab Equipment & Science Teaching Aids from Ambala.',
-    url: `${BASE_URL}/categories`,
+    url: `${SITE_URL}/categories`,
     type: 'website',
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'Vinayak Enterprises Product Categories' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Product Categories | Laboratory Equipment & Anatomy Models Manufacturer',
+    description:
+      'Explore product categories from Vinayak Enterprises: Microscopes, Human Anatomy Models, CPR Manikins, Biology Lab Equipment & Science Teaching Aids from Ambala.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -39,13 +50,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'Categories',
-      item: `${BASE_URL}/categories`,
+      item: `${SITE_URL}/categories`,
     },
   ],
 };

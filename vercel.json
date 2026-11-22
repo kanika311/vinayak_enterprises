@@ -1,5 +1,18 @@
 {
   "framework": "nextjs",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "vinayakenterprisess.agency"
+        }
+      ],
+      "destination": "https://www.vinayakenterprisess.agency/:path*",
+      "permanent": true
+    }
+  ],
   "functions": {
     "src/pages/api/v1/[[...path]].ts": {
       "maxDuration": 30,

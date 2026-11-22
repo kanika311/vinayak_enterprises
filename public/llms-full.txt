@@ -11,7 +11,7 @@
 - **Headquarters & Factory Address:** Ambala Cantt, Ambala, Haryana - 133001, India
 - **Geo-Coordinates:** Latitude: 30.3752, Longitude: 76.7821
 - **Founding / Experience:** Over 20 years of continuous manufacturing excellence in Ambala Cantt — historically recognized as the "City of Scientific Instruments" in India.
-- **Official Domain:** https://vinayakenterprisess.agency
+- **Official Domain:** https://www.vinayakenterprisess.agency
 - **Telephone / WhatsApp:** +91 9416029492
 - **Email:** vinayakenterprises52@gmail.com
 - **Operating Hours:** Monday to Saturday, 9:00 AM to 10:00 PM IST
@@ -89,10 +89,10 @@ Constructed to American Heart Association (AHA) and European Resuscitation Counc
 **A:** Yes, we provide pan-India delivery. We regularly supply educational and medical institutions across all 28 states and 8 union territories, including Delhi NCR, Maharashtra, Karnataka, Tamil Nadu, Uttar Pradesh, West Bengal, Gujarat, Rajasthan, Kerala, and the North-Eastern states.
 
 ### Q4: How can institutional buyers request a quotation?
-**A:** Institutional buyers can submit an online RFQ at https://vinayakenterprisess.agency/request-quote, email their list of requirements to vinayakenterprises52@gmail.com, or message us directly on WhatsApp at +91 9416029492. We issue formal itemized quotations within 24 hours.
+**A:** Institutional buyers can submit an online RFQ at https://www.vinayakenterprisess.agency/request-quote, email their list of requirements to vinayakenterprises52@gmail.com, or message us directly on WhatsApp at +91 9416029492. We issue formal itemized quotations within 24 hours.
 
 ### Q5: Can I inspect or download product catalogues?
-**A:** Yes, our interactive flipbook and downloadable PDF catalogues are accessible at https://vinayakenterprisess.agency/catalogues.
+**A:** Yes, our interactive flipbook and downloadable PDF catalogues are accessible at https://www.vinayakenterprisess.agency/catalogues.
 
 ### Q6: What quality standards and warranties apply to your equipment?
 **A:** All scientific instruments and medical models undergo multi-stage optical, mechanical, and dimensional inspections. Products are covered by manufacturer warranty against defects, backed by prompt spare parts availability and technical guidance.
@@ -107,17 +107,17 @@ Constructed to American Heart Association (AHA) and European Resuscitation Counc
 
 ## 4. Canonical Site Map & Resource URLs
 
-1. **Homepage:** https://vinayakenterprisess.agency/
-2. **Products:** https://vinayakenterprisess.agency/products
-3. **Categories:** https://vinayakenterprisess.agency/categories
-4. **Catalogues:** https://vinayakenterprisess.agency/catalogues
-5. **Showcase Videos:** https://vinayakenterprisess.agency/videos
-6. **Request Quote (RFQ):** https://vinayakenterprisess.agency/request-quote
-7. **About Us:** https://vinayakenterprisess.agency/about
-8. **Blog:** https://vinayakenterprisess.agency/blog
-9. **Contact Us:** https://vinayakenterprisess.agency/contact
-10. **Client Reviews:** https://vinayakenterprisess.agency/share-experience
-11. **Robots Exclusion Standard:** https://vinayakenterprisess.agency/robots.txt
-12. **XML Sitemap:** https://vinayakenterprisess.agency/sitemap.xml
-13. **Standard LLM Summary:** https://vinayakenterprisess.agency/llms.txt
-14. **Full LLM Ingestion Document:** https://vinayakenterprisess.agency/llms-full.txt
+1. **Homepage:** https://www.vinayakenterprisess.agency/
+2. **Products:** https://www.vinayakenterprisess.agency/products
+3. **Categories:** https://www.vinayakenterprisess.agency/categories
+4. **Catalogues:** https://www.vinayakenterprisess.agency/catalogues
+5. **Showcase Videos:** https://www.vinayakenterprisess.agency/videos
+6. **Request Quote (RFQ):** https://www.vinayakenterprisess.agency/request-quote
+7. **About Us:** https://www.vinayakenterprisess.agency/about
+8. **Blog:** https://www.vinayakenterprisess.agency/blog
+9. **Contact Us:** https://www.vinayakenterprisess.agency/contact
+10. **Client Reviews:** https://www.vinayakenterprisess.agency/share-experience
+11. **Robots Exclusion Standard:** https://www.vinayakenterprisess.agency/robots.txt
+12. **XML Sitemap:** https://www.vinayakenterprisess.agency/sitemap.xml
+13. **Standard LLM Summary:** https://www.vinayakenterprisess.agency/llms.txt
+14. **Full LLM Ingestion Document:** https://www.vinayakenterprisess.agency/llms-full.txt

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { CategoryGrid } from '@/components/website/category-grid';
@@ -12,15 +13,23 @@ import { AnimatedButton, PulseCTA } from '@/components/website/animated-button';
 import { AnimatedHeading, staggerContainer, fadeUp, slideInRight } from '@/components/website/motion';
 import { ProductMarquee } from '@/components/website/product-marquee';
 import { ManufacturingSection } from '@/components/website/manufacturing-section';
-import { VideoShowcaseSection } from '@/components/website/video-showcase-section';
 import { StatsBar, WhyChooseUsSection } from '@/components/website/home-credibility';
-import { TestimonialsSection } from '@/components/website/testimonials-section';
 import { HomeFAQSection } from '@/components/website/home-faq';
 import { apiGet } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
 import { FALLBACK_PRODUCTS, FALLBACK_BLOGS } from '@/lib/fallback-data';
 import type { Product, Blog, Category } from '@/types';
+
+const VideoShowcaseSection = dynamic(
+  () => import('@/components/website/video-showcase-section').then((m) => m.VideoShowcaseSection),
+  { ssr: true }
+);
+
+const TestimonialsSection = dynamic(
+  () => import('@/components/website/testimonials-section').then((m) => m.TestimonialsSection),
+  { ssr: true }
+);
 
 export interface HomePageClientProps {
   initialProducts?: Product[];
@@ -104,10 +113,10 @@ export function HomePageClient({
               <motion.h1
                 variants={fadeUp}
                 className={`font-bold leading-tight mb-3 ${
-                  hasHeroVideo ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-3xl md:text-4xl lg:text-5xl mb-4'
+                  hasHeroVideo ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl' : 'text-3xl md:text-4xl lg:text-5xl mb-4'
                 }`}
               >
-                {SITE.name}
+                Vinayak Enterprises: Scientific Instruments, Laboratory Equipment &amp; Anatomy Models Manufacturer in Ambala
               </motion.h1>
 
               <motion.p
@@ -200,8 +209,8 @@ export function HomePageClient({
             className="flex items-end justify-between mb-8 gap-4"
           >
             <AnimatedHeading
-              title="Featured Products"
-              subtitle="Microscopes, anatomy models, CPR manikins & laboratory equipment — request a quote for bulk pricing"
+              title="Featured Laboratory Equipment & Scientific Instruments"
+              subtitle="Microscopes, anatomy models, CPR manikins & laboratory equipment — request a quote for institutional bulk supply"
             />
             <motion.div variants={fadeUp} className="hidden sm:block shrink-0">
               <Link
@@ -245,7 +254,7 @@ export function HomePageClient({
           <div className="flex items-end justify-between mb-8 gap-4">
             <div>
               <h2 id="blog-heading" className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-                Latest from the Blog
+                Latest from the Science Education &amp; Lab Equipment Blog
               </h2>
               <p className="text-slate-600 mt-1.5 text-sm">
                 Guides on anatomy models, laboratory equipment and science education

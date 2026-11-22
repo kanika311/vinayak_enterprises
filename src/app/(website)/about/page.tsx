@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { AboutClient } from './about-client';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'About Us | Scientific & Lab Equipment Manufacturer Ambala',
@@ -14,14 +13,26 @@ export const metadata: Metadata = {
     'Vinayak Enterprises Ambala',
   ],
   alternates: {
-    canonical: `${BASE_URL}/about`,
+    canonical: `${SITE_URL}/about`,
+    languages: {
+      'en-IN': `${SITE_URL}/about`,
+      'x-default': `${SITE_URL}/about`,
+    },
   },
   openGraph: {
     title: 'About Us | Scientific & Lab Equipment Manufacturer Ambala',
     description:
       'Vinayak Enterprises is a leading manufacturer & bulk supplier of scientific instruments, anatomical models & laboratory equipment in Ambala, Haryana.',
-    url: `${BASE_URL}/about`,
+    url: `${SITE_URL}/about`,
     type: 'website',
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'About Vinayak Enterprises' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us | Scientific & Lab Equipment Manufacturer Ambala',
+    description:
+      'Vinayak Enterprises is a leading manufacturer & bulk supplier of scientific instruments, anatomical models & laboratory equipment in Ambala, Haryana.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -33,13 +44,13 @@ const breadcrumbData = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: `${BASE_URL}/`,
+      item: `${SITE_URL}/`,
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'About Us',
-      item: `${BASE_URL}/about`,
+      item: `${SITE_URL}/about`,
     },
   ],
 };

@@ -3,11 +3,12 @@ import { connectDatabase } from '../../server/config/database';
 import Product from '../../server/models/Product';
 import Category from '../../server/models/Category';
 import Blog from '../../server/models/Blog';
+import { SITE_URL } from '@/lib/site-url';
 
 export const revalidate = 3600; // Revalidate every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
+  const baseUrl = SITE_URL;
   const now = new Date();
 
   // Core static routes

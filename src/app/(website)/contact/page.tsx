@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { ContactClient } from './contact-client';
-
-const BASE_URL = process.env.CLIENT_URL || 'https://vinayakenterprisess.agency';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Contact Vinayak Enterprises | Lab Equipment Supplier in Ambala',
@@ -14,14 +13,26 @@ export const metadata: Metadata = {
     'Vinayak Enterprises Contact',
   ],
   alternates: {
-    canonical: `${BASE_URL}/contact`,
+    canonical: `${SITE_URL}/contact`,
+    languages: {
+      'en-IN': `${SITE_URL}/contact`,
+      'x-default': `${SITE_URL}/contact`,
+    },
   },
   openGraph: {
     title: 'Contact Vinayak Enterprises | Lab Equipment Supplier in Ambala',
     description:
       'Contact Vinayak Enterprises in Ambala Cantt, Haryana. Phone: +91 94160-29492. Reach out for institutional laboratory equipment quotes & dealer inquiries.',
-    url: `${BASE_URL}/contact`,
+    url: `${SITE_URL}/contact`,
     type: 'website',
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'Contact Vinayak Enterprises' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Vinayak Enterprises | Lab Equipment Supplier in Ambala',
+    description:
+      'Contact Vinayak Enterprises in Ambala Cantt, Haryana. Phone: +91 94160-29492. Reach out for institutional laboratory equipment quotes & dealer inquiries.',
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -30,8 +41,8 @@ const structuredData = {
   '@graph': [
     {
       '@type': 'ContactPage',
-      '@id': `${BASE_URL}/contact/#webpage`,
-      url: `${BASE_URL}/contact`,
+      '@id': `${SITE_URL}/contact/#webpage`,
+      url: `${SITE_URL}/contact`,
       name: 'Contact Vinayak Enterprises',
       description: 'Contact details and inquiry form for Vinayak Enterprises Ambala.',
     },
@@ -42,13 +53,13 @@ const structuredData = {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: `${BASE_URL}/`,
+          item: `${SITE_URL}/`,
         },
         {
           '@type': 'ListItem',
           position: 2,
           name: 'Contact Us',
-          item: `${BASE_URL}/contact`,
+          item: `${SITE_URL}/contact`,
         },
       ],
     },

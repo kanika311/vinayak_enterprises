@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
-
   const privatePaths = [
     '/console/',
     '/console/*',
@@ -66,8 +65,13 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/console/', '/admin/', '/api/'],
       },
+      {
+        userAgent: 'Amazonbot',
+        allow: '/',
+        disallow: ['/console/', '/admin/', '/api/'],
+      },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

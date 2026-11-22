@@ -20,7 +20,7 @@ export async function GET() {
     });
   } catch (error) {
     return new NextResponse(
-      '# Vinayak Enterprises — Comprehensive Knowledge Base\n\nVisit: https://vinayakenterprisess.agency/llms.txt\n',
+      '# Vinayak Enterprises — Comprehensive Knowledge Base\n\nVisit: https://www.vinayakenterprisess.agency/llms.txt\n',
       {
         status: 200,
         headers: {

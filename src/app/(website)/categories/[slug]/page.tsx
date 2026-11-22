@@ -4,11 +4,10 @@ import { connectDatabase } from '../../../../../server/config/database';
 import CategoryModel from '../../../../../server/models/Category';
 import ProductModel from '../../../../../server/models/Product';
 import { CategoryDetailClient } from './category-detail-client';
+import { SITE_URL } from '@/lib/site-url';
 import type { Category, Product } from '@/types';
 
 export const revalidate = 1800; // 30 minutes
-
-const BASE_URL = (process.env.CLIENT_URL || 'https://vinayakenterprisess.agency').replace(/\/$/, '');
 
 async function getCategoryAndProductsBySlug(slug: string): Promise<{ category: Category | null; products: Product[] }> {
   try {
@@ -54,12 +53,18 @@ export async function generateMetadata({
   const description =
     category.description ||
     `Explore ${category.name} manufactured by Vinayak Enterprises in Ambala, Haryana. Wholesale supplier of scientific instruments & institutional lab equipment across India.`;
-  const canonical = `${BASE_URL}/categories/${category.slug}`;
+  const canonical = `${SITE_URL}/categories/${category.slug}`;
 
   return {
     title,
     description: description.slice(0, 160),
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      languages: {
+        'en-IN': canonical,
+        'x-default': canonical,
+      },
+    },
     keywords: [
       category.name,
       `${category.name} Manufacturer India`,
@@ -72,11 +77,20 @@ export async function generateMetadata({
       description: description.slice(0, 160),
       url: canonical,
       type: 'website',
+      images: [
+        {
+          url: `${SITE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${category.name} - Vinayak Enterprises`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: description.slice(0, 160),
+      images: [`${SITE_URL}/og-image.png`],
     },
   };
 }
@@ -101,19 +115,19 @@ export default async function CategoryPage({
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: `${BASE_URL}/`,
+        item: `${SITE_URL}/`,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Categories',
-        item: `${BASE_URL}/categories`,
+        item: `${SITE_URL}/categories`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: category.name,
-        item: `${BASE_URL}/categories/${category.slug}`,
+        item: `${SITE_URL}/categories/${category.slug}`,
       },
     ],
   };
@@ -123,7 +137,7 @@ export default async function CategoryPage({
     '@type': 'CollectionPage',
     name: `${category.name} - Vinayak Enterprises`,
     description: category.description || `Browse ${category.name} from Vinayak Enterprises Ambala.`,
-    url: `${BASE_URL}/categories/${category.slug}`,
+    url: `${SITE_URL}/categories/${category.slug}`,
   };
 
   return (

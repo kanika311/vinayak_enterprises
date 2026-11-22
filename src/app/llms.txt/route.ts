@@ -20,7 +20,7 @@ export async function GET() {
     });
   } catch (error) {
     return new NextResponse(
-      '# Vinayak Enterprises\n\n> Leading Manufacturer of Scientific Instruments, Laboratory Equipment, Anatomical Models & Microscopes in Ambala, India.\n\nWebsite: https://vinayakenterprisess.agency\nPhone: +91 9416029492\nEmail: vinayakenterprises52@gmail.com\n',
+      '# Vinayak Enterprises\n\n> Leading Manufacturer of Scientific Instruments, Laboratory Equipment, Anatomical Models & Microscopes in Ambala, India.\n\nWebsite: https://www.vinayakenterprisess.agency\nPhone: +91 9416029492\nEmail: vinayakenterprises52@gmail.com\n',
       {
         status: 200,
         headers: {

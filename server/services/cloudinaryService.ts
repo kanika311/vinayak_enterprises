@@ -1,5 +1,6 @@
 import { Readable } from 'stream';
 import cloudinary, { ensureCloudinaryConfigured } from '../config/cloudinary';
+import { AppError } from '../utils/helpers';
 
 const bufferToStream = (buffer: Buffer): Readable => {
   const stream = new Readable();
@@ -45,7 +46,10 @@ export const getMediaType = (mimetype: string): 'image' | 'video' | 'pdf' | 'doc
 /** Generate signed upload parameters so the browser can upload large videos directly to Cloudinary */
 export const getCloudinarySignature = (folder = 'showcase_videos') => {
   if (!ensureCloudinaryConfigured()) {
-    throw new Error('Cloudinary is not configured');
+    throw new AppError(
+      'Cloudinary is not configured. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Vercel Project Settings.',
+      400
+    );
   }
   const timestamp = Math.round(new Date().getTime() / 1000);
   const paramsToSign: Record<string, string | number> = {
