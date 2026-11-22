@@ -12,7 +12,6 @@ import { HeroBackground, useHeroBanners } from '@/components/website/hero-backgr
 import { AnimatedButton, PulseCTA } from '@/components/website/animated-button';
 import { AnimatedHeading, staggerContainer, fadeUp, slideInRight } from '@/components/website/motion';
 import { ProductMarquee } from '@/components/website/product-marquee';
-import { ManufacturingSection } from '@/components/website/manufacturing-section';
 import { StatsBar, WhyChooseUsSection } from '@/components/website/home-credibility';
 import { HomeFAQSection } from '@/components/website/home-faq';
 import { apiGet } from '@/lib/api';
@@ -245,7 +244,6 @@ export function HomePageClient({
         </div>
       </section>
 
-      <ManufacturingSection />
       <VideoShowcaseSection />
       <WhyChooseUsSection />
 

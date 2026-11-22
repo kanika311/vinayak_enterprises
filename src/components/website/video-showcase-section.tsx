@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X, ExternalLink, ShieldCheck, MessageCircle, FileText, Sparkles } from 'lucide-react';
+import { Play, X, ExternalLink, ShieldCheck, MessageCircle, FileText } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api';
 import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
@@ -121,20 +121,13 @@ export function VideoShowcaseSection() {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-[#1a3a6b] mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-            Equipment Walkthroughs &amp; Demonstrations
-          </span>
+        <div className="text-center max-w-2xl mx-auto mb-8">
           <h2
             id="videos-heading"
-            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight"
+            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight"
           >
-            Watch Our Instruments In Action
+            Videos
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base mt-2.5 leading-relaxed">
-            High-definition video walkthroughs of microscopes, anatomical models, CPR manikins and scientific laboratory apparatus — manufactured in Ambala.
-          </p>
         </div>
 
         {/* Category Pills Filter */}
