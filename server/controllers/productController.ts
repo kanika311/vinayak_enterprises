@@ -4,6 +4,9 @@ import { asyncHandler, sendResponse, getParam } from '../utils/helpers';
 import * as productService from '../services/productService';
 
 export const getProducts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+  }
   const result = await productService.getProducts(req.query as Record<string, string>);
   sendResponse(res, 200, result);
 });
@@ -14,6 +17,9 @@ export const getProduct = asyncHandler(async (req: AuthRequest, res: Response) =
 });
 
 export const getProductBySlug = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+  }
   const product = await productService.getProductBySlug(getParam(req.params.slug));
   sendResponse(res, 200, product);
 });

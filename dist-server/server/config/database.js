@@ -14,6 +14,11 @@ const connectDatabase = async () => {
     if (!cached.promise) {
         cached.promise = mongoose_1.default.connect(uri, {
             bufferCommands: false,
+            maxPoolSize: 10,
+            minPoolSize: 0,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 30000,
+            family: 4,
         });
     }
     try {

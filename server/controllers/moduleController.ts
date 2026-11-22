@@ -11,6 +11,9 @@ import * as bannerService from '../services/bannerService';
 
 // Categories
 export const getCategories = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+  }
   const categories = await categoryService.getCategories(req.query.active === 'true');
   sendResponse(res, 200, categories);
 });
@@ -79,11 +82,17 @@ export const getRFQReport = asyncHandler(async (req: AuthRequest, res: Response)
 
 // Blogs
 export const getBlogs = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+  }
   const result = await blogService.getBlogs(req.query as Record<string, string>, !req.user);
   sendResponse(res, 200, result);
 });
 
 export const getBlogBySlug = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+  }
   const blog = await blogService.getBlogBySlug(getParam(req.params.slug));
   sendResponse(res, 200, blog);
 });
@@ -94,6 +103,9 @@ export const getBlogById = asyncHandler(async (req: AuthRequest, res: Response) 
 });
 
 export const getCategoryBySlug = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+  }
   const category = await categoryService.getCategoryBySlug(getParam(req.params.slug));
   sendResponse(res, 200, category);
 });
@@ -144,6 +156,9 @@ export const deleteCatalogue = asyncHandler(async (req: AuthRequest, res: Respon
 
 // Testimonials
 export const getTestimonials = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+  }
   const items = await miscService.getTestimonials(!req.user);
   sendResponse(res, 200, items);
 });
@@ -225,6 +240,7 @@ export const updateInquiry = asyncHandler(async (req: AuthRequest, res: Response
 
 // Banners (hero background videos)
 export const getPublicBanners = asyncHandler(async (req: AuthRequest, res: Response) => {
+  res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
   const banners = await bannerService.getPublicBanners((req.query.placement as string) || 'hero');
   sendResponse(res, 200, banners);
 });
@@ -290,6 +306,7 @@ export const upsertPage = asyncHandler(async (req: AuthRequest, res: Response) =
 
 // Settings
 export const getPublicSettings = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
   const settings = await miscService.getPublicSettings();
   sendResponse(res, 200, settings);
 });

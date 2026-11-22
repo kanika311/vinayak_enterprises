@@ -37,6 +37,9 @@ exports.uploadProductImage = exports.deleteProduct = exports.updateProduct = exp
 const helpers_1 = require("../utils/helpers");
 const productService = __importStar(require("../services/productService"));
 exports.getProducts = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+    }
     const result = await productService.getProducts(req.query);
     (0, helpers_1.sendResponse)(res, 200, result);
 });
@@ -45,6 +48,9 @@ exports.getProduct = (0, helpers_1.asyncHandler)(async (req, res) => {
     (0, helpers_1.sendResponse)(res, 200, product);
 });
 exports.getProductBySlug = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+    }
     const product = await productService.getProductBySlug((0, helpers_1.getParam)(req.params.slug));
     (0, helpers_1.sendResponse)(res, 200, product);
 });

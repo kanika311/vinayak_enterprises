@@ -36,5 +36,7 @@ const blogSchema = new Schema<IBlog>(
 );
 
 blogSchema.index({ title: 'text', content: 'text' });
+blogSchema.index({ status: 1, publishedAt: -1, createdAt: -1 });
+blogSchema.index({ slug: 1 });
 
 export default mongoose.model<IBlog>('Blog', blogSchema);

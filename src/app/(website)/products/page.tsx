@@ -23,7 +23,6 @@ export default function ProductsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['products-public', search, category],
     queryFn: () => apiGet<{ products: Product[] }>('/products', { status: 'published', limit: 24, search, category }),
-    refetchOnMount: 'always',
   });
 
   const apiProducts = data?.products || [];

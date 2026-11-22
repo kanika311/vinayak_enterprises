@@ -45,6 +45,9 @@ const miscService = __importStar(require("../services/miscService"));
 const bannerService = __importStar(require("../services/bannerService"));
 // Categories
 exports.getCategories = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+    }
     const categories = await categoryService.getCategories(req.query.active === 'true');
     (0, helpers_1.sendResponse)(res, 200, categories);
 });
@@ -100,10 +103,16 @@ exports.getRFQReport = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Blogs
 exports.getBlogs = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+    }
     const result = await blogService.getBlogs(req.query, !req.user);
     (0, helpers_1.sendResponse)(res, 200, result);
 });
 exports.getBlogBySlug = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+    }
     const blog = await blogService.getBlogBySlug((0, helpers_1.getParam)(req.params.slug));
     (0, helpers_1.sendResponse)(res, 200, blog);
 });
@@ -112,6 +121,9 @@ exports.getBlogById = (0, helpers_1.asyncHandler)(async (req, res) => {
     (0, helpers_1.sendResponse)(res, 200, blog);
 });
 exports.getCategoryBySlug = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+    }
     const category = await categoryService.getCategoryBySlug((0, helpers_1.getParam)(req.params.slug));
     (0, helpers_1.sendResponse)(res, 200, category);
 });
@@ -153,6 +165,9 @@ exports.deleteCatalogue = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Testimonials
 exports.getTestimonials = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+    }
     const items = await miscService.getTestimonials(!req.user);
     (0, helpers_1.sendResponse)(res, 200, items);
 });
@@ -219,6 +234,7 @@ exports.updateInquiry = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Banners (hero background videos)
 exports.getPublicBanners = (0, helpers_1.asyncHandler)(async (req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
     const banners = await bannerService.getPublicBanners(req.query.placement || 'hero');
     (0, helpers_1.sendResponse)(res, 200, banners);
 });
@@ -274,6 +290,7 @@ exports.upsertPage = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Settings
 exports.getPublicSettings = (0, helpers_1.asyncHandler)(async (_req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
     const settings = await miscService.getPublicSettings();
     (0, helpers_1.sendResponse)(res, 200, settings);
 });

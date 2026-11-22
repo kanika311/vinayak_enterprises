@@ -22,7 +22,8 @@ const getProducts = async (query) => {
             .populate('category', 'name slug')
             .sort(sort)
             .skip(skip)
-            .limit(limit),
+            .limit(limit)
+            .lean(),
         Product_1.default.countDocuments(filter),
     ]);
     return { products, total, page, limit, pages: Math.ceil(total / limit) };

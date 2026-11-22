@@ -34,4 +34,7 @@ const categorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
+categorySchema.index({ isActive: 1, order: 1 });
+categorySchema.index({ slug: 1 });
+
 export default mongoose.model<ICategory>('Category', categorySchema);

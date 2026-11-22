@@ -21,6 +21,11 @@ export const connectDatabase = async (): Promise<typeof mongoose> => {
   if (!cached.promise) {
     cached.promise = mongoose.connect(uri, {
       bufferCommands: false,
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      family: 4,
     });
   }
 

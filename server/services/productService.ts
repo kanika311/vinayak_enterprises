@@ -19,7 +19,8 @@ export const getProducts = async (query: Record<string, string>) => {
       .populate('category', 'name slug')
       .sort(sort)
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
     Product.countDocuments(filter),
   ]);
 

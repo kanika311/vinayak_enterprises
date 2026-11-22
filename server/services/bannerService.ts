@@ -41,6 +41,19 @@ export const uploadBannerVideo = async (
   return saveLocal(file, 'banners');
 };
 
+const optimizeCloudinaryVideo = (url: string) => {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/video/upload/')) return url;
+  if (url.includes('/upload/f_auto') || url.includes('/upload/q_auto')) return url;
+  return url.replace('/video/upload/', '/video/upload/f_auto,q_auto:eco,vc_auto,w_1280/');
+};
+
+const makeCloudinaryPoster = (url: string) => {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/video/upload/')) return undefined;
+  return url
+    .replace('/video/upload/', '/video/upload/so_0,f_auto,q_auto,w_1280/')
+    .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+};
+
 export const getBanners = async (query: Record<string, string> = {}) => {
   const filter: Record<string, unknown> = {};
   if (query.active === 'true') filter.isActive = true;
@@ -49,7 +62,15 @@ export const getBanners = async (query: Record<string, string> = {}) => {
 };
 
 export const getPublicBanners = async (placement = 'hero') => {
-  return Banner.find({ isActive: true, placement }).sort({ order: 1, createdAt: -1 });
+  const docs = await Banner.find({ isActive: true, placement })
+    .sort({ order: 1, createdAt: -1 })
+    .lean();
+
+  return docs.map((b) => ({
+    ...b,
+    videoUrl: optimizeCloudinaryVideo(b.videoUrl),
+    posterUrl: b.posterUrl || makeCloudinaryPoster(b.videoUrl),
+  }));
 };
 
 export const createBanner = async (data: {
@@ -63,11 +84,14 @@ export const createBanner = async (data: {
 }) => {
   if (!data.title?.trim()) throw new AppError('Title is required', 400);
   if (!data.videoUrl) throw new AppError('Video is required', 400);
+
+  const poster = data.posterUrl || makeCloudinaryPoster(data.videoUrl);
+
   return Banner.create({
     title: data.title.trim(),
     videoUrl: data.videoUrl,
     videoPublicId: data.videoPublicId,
-    posterUrl: data.posterUrl,
+    posterUrl: poster,
     placement: data.placement || 'hero',
     isActive: data.isActive !== false,
     order: data.order ?? 0,

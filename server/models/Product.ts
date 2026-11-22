@@ -54,5 +54,8 @@ const productSchema = new Schema<IProduct>(
 );
 
 productSchema.index({ name: 'text', shortDescription: 'text', sku: 'text' });
+productSchema.index({ status: 1, createdAt: -1 });
+productSchema.index({ category: 1, status: 1 });
+productSchema.index({ slug: 1 });
 
 export default mongoose.model<IProduct>('Product', productSchema);
