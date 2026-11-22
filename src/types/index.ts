@@ -104,6 +104,23 @@ export interface Blog {
   updatedAt?: string;
 }
 
+export interface ShowcaseVideo {
+  _id: string;
+  title: string;
+  description?: string;
+  videoUrl: string;
+  videoPublicId?: string;
+  posterUrl?: string;
+  category: string;
+  duration?: string;
+  isFeatured: boolean;
+  isActive: boolean;
+  order: number;
+  views: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface DashboardData {
   stats: {
     totalProducts: number;

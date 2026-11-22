@@ -108,6 +108,15 @@ router.post('/banners', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.create
 router.put('/banners/:id', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.updateBanner);
 router.delete('/banners/:id', protect, authorize(PERMISSIONS.PAGES), moduleCtrl.deleteBanner);
 
+// Showcase Videos (Equipment Demos & Lab Tutorials)
+router.get('/videos/public', moduleCtrl.getPublicVideos);
+router.post('/videos/:id/view', moduleCtrl.trackVideoView);
+router.get('/videos', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.getShowcaseVideos);
+router.post('/videos/upload', protect, authorize(PERMISSIONS.MEDIA), upload.single('file'), moduleCtrl.uploadShowcaseVideo);
+router.post('/videos', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.createShowcaseVideo);
+router.put('/videos/:id', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.updateShowcaseVideo);
+router.delete('/videos/:id', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.deleteShowcaseVideo);
+
 // Media
 router.get('/media', protect, authorize(PERMISSIONS.MEDIA), moduleCtrl.getMedia);
 router.post('/media/upload', protect, authorize(PERMISSIONS.MEDIA), upload.single('file'), moduleCtrl.uploadMedia);

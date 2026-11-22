@@ -296,6 +296,10 @@ const generateSitemap = async () => {
     ]);
     const urls = [
         { loc: baseUrl, priority: '1.0' },
+        { loc: `${baseUrl}/videos`, priority: '0.9' },
+        { loc: `${baseUrl}/catalogues`, priority: '0.9' },
+        { loc: `${baseUrl}/about`, priority: '0.8' },
+        { loc: `${baseUrl}/contact`, priority: '0.8' },
         ...categories.map((c) => ({ loc: `${baseUrl}/categories/${c.slug}`, lastmod: c.updatedAt })),
         ...products.map((p) => ({ loc: `${baseUrl}/products/${p.slug}`, lastmod: p.updatedAt })),
         ...blogs.map((b) => ({ loc: `${baseUrl}/blog/${b.slug}`, lastmod: b.updatedAt })),

@@ -120,6 +120,14 @@ router.post('/banners/upload-video', auth_1.protect, (0, auth_1.authorize)(const
 router.post('/banners', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.createBanner);
 router.put('/banners/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.updateBanner);
 router.delete('/banners/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.PAGES), moduleCtrl.deleteBanner);
+// Showcase Videos (Equipment Demos & Lab Tutorials)
+router.get('/videos/public', moduleCtrl.getPublicVideos);
+router.post('/videos/:id/view', moduleCtrl.trackVideoView);
+router.get('/videos', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.getShowcaseVideos);
+router.post('/videos/upload', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), upload_1.upload.single('file'), moduleCtrl.uploadShowcaseVideo);
+router.post('/videos', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.createShowcaseVideo);
+router.put('/videos/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.updateShowcaseVideo);
+router.delete('/videos/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.deleteShowcaseVideo);
 // Media
 router.get('/media', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), moduleCtrl.getMedia);
 router.post('/media/upload', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.MEDIA), upload_1.upload.single('file'), moduleCtrl.uploadMedia);

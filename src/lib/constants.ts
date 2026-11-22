@@ -40,6 +40,7 @@ export const SEO = {
 export const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Our Products' },
+  { href: '/videos', label: 'Videos' },
   { href: '/catalogues', label: 'Download Catalogue' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About Us' },

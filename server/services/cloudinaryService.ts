@@ -41,3 +41,10 @@ export const getMediaType = (mimetype: string): 'image' | 'video' | 'pdf' | 'doc
   if (mimetype === 'application/pdf') return 'pdf';
   return 'document';
 };
+
+/** Convert any Cloudinary image to WebP with auto quality */
+export const toWebpUrl = (url: string): string => {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;
+  if (url.includes('/upload/f_webp')) return url;
+  return url.replace('/image/upload/', '/image/upload/f_webp,q_auto/');
+};

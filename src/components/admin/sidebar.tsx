@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, FolderTree, Users, BookOpen,
-  Settings, LogOut, Menu, X, ClipboardList, Star, Video,
+  Settings, LogOut, Menu, X, ClipboardList, Star, Video, PlaySquare,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -34,6 +34,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: `${ADMIN_BASE}/blogs`, label: 'Blogs', icon: BookOpen, description: 'Manage blog posts' },
       { href: `${ADMIN_BASE}/banners`, label: 'Banner Videos', icon: Video, description: 'Homepage hero looping background videos' },
+      { href: `${ADMIN_BASE}/videos`, label: 'Showcase Videos', icon: PlaySquare, description: 'Product demos & laboratory walkthroughs' },
       { href: `${ADMIN_BASE}/testimonials`, label: 'Testimonials', icon: Star, description: 'Approve client reviews' },
     ],
   },

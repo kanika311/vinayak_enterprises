@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getWebpImageUrl } from '@/lib/utils';
 
 interface ProductCardProps {
   product: {
@@ -23,7 +23,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
-  const imageUrl = product.images?.[0]?.url;
+  const imageUrl = getWebpImageUrl(product.images?.[0]?.url, 600);
   const categoryName = typeof product.category === 'object' ? product.category?.name : '';
   const isDark = variant === 'dark';
 

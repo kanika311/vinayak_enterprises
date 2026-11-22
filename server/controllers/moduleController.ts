@@ -8,6 +8,7 @@ import * as blogService from '../services/blogService';
 import * as catalogueService from '../services/catalogueService';
 import * as miscService from '../services/miscService';
 import * as bannerService from '../services/bannerService';
+import * as videoService from '../services/videoService';
 
 // Categories
 export const getCategories = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -269,6 +270,44 @@ export const updateBanner = asyncHandler(async (req: AuthRequest, res: Response)
 export const deleteBanner = asyncHandler(async (req: AuthRequest, res: Response) => {
   await bannerService.deleteBanner(getParam(req.params.id));
   sendResponse(res, 200, null, 'Deleted');
+});
+
+// Showcase Videos (Equipment Demos & Lab Videos)
+export const getPublicVideos = asyncHandler(async (req: AuthRequest, res: Response) => {
+  res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+  const videos = await videoService.getPublicVideos(req.query.category as string | undefined);
+  sendResponse(res, 200, videos);
+});
+
+export const getShowcaseVideos = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const videos = await videoService.getVideos(req.query as Record<string, string>);
+  sendResponse(res, 200, videos);
+});
+
+export const uploadShowcaseVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.file) throw new Error('No video file uploaded');
+  const result = await videoService.uploadShowcaseVideoFile(req.file);
+  sendResponse(res, 201, result);
+});
+
+export const createShowcaseVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const video = await videoService.createVideo(req.body);
+  sendResponse(res, 201, video);
+});
+
+export const updateShowcaseVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const video = await videoService.updateVideo(getParam(req.params.id), req.body);
+  sendResponse(res, 200, video);
+});
+
+export const deleteShowcaseVideo = asyncHandler(async (req: AuthRequest, res: Response) => {
+  await videoService.deleteVideo(getParam(req.params.id));
+  sendResponse(res, 200, null, 'Video deleted');
+});
+
+export const trackVideoView = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const updated = await videoService.trackVideoView(getParam(req.params.id));
+  sendResponse(res, 200, { views: updated?.views || 0 });
 });
 
 // Media

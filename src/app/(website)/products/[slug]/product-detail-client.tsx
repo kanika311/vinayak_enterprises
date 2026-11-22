@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { apiGet } from '@/lib/api';
 import { useSiteContact } from '@/hooks/use-site-contact';
 import { whatsappChatUrl } from '@/lib/site-contact';
+import { getWebpImageUrl } from '@/lib/utils';
 import type { Product } from '@/types';
 
 export function ProductDetailClient({ slug, initialProduct }: { slug: string; initialProduct?: Product | null }) {
@@ -66,7 +67,7 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
             <div className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden relative">
               {product.images?.[0]?.url ? (
                 <Image
-                  src={product.images[0].url}
+                  src={getWebpImageUrl(product.images[0].url, 800)}
                   alt={`${product.name} - manufactured by Vinayak Enterprises Ambala`}
                   fill
                   priority
@@ -85,7 +86,7 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
                 {product.images.map((img, i) => (
                   <div key={img.url} className="relative h-16 w-16 shrink-0 rounded-lg border bg-slate-50 overflow-hidden">
                     <Image
-                      src={img.url}
+                      src={getWebpImageUrl(img.url, 160)}
                       alt={`${product.name} view ${i + 1}`}
                       fill
                       sizes="64px"

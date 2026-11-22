@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
+exports.toWebpUrl = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
 const stream_1 = require("stream");
 const cloudinary_1 = __importStar(require("../config/cloudinary"));
 const bufferToStream = (buffer) => {
@@ -73,3 +73,12 @@ const getMediaType = (mimetype) => {
     return 'document';
 };
 exports.getMediaType = getMediaType;
+/** Convert any Cloudinary image to WebP with auto quality */
+const toWebpUrl = (url) => {
+    if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/'))
+        return url;
+    if (url.includes('/upload/f_webp'))
+        return url;
+    return url.replace('/image/upload/', '/image/upload/f_webp,q_auto/');
+};
+exports.toWebpUrl = toWebpUrl;

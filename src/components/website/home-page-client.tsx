@@ -12,6 +12,7 @@ import { AnimatedButton, PulseCTA } from '@/components/website/animated-button';
 import { AnimatedHeading, staggerContainer, fadeUp, slideInRight } from '@/components/website/motion';
 import { ProductMarquee } from '@/components/website/product-marquee';
 import { ManufacturingSection } from '@/components/website/manufacturing-section';
+import { VideoShowcaseSection } from '@/components/website/video-showcase-section';
 import { StatsBar, WhyChooseUsSection } from '@/components/website/home-credibility';
 import { TestimonialsSection } from '@/components/website/testimonials-section';
 import { HomeFAQSection } from '@/components/website/home-faq';
@@ -218,6 +219,7 @@ export function HomePageClient() {
       </section>
 
       <ManufacturingSection />
+      <VideoShowcaseSection />
       <WhyChooseUsSection />
 
       <section className="py-14 bg-white overflow-hidden" aria-labelledby="blog-heading">
