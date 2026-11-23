@@ -1,9 +1,20 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle, FileText, MessageCircle, HelpCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  CheckCircle,
+  FileText,
+  MessageCircle,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiGet } from '@/lib/api';
 import { useSiteContact } from '@/hooks/use-site-contact';
@@ -13,6 +24,8 @@ import type { Product } from '@/types';
 
 export function ProductDetailClient({ slug, initialProduct }: { slug: string; initialProduct?: Product | null }) {
   const { site } = useSiteContact();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const { data: product = initialProduct, isLoading } = useQuery({
     queryKey: ['product', slug],
@@ -42,6 +55,30 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
 
   const bulkOrderWhatsAppMessage = `Namaste Vinayak Enterprises! Mujhe bulk / institutional supply ke liye quote chahiye:\n- Product: ${product.name}\n- SKU: ${product.sku}\nKripya quantity discount aur wholesale quotation provide karein.`;
 
+  const images = product.images && product.images.length > 0 ? product.images : [];
+  const currentImage = images[activeImageIndex] || images[0];
+
+  const handlePrevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setActiveImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setActiveImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+      if (e.key === 'ArrowLeft') handlePrevImage();
+      if (e.key === 'ArrowRight') handleNextImage();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, images.length]);
+
   return (
     <div className="bg-slate-50 min-h-screen">
       <div className="container mx-auto px-4 py-6">
@@ -64,36 +101,90 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
 
         <div className="grid lg:grid-cols-2 gap-10 bg-white rounded-2xl border p-6 lg:p-10 shadow-sm">
           <div>
-            <div className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden relative">
-              {product.images?.[0]?.url ? (
-                <Image
-                  src={getWebpImageUrl(product.images[0].url, 800)}
-                  alt={`${product.name} - manufactured by Vinayak Enterprises Ambala`}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-contain p-4"
-                  unoptimized={product.images[0].url.startsWith('/uploads/')}
-                />
+            <div
+              className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden relative group cursor-pointer border border-slate-200"
+              onClick={() => images.length > 0 && setIsLightboxOpen(true)}
+              title="Click to view fullscreen photo"
+            >
+              {currentImage?.url ? (
+                <>
+                  <Image
+                    key={currentImage.url}
+                    src={getWebpImageUrl(currentImage.url, 900)}
+                    alt={currentImage.alt || `${product.name} - view ${activeImageIndex + 1} by Vinayak Enterprises`}
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                    unoptimized={currentImage.url.startsWith('/uploads/')}
+                  />
+
+                  {/* Click to Zoom indicator */}
+                  <div className="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 text-white text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 backdrop-blur-sm transition-opacity opacity-80 group-hover:opacity-100 shadow-md">
+                    <ZoomIn className="w-3.5 h-3.5" />
+                    <span>Click to zoom</span>
+                  </div>
+
+                  {/* Photo count indicator */}
+                  {images.length > 1 && (
+                    <div className="absolute top-3 left-3 bg-slate-900/70 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm shadow-sm">
+                      {activeImageIndex + 1} / {images.length} Photos
+                    </div>
+                  )}
+
+                  {/* Left / Right arrows on main image */}
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handlePrevImage}
+                        aria-label="Previous photo"
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleNextImage}
+                        aria-label="Next photo"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+                </>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-8xl" aria-label="Product thumbnail placeholder">
                   🔬
                 </div>
               )}
             </div>
-            {product.images && product.images.length > 1 && (
-              <div className="flex gap-2 mt-3 overflow-x-auto">
-                {product.images.map((img, i) => (
-                  <div key={img.url} className="relative h-16 w-16 shrink-0 rounded-lg border bg-slate-50 overflow-hidden">
+
+            {/* Thumbnails below */}
+            {images.length > 1 && (
+              <div className="flex gap-2.5 mt-3.5 overflow-x-auto pb-1 items-center">
+                {images.map((img, i) => (
+                  <button
+                    key={`${img.url}-${i}`}
+                    type="button"
+                    onClick={() => setActiveImageIndex(i)}
+                    className={`relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-lg border-2 bg-slate-50 overflow-hidden transition-all duration-200 cursor-pointer ${
+                      activeImageIndex === i
+                        ? 'border-orange-500 ring-2 ring-orange-500/30 scale-105 shadow-sm'
+                        : 'border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100'
+                    }`}
+                    aria-label={`View photo ${i + 1}`}
+                  >
                     <Image
                       src={getWebpImageUrl(img.url, 160)}
                       alt={`${product.name} view ${i + 1}`}
                       fill
-                      sizes="64px"
+                      sizes="80px"
                       className="object-contain p-1"
                       unoptimized={img.url.startsWith('/uploads/')}
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -281,6 +372,110 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
           </div>
         )}
       </div>
+
+      {/* Lightbox Fullscreen Modal */}
+      {isLightboxOpen && currentImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/92 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center justify-between text-white max-w-6xl mx-auto w-full z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-sm sm:text-base truncate max-w-md">{product.name}</span>
+              {images.length > 1 && (
+                <span className="text-xs bg-white/20 px-2.5 py-0.5 rounded-full font-mono">
+                  {activeImageIndex + 1} / {images.length}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              aria-label="Close fullscreen view"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Center Image */}
+          <div
+            className="relative flex-1 flex items-center justify-center my-2 max-w-5xl mx-auto w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                aria-label="Previous photo"
+                className="absolute left-2 sm:left-4 z-20 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white transition-all hover:scale-110 cursor-pointer shadow-lg"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            <div className="relative w-full h-[70vh] max-h-[800px]">
+              <Image
+                src={getWebpImageUrl(currentImage.url, 1400)}
+                alt={currentImage.alt || product.name}
+                fill
+                priority
+                sizes="95vw"
+                className="object-contain"
+                unoptimized={currentImage.url.startsWith('/uploads/')}
+              />
+            </div>
+
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={handleNextImage}
+                aria-label="Next photo"
+                className="absolute right-2 sm:right-4 z-20 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white transition-all hover:scale-110 cursor-pointer shadow-lg"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          {/* Thumbnails row at bottom of lightbox */}
+          {images.length > 1 && (
+            <div
+              className="flex gap-2 justify-center overflow-x-auto max-w-4xl mx-auto w-full py-2 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {images.map((img, i) => (
+                <button
+                  key={`${img.url}-lightbox-${i}`}
+                  type="button"
+                  onClick={() => setActiveImageIndex(i)}
+                  className={`relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-lg border-2 overflow-hidden transition-all cursor-pointer ${
+                    activeImageIndex === i
+                      ? 'border-orange-500 scale-110 shadow-lg ring-2 ring-orange-500/50'
+                      : 'border-white/30 opacity-60 hover:opacity-100'
+                  }`}
+                  aria-label={`Thumbnail ${i + 1}`}
+                >
+                  <Image
+                    src={getWebpImageUrl(img.url, 160)}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain p-1"
+                    unoptimized={img.url.startsWith('/uploads/')}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
