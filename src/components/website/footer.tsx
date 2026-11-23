@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, MessageCircle, ShieldCheck, FileCheck } from 'lucide-react';
@@ -12,7 +11,6 @@ import { whatsappChatUrl } from '@/lib/site-contact';
 
 export function WebsiteFooter() {
   const { site } = useSiteContact();
-  const [emailRevealed, setEmailRevealed] = useState(false);
 
   return (
     <footer className="bg-white text-slate-600 border-t border-slate-200 overflow-hidden" aria-label="Site Footer">
@@ -148,23 +146,12 @@ export function WebsiteFooter() {
               ))}
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-orange-500" />
-                {emailRevealed ? (
-                  <a
-                    href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
-                    className="hover:text-[#1a3a6b] text-slate-800 font-medium break-all transition-colors"
-                  >
-                    {site.email}
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setEmailRevealed(true)}
-                    className="hover:text-orange-600 text-left transition-colors text-xs text-slate-600 underline underline-offset-2"
-                    title="Click to reveal email"
-                  >
-                    Click to reveal email or use Contact Form →
-                  </button>
-                )}
+                <a
+                  href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+                  className="hover:text-orange-600 text-slate-700 font-medium break-all transition-colors"
+                >
+                  {site.email}
+                </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Clock className="h-4 w-4 mt-0.5 shrink-0 text-orange-500" />
