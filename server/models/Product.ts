@@ -59,4 +59,4 @@ productSchema.index({ name: 'text', shortDescription: 'text', sku: 'text' });
 productSchema.index({ status: 1, createdAt: -1 });
 productSchema.index({ category: 1, status: 1 });
 
-export default mongoose.model<IProduct>('Product', productSchema);
+export default (mongoose.models.Product as mongoose.Model<IProduct>) || mongoose.model<IProduct>('Product', productSchema);

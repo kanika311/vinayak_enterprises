@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadProductImage = exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductById = exports.getProductBySlug = exports.getProducts = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
+require("../models/Category");
 const helpers_1 = require("../utils/helpers");
 const getProducts = async (query) => {
     const { page, limit, skip } = (0, helpers_1.getPagination)({ query });
@@ -30,10 +31,16 @@ const getProducts = async (query) => {
 };
 exports.getProducts = getProducts;
 const getProductBySlug = async (slug) => {
-    const product = await Product_1.default.findOne({ slug, status: 'published' }).populate('category', 'name slug');
+    let product = await Product_1.default.findOne({
+        slug,
+        $or: [{ status: 'published' }, { status: { $exists: false } }],
+    }).populate('category', 'name slug');
+    if (!product) {
+        product = await Product_1.default.findOne({ slug }).populate('category', 'name slug');
+    }
     if (!product)
         throw new helpers_1.AppError('Product not found', 404);
-    product.views += 1;
+    product.views = (product.views || 0) + 1;
     await product.save();
     return product;
 };

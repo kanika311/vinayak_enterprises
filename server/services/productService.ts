@@ -1,4 +1,5 @@
 import Product from '../models/Product';
+import '../models/Category';
 import { AppError, generateSlug, getPagination, buildSort } from '../utils/helpers';
 import { FilterQuery } from 'mongoose';
 
@@ -28,12 +29,17 @@ export const getProducts = async (query: Record<string, string>) => {
 };
 
 export const getProductBySlug = async (slug: string) => {
-  const product = await Product.findOne({ slug, status: 'published' }).populate(
-    'category',
-    'name slug'
-  );
+  let product = await Product.findOne({
+    slug,
+    $or: [{ status: 'published' }, { status: { $exists: false } }],
+  }).populate('category', 'name slug');
+
+  if (!product) {
+    product = await Product.findOne({ slug }).populate('category', 'name slug');
+  }
+
   if (!product) throw new AppError('Product not found', 404);
-  product.views += 1;
+  product.views = (product.views || 0) + 1;
   await product.save();
   return product;
 };

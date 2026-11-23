@@ -1,23 +1,42 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { connectDatabase } from '../../../../../server/config/database';
 import ProductModel from '../../../../../server/models/Product';
+import '../../../../../server/models/Category';
 import { ProductDetailClient } from './product-detail-client';
 import { SITE_URL } from '@/lib/site-url';
+import { FALLBACK_PRODUCTS } from '@/lib/fallback-data';
 import type { Product } from '@/types';
 
 async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
     await connectDatabase();
-    const doc = await ProductModel.findOne({ slug, status: 'published' })
+    // 1. Try finding published product with populated category
+    let doc = await ProductModel.findOne({
+      slug,
+      $or: [{ status: 'published' }, { status: { $exists: false } }],
+    })
       .populate('category', 'name slug')
       .lean();
-    if (!doc) return null;
-    return JSON.parse(JSON.stringify(doc)) as Product;
+
+    // 2. Fallback: try finding by slug without status constraint
+    if (!doc) {
+      doc = await ProductModel.findOne({ slug })
+        .populate('category', 'name slug')
+        .lean();
+    }
+
+    if (doc) {
+      return JSON.parse(JSON.stringify(doc)) as Product;
+    }
   } catch (err) {
     console.warn(`Failed to fetch product for slug ${slug}:`, err);
-    return null;
   }
+
+  // 3. Fallback to static data if database is not reachable
+  const fallback = FALLBACK_PRODUCTS.find((p) => p.slug === slug);
+  if (fallback) return fallback;
+
+  return null;
 }
 
 export async function generateMetadata({
@@ -28,19 +47,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
-  if (!product) {
-    return {
-      title: 'Product Not Found | Vinayak Enterprises',
-      robots: { index: false, follow: false },
-    };
-  }
+  const readableName = slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 
-  const title = `${product.name} | Vinayak Enterprises`;
+  const title = product ? `${product.name} | Vinayak Enterprises` : `${readableName} | Vinayak Enterprises`;
   const description =
-    product.shortDescription?.slice(0, 155) ||
-    `${product.name} manufactured by Vinayak Enterprises in Ambala, Haryana. High-grade scientific instruments & institutional lab supplies.`;
-  const canonical = `${SITE_URL}/products/${product.slug}`;
-  const imageUrl = product.images?.[0]?.url || `${SITE_URL}/og-image.png`;
+    product?.shortDescription?.slice(0, 155) ||
+    `${title} manufactured by Vinayak Enterprises in Ambala, Haryana. High-grade scientific instruments & institutional lab supplies.`;
+  const canonical = `${SITE_URL}/products/${slug}`;
+  const imageUrl = product?.images?.[0]?.url || `${SITE_URL}/og-image.png`;
 
   return {
     title,
@@ -52,9 +69,9 @@ export async function generateMetadata({
       },
     },
     keywords: [
-      product.name,
-      product.sku,
-      typeof product.category === 'object' ? product.category.name : '',
+      product?.name || readableName,
+      product?.sku || '',
+      product && typeof product.category === 'object' ? product.category.name : '',
       'Vinayak Enterprises Ambala',
       'Laboratory Equipment Supplier India',
     ].filter(Boolean),
@@ -68,7 +85,7 @@ export async function generateMetadata({
           url: imageUrl,
           width: 800,
           height: 600,
-          alt: `${product.name} - Vinayak Enterprises`,
+          alt: `${product?.name || readableName} - Vinayak Enterprises`,
         },
       ],
     },
@@ -89,44 +106,42 @@ export default async function ProductDetailPage({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
-  if (!product) {
-    return notFound();
-  }
+  const categoryName = product && typeof product.category === 'object' ? product.category.name : '';
+  const categorySlug = product && typeof product.category === 'object' ? product.category.slug : '';
 
-  const categoryName = typeof product.category === 'object' ? product.category.name : '';
-  const categorySlug = typeof product.category === 'object' ? product.category.slug : '';
-
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    image: product.images?.map((img) => img.url) || [`${SITE_URL}/og-image.png`],
-    description: product.shortDescription || product.longDescription,
-    sku: product.sku,
-    brand: {
-      '@type': 'Brand',
-      name: 'Vinayak Enterprises',
-    },
-    manufacturer: {
-      '@type': 'Organization',
-      name: 'Vinayak Enterprises',
-      url: SITE_URL,
-    },
-    category: categoryName || 'Scientific Instruments',
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'INR',
-      price: product.price ? product.price : 0,
-      priceValidUntil: '2027-12-31',
-      availability: 'https://schema.org/InStock',
-      url: `${SITE_URL}/products/${product.slug}`,
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: {
-        '@type': 'Organization',
-        name: 'Vinayak Enterprises',
-      },
-    },
-  };
+  const productSchema = product
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        image: product.images?.map((img) => img.url) || [`${SITE_URL}/og-image.png`],
+        description: product.shortDescription || product.longDescription,
+        sku: product.sku,
+        brand: {
+          '@type': 'Brand',
+          name: 'Vinayak Enterprises',
+        },
+        manufacturer: {
+          '@type': 'Organization',
+          name: 'Vinayak Enterprises',
+          url: SITE_URL,
+        },
+        category: categoryName || 'Scientific Instruments',
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'INR',
+          price: product.price ? product.price : 0,
+          priceValidUntil: '2027-12-31',
+          availability: 'https://schema.org/InStock',
+          url: `${SITE_URL}/products/${product.slug}`,
+          itemCondition: 'https://schema.org/NewCondition',
+          seller: {
+            '@type': 'Organization',
+            name: 'Vinayak Enterprises',
+          },
+        },
+      }
+    : null;
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -144,7 +159,7 @@ export default async function ProductDetailPage({
         name: 'Products',
         item: `${SITE_URL}/products`,
       },
-      ...(categoryName
+      ...(product && categoryName
         ? [
             {
               '@type': 'ListItem',
@@ -159,23 +174,27 @@ export default async function ProductDetailPage({
               item: `${SITE_URL}/products/${product.slug}`,
             },
           ]
-        : [
+        : product
+        ? [
             {
               '@type': 'ListItem',
               position: 3,
               name: product.name,
               item: `${SITE_URL}/products/${product.slug}`,
             },
-          ]),
+          ]
+        : []),
     ],
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
+      {productSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
