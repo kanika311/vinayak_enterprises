@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Linkedin, Youtube, MessageCircle, ShieldCheck, FileCheck } from 'lucide-react';
@@ -11,6 +12,12 @@ import { whatsappChatUrl } from '@/lib/site-contact';
 
 export function WebsiteFooter() {
   const { site } = useSiteContact();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   return (
     <footer
@@ -187,13 +194,19 @@ export function WebsiteFooter() {
               ))}
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-orange-500" />
-                <a
-                  href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
-                  itemProp="email"
-                  className="hover:text-orange-600 text-slate-700 font-medium break-all transition-colors"
-                >
-                  {site.email}
-                </a>
+                {mounted ? (
+                  <a
+                    href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+                    itemProp="email"
+                    className="hover:text-orange-600 text-slate-700 font-medium break-all transition-colors"
+                  >
+                    {site.email}
+                  </a>
+                ) : (
+                  <span className="text-slate-700 font-medium break-all">
+                    vinayakenterprises52 [at] gmail.com
+                  </span>
+                )}
               </li>
               <li className="flex items-start gap-2.5">
                 <Clock className="h-4 w-4 mt-0.5 shrink-0 text-orange-500" />

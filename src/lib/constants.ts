@@ -20,10 +20,11 @@ export const SITE = {
 };
 
 export const SEO = {
-  title:
-    'Vinayak Enterprises | Scientific Instruments, Laboratory Equipment & Human Anatomy Models Manufacturer Ambala',
+  // Title: 59 characters (strictly within HOTH 50-60 character requirement)
+  title: 'Vinayak Enterprises | Anatomy Models & Lab Equipment Ambala',
+  // Meta description: 142 characters (strictly within HOTH 120-160 character requirement)
   description:
-    'Vinayak Enterprises is a leading manufacturer & bulk supplier of scientific instruments, laboratory equipment, human anatomy models & microscopes in Ambala Cantt, Haryana, India.',
+    'Vinayak Enterprises is a leading manufacturer & bulk supplier of anatomical models, microscopes & laboratory equipment in Ambala Cantt, India.',
   keywords: [
     'Anatomical Models Manufacturer in India',
     'Laboratory Equipment Supplier in India',

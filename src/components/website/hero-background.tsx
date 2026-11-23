@@ -65,7 +65,18 @@ export function HeroBackground() {
   const { data: banners = [] } = useHeroBanners();
   const [index, setIndex] = useState(0);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Only stream background video on desktop (>=768px) and after client hydration
+    const checkDesktop = () => {
+      setIsDesktop(typeof window !== 'undefined' && window.innerWidth >= 768);
+    };
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   useEffect(() => {
     if (banners.length <= 1) return;
@@ -85,13 +96,13 @@ export function HeroBackground() {
   const optimizedVideoUrl = active ? getOptimizedVideoUrl(active.videoUrl) : '';
   const posterUrl = active ? getAutoPosterUrl(active.videoUrl, active.posterUrl) : '';
 
-  // Trigger play as soon as video source changes
+  // Trigger play only on desktop screens
   useEffect(() => {
-    if (videoRef.current && hasVideo) {
+    if (videoRef.current && hasVideo && isDesktop) {
       videoRef.current.load();
       videoRef.current.play().catch(() => {});
     }
-  }, [optimizedVideoUrl, hasVideo]);
+  }, [optimizedVideoUrl, hasVideo, isDesktop]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -115,23 +126,25 @@ export function HeroBackground() {
               />
             )}
 
-            {/* Compressed lightweight streaming video cross-fades in once ready */}
-            <video
-              ref={videoRef}
-              key={optimizedVideoUrl}
-              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
-                isVideoLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              src={optimizedVideoUrl}
-              poster={posterUrl || undefined}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="none"
-              onLoadedData={() => setIsVideoLoaded(true)}
-              onCanPlay={() => setIsVideoLoaded(true)}
-            />
+            {/* Compressed lightweight streaming video loads ONLY on desktop to keep mobile payload ultra-light */}
+            {isDesktop && (
+              <video
+                ref={videoRef}
+                key={optimizedVideoUrl}
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
+                  isVideoLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                src={optimizedVideoUrl}
+                poster={posterUrl || undefined}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="none"
+                onLoadedData={() => setIsVideoLoaded(true)}
+                onCanPlay={() => setIsVideoLoaded(true)}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       ) : (
