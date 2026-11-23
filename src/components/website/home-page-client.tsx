@@ -5,7 +5,6 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { CategoryGrid } from '@/components/website/category-grid';
 import { ProductCard } from '@/components/website/product-card';
 import { WelcomeSection, BusinessTrustBar } from '@/components/website/business-section';
 import { HeroBackground, useHeroBanners } from '@/components/website/hero-background';
@@ -200,7 +199,6 @@ export function HomePageClient({
       </section>
 
       <StatsBar />
-      <CategoryGrid initialCategories={initialCategories} />
 
       <section className="py-14 bg-white overflow-hidden" aria-labelledby="products-heading">
         <div className="container mx-auto px-4">
