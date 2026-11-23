@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Phone, Mail, ChevronDown, Search, Download } from 'lucide-react';
 import { NAV_LINKS, PRODUCT_CATEGORIES } from '@/lib/constants';
@@ -14,6 +15,10 @@ import { useQuery } from '@tanstack/react-query';
 
 export function WebsiteHeader() {
   const { site } = useSiteContact();
+  const rawPathname = usePathname();
+  const pathname = rawPathname || '';
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +36,23 @@ export function WebsiteHeader() {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close menus on route change
+  useEffect(() => {
+    setProductsOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const onMouseDown = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setProductsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onMouseDown);
+    return () => document.removeEventListener('mousedown', onMouseDown);
   }, []);
 
   return (
@@ -78,11 +100,11 @@ export function WebsiteHeader() {
           animate={{ height: scrolled ? 64 : 72 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-          <div className="flex h-full items-center justify-between gap-4">
-            <SiteLogo variant="header" priority className="-ml-1" />
+          <div className="flex h-full items-center justify-between gap-2 lg:gap-3 xl:gap-4">
+            <SiteLogo variant="header" priority className="-ml-1 shrink-0" />
 
             <motion.div
-              className="hidden md:flex flex-1 max-w-md mx-4"
+              className="hidden md:flex flex-1 max-w-xs xl:max-w-sm mx-1.5 xl:mx-3"
               animate={{ scale: searchFocused ? 1.02 : 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
@@ -94,13 +116,13 @@ export function WebsiteHeader() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
-                  className="flex-1 px-4 py-2 text-sm outline-none"
+                  className="flex-1 px-3.5 py-1.5 xl:py-2 text-sm outline-none"
                 />
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     href={`/products?search=${searchQuery}`}
                     aria-label="Search products"
-                    className="bg-[#1a3a6b] text-white px-4 h-full flex items-center hover:bg-[#15305a]"
+                    className="bg-[#1a3a6b] text-white px-3.5 h-full flex items-center hover:bg-[#15305a]"
                   >
                     <Search className="h-4 w-4" aria-hidden="true" />
                   </Link>
@@ -108,33 +130,63 @@ export function WebsiteHeader() {
               </div>
             </motion.div>
 
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
               {[
                 { href: '/', label: 'Home' },
                 { href: '/about', label: 'About Us' },
                 { href: '/blog', label: 'Blog' },
                 { href: '/catalogues', label: 'Catalogue' },
                 { href: '/contact', label: 'Contact Us' },
-              ].map((link) => (
-                <motion.div key={link.href} whileHover={{ y: -2 }}>
-                  <Link href={link.href} className="relative px-3 py-2 text-sm font-medium text-slate-700 hover:text-[#1a3a6b] group">
-                    {link.label}
-                    <motion.span
-                      className="absolute bottom-0 left-3 right-3 h-0.5 bg-orange-500 rounded-full"
-                      initial={{ scaleX: 0 }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </Link>
-                </motion.div>
-              ))}
-              <div className="relative" onMouseEnter={() => setProductsOpen(true)} onMouseLeave={() => setProductsOpen(false)}>
+              ].map((link) => {
+                const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+                return (
+                  <motion.div key={link.href} whileHover={{ y: -2 }}>
+                    <Link
+                      href={link.href}
+                      className={`relative px-2.5 xl:px-3 py-2 text-sm whitespace-nowrap transition-colors group ${
+                        isActive
+                          ? 'text-orange-600 font-bold'
+                          : 'text-slate-700 hover:text-orange-600 font-medium'
+                      }`}
+                    >
+                      {link.label}
+                      <motion.span
+                        className="absolute bottom-0 left-2.5 right-2.5 h-0.5 bg-orange-500 rounded-full"
+                        initial={{ scaleX: isActive ? 1 : 0 }}
+                        animate={{ scaleX: isActive ? 1 : 0 }}
+                        whileHover={{ scaleX: 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </Link>
+                  </motion.div>
+                );
+              })}
+              <div
+                ref={dropdownRef}
+                className="relative"
+                onMouseEnter={() => setProductsOpen(true)}
+                onMouseLeave={() => setProductsOpen(false)}
+              >
                 <motion.button
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-700 hover:text-[#1a3a6b]"
-                  animate={{ color: productsOpen ? '#1a3a6b' : undefined }}
+                  type="button"
+                  onClick={() => setProductsOpen((prev) => !prev)}
+                  className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors rounded-md ${
+                    pathname.startsWith('/products') || pathname.startsWith('/categories') || productsOpen
+                      ? 'text-orange-600 font-bold bg-orange-50/80'
+                      : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                  }`}
+                  whileTap={{ scale: 0.97 }}
                 >
                   Our Products
-                  <motion.span animate={{ rotate: productsOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <motion.span
+                    animate={{ rotate: productsOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={
+                      pathname.startsWith('/products') || pathname.startsWith('/categories') || productsOpen
+                        ? 'text-orange-600'
+                        : 'text-slate-500'
+                    }
+                  >
                     <ChevronDown className="h-4 w-4" />
                   </motion.span>
                 </motion.button>
@@ -145,21 +197,26 @@ export function WebsiteHeader() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.96 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-                      className="absolute top-full left-0 w-72 bg-white border shadow-xl rounded-lg py-2 z-50"
+                      className="absolute top-full left-0 w-72 bg-white border border-slate-200 shadow-xl rounded-xl py-2 z-50 mt-1"
                     >
                       <motion.div initial="hidden" animate="visible" variants={staggerFast}>
                         {PRODUCT_CATEGORIES.map((cat) => (
                           <motion.div key={cat.slug} variants={popIn}>
                             <Link
                               href={`/categories/${cat.slug}`}
-                              className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-[#1a3a6b]"
+                              onClick={() => setProductsOpen(false)}
+                              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium"
                             >
-                              <motion.span whileHover={{ scale: 1.3, rotate: 10 }}>{cat.icon}</motion.span>
-                              {cat.name}
+                              <motion.span whileHover={{ scale: 1.25, rotate: 8 }}>{cat.icon}</motion.span>
+                              <span>{cat.name}</span>
                             </Link>
                           </motion.div>
                         ))}
-                        <Link href="/categories" className="block px-4 py-2.5 text-sm font-semibold text-orange-600 border-t mt-1 hover:bg-orange-50">
+                        <Link
+                          href="/categories"
+                          onClick={() => setProductsOpen(false)}
+                          className="block px-4 py-2.5 text-sm font-bold text-orange-600 border-t border-slate-100 mt-1 hover:bg-orange-50 transition-colors"
+                        >
                           View All Categories →
                         </Link>
                       </motion.div>
@@ -169,22 +226,30 @@ export function WebsiteHeader() {
               </div>
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden md:block">
-                <Button asChild variant="outline" className="border-[#1a3a6b]/30 text-[#1a3a6b] hover:bg-blue-50 font-semibold">
+                <Button
+                  asChild
+                  variant="outline"
+                  className={`font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 ${
+                    pathname.startsWith('/catalogues')
+                      ? 'bg-orange-50 border-orange-500 text-orange-600 shadow-sm'
+                      : 'border-[#1a3a6b]/30 text-[#1a3a6b] hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 active:bg-orange-600 active:text-white'
+                  }`}
+                >
                   {catalogueUrl.startsWith('http') ? (
                     <a href={catalogueUrl} target="_blank" rel="noopener noreferrer">
-                      <Download className="mr-1.5 h-4 w-4" /> Catalogue
+                      <Download className={`mr-1.5 h-4 w-4 ${pathname.startsWith('/catalogues') ? 'text-orange-600' : 'text-[#1a3a6b]'}`} /> Catalogue
                     </a>
                   ) : (
                     <Link href="/catalogues">
-                      <Download className="mr-1.5 h-4 w-4" /> Catalogue
+                      <Download className={`mr-1.5 h-4 w-4 ${pathname.startsWith('/catalogues') ? 'text-orange-600' : 'text-[#1a3a6b]'}`} /> Catalogue
                     </Link>
                   )}
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
-                <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow">
+                <Button asChild className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold shadow whitespace-nowrap">
                   <Link href="/request-quote">Get Quote</Link>
                 </Button>
               </motion.div>
@@ -212,17 +277,24 @@ export function WebsiteHeader() {
                 variants={staggerFast}
                 className="px-4 py-4 space-y-1"
               >
-                {NAV_LINKS.map((link) => (
-                  <motion.div key={link.href} variants={popIn}>
-                    <Link
-                      href={link.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="block px-3 py-2.5 text-sm font-medium hover:bg-blue-50 rounded"
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+                  return (
+                    <motion.div key={link.href} variants={popIn}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`block px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500 font-bold'
+                            : 'text-slate-700 hover:bg-slate-50 hover:text-orange-600'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
                 <motion.div variants={popIn}>
                   {catalogueUrl.startsWith('http') ? (
                     <a
@@ -230,7 +302,11 @@ export function WebsiteHeader() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[#1a3a6b] hover:bg-blue-50 rounded"
+                      className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                        pathname.startsWith('/catalogues')
+                          ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500 font-bold'
+                          : 'text-[#1a3a6b] hover:bg-blue-50'
+                      }`}
                     >
                       <Download className="h-4 w-4" /> Download Catalogue
                     </a>
@@ -238,7 +314,11 @@ export function WebsiteHeader() {
                     <Link
                       href="/catalogues"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[#1a3a6b] hover:bg-blue-50 rounded"
+                      className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                        pathname.startsWith('/catalogues')
+                          ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500 font-bold'
+                          : 'text-[#1a3a6b] hover:bg-blue-50'
+                      }`}
                     >
                       <Download className="h-4 w-4" /> Download Catalogue
                     </Link>
