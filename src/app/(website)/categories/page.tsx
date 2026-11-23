@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { CategoriesClient } from './categories-client';
 import { connectDatabase } from '../../../../server/config/database';
 import CategoryModel from '../../../../server/models/Category';
+import ProductModel from '../../../../server/models/Product';
 import { SITE_URL } from '@/lib/site-url';
 import type { Category } from '@/types';
 
@@ -64,7 +65,8 @@ const breadcrumbData = {
 async function getCategoriesData() {
   try {
     await connectDatabase();
-    const cats = await CategoryModel.find({ isActive: true })
+    const publishedCategoryIds = await ProductModel.distinct('category', { status: 'published' });
+    const cats = await CategoryModel.find({ _id: { $in: publishedCategoryIds }, isActive: true })
       .sort({ order: 1, name: 1 })
       .lean();
     return JSON.parse(JSON.stringify(cats)) as Category[];

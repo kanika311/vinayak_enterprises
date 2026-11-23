@@ -65,13 +65,14 @@ const breadcrumbData = {
 async function getProductsData() {
   try {
     await connectDatabase();
+    const publishedCategoryIds = await ProductModel.distinct('category', { status: 'published' });
     const [products, categories] = await Promise.all([
       ProductModel.find({ status: 'published' })
         .sort({ createdAt: -1 })
         .limit(24)
         .populate('category', 'name slug')
         .lean(),
-      CategoryModel.find({ isActive: true })
+      CategoryModel.find({ _id: { $in: publishedCategoryIds }, isActive: true })
         .sort({ order: 1, name: 1 })
         .lean(),
     ]);

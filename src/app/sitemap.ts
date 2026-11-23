@@ -72,9 +72,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await connectDatabase();
 
+    const publishedCategoryIds = await Product.distinct('category', { status: 'published' });
     const [products, categories, blogs] = await Promise.all([
       Product.find({ status: 'published' }).select('slug updatedAt').lean(),
-      Category.find({ isActive: true }).select('slug updatedAt').lean(),
+      Category.find({ _id: { $in: publishedCategoryIds }, isActive: true }).select('slug updatedAt').lean(),
       Blog.find({ status: 'published' }).select('slug updatedAt publishedAt').lean(),
     ]);
 

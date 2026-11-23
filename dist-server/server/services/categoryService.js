@@ -5,9 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategoryBySlug = exports.getCategories = void 0;
 const Category_1 = __importDefault(require("../models/Category"));
+const Product_1 = __importDefault(require("../models/Product"));
 const helpers_1 = require("../utils/helpers");
-const getCategories = async (activeOnly = false) => {
+const getCategories = async (activeOnly = false, hasProductsOnly = false) => {
     const filter = activeOnly ? { isActive: true } : {};
+    if (hasProductsOnly) {
+        const publishedCategoryIds = await Product_1.default.distinct('category', { status: 'published' });
+        filter._id = { $in: publishedCategoryIds };
+    }
     return Category_1.default.find(filter).sort({ order: 1, name: 1 });
 };
 exports.getCategories = getCategories;

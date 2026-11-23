@@ -1,8 +1,13 @@
 import Category from '../models/Category';
+import Product from '../models/Product';
 import { AppError, generateSlug } from '../utils/helpers';
 
-export const getCategories = async (activeOnly = false) => {
-  const filter = activeOnly ? { isActive: true } : {};
+export const getCategories = async (activeOnly = false, hasProductsOnly = false) => {
+  const filter: Record<string, unknown> = activeOnly ? { isActive: true } : {};
+  if (hasProductsOnly) {
+    const publishedCategoryIds = await Product.distinct('category', { status: 'published' });
+    filter._id = { $in: publishedCategoryIds };
+  }
   return Category.find(filter).sort({ order: 1, name: 1 });
 };
 

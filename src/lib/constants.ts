@@ -151,14 +151,11 @@ export const ABOUT_CONTENT = {
 };
 
 export const PRODUCT_CATEGORIES = [
-  { slug: 'chemistry-lab-instrument', name: 'Chemistry Lab Instrument', icon: '🧪', color: 'bg-blue-50 border-blue-200 hover:border-blue-400' },
-  { slug: 'laboratory-equipment', name: 'Laboratory Equipment', icon: '⚗️', color: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400' },
-  { slug: 'physics-scientific-equipment', name: 'Physics Scientific Equipment', icon: '⚡', color: 'bg-amber-50 border-amber-200 hover:border-amber-400' },
-  { slug: 'scientific-instrument', name: 'Scientific Instrument', icon: '🔬', color: 'bg-violet-50 border-violet-200 hover:border-violet-400' },
-  { slug: 'biological-model', name: 'Biological Model', icon: '🫀', color: 'bg-rose-50 border-rose-200 hover:border-rose-400' },
-  { slug: 'laboratory-dishes', name: 'Laboratory Dishes', icon: '🧫', color: 'bg-cyan-50 border-cyan-200 hover:border-cyan-400' },
-  { slug: 'educational-teaching-aid', name: 'Educational & Teaching Aid', icon: '📚', color: 'bg-orange-50 border-orange-200 hover:border-orange-400' },
-  { slug: 'laboratory-instruments', name: 'Laboratory Instruments', icon: '🔭', color: 'bg-indigo-50 border-indigo-200 hover:border-indigo-400' },
+  { slug: 'human-anatomy-models', name: 'Human Anatomy Models', icon: '🫀', color: 'bg-rose-50 border-rose-200 hover:border-rose-400' },
+  { slug: 'microscopes', name: 'Microscopes', icon: '🔬', color: 'bg-blue-50 border-blue-200 hover:border-blue-400' },
+  { slug: 'human-skeleton-models', name: 'Human Skeleton Models', icon: '🦴', color: 'bg-amber-50 border-amber-200 hover:border-amber-400' },
+  { slug: 'cpr-training-manikins', name: 'CPR Training Manikins', icon: '🫁', color: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400' },
+  { slug: 'human-dummies', name: 'Human Dummies', icon: '🧍', color: 'bg-violet-50 border-violet-200 hover:border-violet-400' },
 ];
 
 export const CATEGORIES_PREVIEW = PRODUCT_CATEGORIES;

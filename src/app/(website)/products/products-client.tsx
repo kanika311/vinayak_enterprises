@@ -24,8 +24,8 @@ export function ProductsClient({
   const [category, setCategory] = useState('');
 
   const { data: categories = initialCategories } = useQuery({
-    queryKey: ['categories-public'],
-    queryFn: () => apiGet<Category[]>('/categories', { active: true }),
+    queryKey: ['categories-public-with-products'],
+    queryFn: () => apiGet<Category[]>('/categories', { active: true, hasProducts: true }),
     initialData: initialCategories,
   });
 

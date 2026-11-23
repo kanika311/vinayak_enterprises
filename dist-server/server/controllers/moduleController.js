@@ -49,7 +49,9 @@ exports.getCategories = (0, helpers_1.asyncHandler)(async (req, res) => {
     if (!req.user) {
         res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
     }
-    const categories = await categoryService.getCategories(req.query.active === 'true');
+    const activeOnly = req.query.active === 'true';
+    const hasProducts = req.query.hasProducts === 'true';
+    const categories = await categoryService.getCategories(activeOnly, hasProducts);
     (0, helpers_1.sendResponse)(res, 200, categories);
 });
 exports.createCategory = (0, helpers_1.asyncHandler)(async (req, res) => {
