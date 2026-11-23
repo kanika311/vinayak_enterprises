@@ -137,13 +137,9 @@ export function BlogReader({ initialSlug, initialBlogs }: BlogReaderProps) {
     refetchOnMount: 'always',
   });
 
-  // Combine API blogs with fallback articles to ensure rich content
+  // Display database blogs directly
   const allBlogs = useMemo(() => {
-    const apiBlogs = data?.blogs || [];
-    if (apiBlogs.length >= 3) return apiBlogs;
-    const existingSlugs = new Set(apiBlogs.map((b) => b.slug));
-    const supplemental = FALLBACK_BLOGS.filter((fb) => !existingSlugs.has(fb.slug));
-    return [...apiBlogs, ...supplemental];
+    return data?.blogs || [];
   }, [data?.blogs]);
 
   // Active blog state
