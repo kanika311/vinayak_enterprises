@@ -3,6 +3,22 @@ import { FEATURED_PRODUCTS } from '@/lib/constants';
 
 export const FALLBACK_BLOGS: Blog[] = [
   {
+    _id: 'fallback-blog-0',
+    title: 'Human Skeleton: 206 Bones List and Names (The Complete Anatomy Guide)',
+    slug: 'human-skeleton-206-bones-list-and-names',
+    category: 'Human Anatomy Model',
+    tags: ['Anatomy', 'Human Skeleton', '206 Bones', 'NEET Biology', 'MBBS Osteology', 'Bone Model'],
+    author: { name: 'Vinayak Enterprises Editorial & Technical Team' },
+    views: 350,
+    createdAt: '2026-11-23T10:00:00.000Z',
+    publishedAt: '2026-11-23T10:00:00.000Z',
+    status: 'published',
+    excerpt:
+      'Complete academic breakdown of all 206 human bones across the Axial and Appendicular skeletons with osteology summary tables and laboratory study tips.',
+    content:
+      'Understanding the human skeletal framework is the cornerstone of biological education, pre-medical exam preparation (NEET-UG), nursing training, and first-year medical school (MBBS) osteology. The adult human body consists of exactly 206 individual bones.\n\n## The Two Primary Skeletal Divisions\n1. **The Axial Skeleton (80 Bones):** Skull (22), Auditory Ossicles (6), Hyoid (1), Vertebral Column (26), Thoracic Cage (25).\n2. **The Appendicular Skeleton (126 Bones):** Pectoral Girdles (4), Upper Extremities (60), Pelvic Girdle (2), Lower Extremities (60).\n\n## Full Bone Breakdown & Study Aids\nIn medical curricula, studying articulated skeletons alongside disarticulated sets allows students to examine individual foramina and articulation surfaces directly.',
+  },
+  {
     _id: 'fallback-blog-1',
     title: 'Importance of Human Anatomy Models in Medical Education',
     slug: 'importance-of-human-anatomy-models-in-medical-education',

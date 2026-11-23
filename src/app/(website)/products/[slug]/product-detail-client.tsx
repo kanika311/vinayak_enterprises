@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle, FileText, MessageCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, FileText, MessageCircle, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiGet } from '@/lib/api';
 import { useSiteContact } from '@/hooks/use-site-contact';
@@ -245,6 +245,28 @@ export function ProductDetailClient({ slug, initialProduct }: { slug: string; in
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {product.faq?.length > 0 && (
+          <div className="mt-8 bg-white rounded-2xl border p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <HelpCircle className="h-6 w-6 text-amber-500 shrink-0" />
+              Frequently Asked Questions (FAQs)
+            </h2>
+            <div className="space-y-4">
+              {product.faq.map((item, idx) => (
+                <div key={idx} className="border border-slate-200 rounded-xl p-5 bg-slate-50/60">
+                  <h3 className="font-semibold text-slate-900 text-base mb-2 flex items-start gap-2">
+                    <span className="text-amber-600 font-bold shrink-0">Q:</span>
+                    <span>{item.question}</span>
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed pl-6">
+                    {item.answer}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         )}

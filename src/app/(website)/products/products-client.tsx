@@ -72,11 +72,7 @@ export function ProductsClient({
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      <PageHeader
-        title="Scientific & Laboratory Equipment Catalogue"
-        subtitle="Explore anatomy models, microscopes, CPR training manikins & lab apparatus manufactured in Ambala"
-        dark
-      />
+   
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
