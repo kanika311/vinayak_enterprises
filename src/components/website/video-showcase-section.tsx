@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X, ExternalLink, ShieldCheck, MessageCircle, FileText } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api';
-import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId } from '@/lib/utils';
+import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId, getOptimizedVideoUrl } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
 import { whatsappChatUrl } from '@/lib/site-contact';
 import type { ShowcaseVideo } from '@/types';
@@ -73,6 +73,151 @@ const CATEGORY_TABS = [
   'CPR Manikins',
   'Lab Equipment',
 ] as const;
+
+function ShowcaseVideoCard({
+  video,
+  idx,
+  onOpen,
+  whatsappLink,
+}: {
+  video: ShowcaseVideo;
+  idx: number;
+  onOpen: () => void;
+  whatsappLink: string;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isYouTube = Boolean(extractYouTubeId(video.videoUrl));
+  const autoPoster = video.posterUrl || getWebpPosterUrl(video.videoUrl);
+  const streamUrl = getOptimizedVideoUrl(video.videoUrl);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current && !isYouTube) {
+      videoRef.current.play().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    if (videoRef.current && !isYouTube) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, [isYouTube, streamUrl]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: idx * 0.08 }}
+      className="group flex flex-col bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
+      onMouseEnter={handleMouseEnter}
+    >
+      {/* Video Preview Box with Autoplay Replay Mode */}
+      <div
+        onClick={onOpen}
+        className="relative aspect-video bg-slate-950 overflow-hidden cursor-pointer"
+      >
+        {!isYouTube && streamUrl ? (
+          <video
+            ref={videoRef}
+            src={streamUrl}
+            poster={autoPoster || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : autoPoster ? (
+          <img
+            src={autoPoster}
+            alt={`${video.title} demonstration video - Vinayak Enterprises`}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : (
+          <div className="w-full h-full bg-slate-900 flex items-center justify-center text-slate-400">
+            <Play className="w-10 h-10" />
+          </div>
+        )}
+
+        {/* Gradient overlay for badges and contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none group-hover:from-black/85 transition-colors" />
+
+        {/* Category Pill */}
+        <div className="absolute top-2.5 left-2.5 z-10">
+          <span className="inline-block bg-white/95 backdrop-blur-md text-[#1a3a6b] text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">
+            {video.category}
+          </span>
+        </div>
+
+        {/* Auto Replay Badge & Duration */}
+        <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
+          {!isYouTube && (
+            <span className="inline-flex items-center gap-1 bg-black/75 backdrop-blur-md text-emerald-400 text-[10px] font-semibold px-2 py-0.5 rounded-full shadow">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Auto Preview
+            </span>
+          )}
+          <span className="inline-block bg-black/75 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded shadow">
+            ⏱ {video.duration || '1:45'}
+          </span>
+        </div>
+
+        {/* Play Button Overlay (Click to watch with sound) */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-13 h-13 rounded-full bg-white/95 text-[#1a3a6b] shadow-2xl flex items-center justify-center group-hover:scale-115 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+            <Play className="w-5 h-5 ml-0.5 fill-current" />
+          </div>
+        </div>
+
+        {/* Bottom Banner Title Overlay */}
+        <div className="absolute bottom-2 left-2.5 right-2.5 z-10 flex items-center justify-between text-[11px] text-white/95 font-medium">
+          <div className="flex items-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>HD 1080p · Click for Sound</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-4 flex flex-col flex-1 justify-between">
+        <div>
+          <h3
+            onClick={onOpen}
+            className="font-bold text-slate-900 text-sm leading-snug line-clamp-2 hover:text-orange-600 cursor-pointer transition-colors"
+          >
+            {video.title}
+          </h3>
+          <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+            {video.description}
+          </p>
+        </div>
+
+        {/* Bottom Action */}
+        <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onOpen}
+            className="text-xs font-bold text-[#1a3a6b] hover:text-orange-600 flex items-center gap-1 group-hover:translate-x-1 transition-all cursor-pointer"
+          >
+            Watch Video →
+          </button>
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors"
+            title="Ask quote for this video on WhatsApp"
+            aria-label="Ask on WhatsApp"
+          >
+            <MessageCircle className="w-4 h-4 fill-emerald-100" />
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function VideoShowcaseSection() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -147,106 +292,17 @@ export function VideoShowcaseSection() {
           ))}
         </div>
 
-        {/* Videos Grid */}
+        {/* Videos Grid with Auto-Replay & Dynamic Auto-Banners */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredVideos.map((video, idx) => {
-            const poster = video.posterUrl || getWebpPosterUrl(video.videoUrl);
-            return (
-              <motion.div
-                key={video._id || idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="group flex flex-col bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
-              >
-                {/* Poster / Video Thumbnail with Play Button */}
-                <div
-                  onClick={() => handleOpenVideo(video)}
-                  className="relative aspect-video bg-slate-900 overflow-hidden cursor-pointer"
-                >
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={`${video.title} demonstration video - Vinayak Enterprises`}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400">
-                      <Play className="w-10 h-10" />
-                    </div>
-                  )}
-
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors" />
-
-                  {/* Category Pill */}
-                  <div className="absolute top-2.5 left-2.5 z-10">
-                    <span className="inline-block bg-white/90 backdrop-blur-md text-[#1a3a6b] text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">
-                      {video.category}
-                    </span>
-                  </div>
-
-                  {/* Duration Badge */}
-                  <div className="absolute top-2.5 right-2.5 z-10">
-                    <span className="inline-block bg-black/75 backdrop-blur-md text-white text-[11px] font-mono px-2 py-0.5 rounded shadow">
-                      ⏱ {video.duration || '1:30'}
-                    </span>
-                  </div>
-
-                  {/* Glowing Animated Play Button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-white/95 text-[#1a3a6b] shadow-2xl flex items-center justify-center group-hover:scale-115 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
-                      <Play className="w-6 h-6 ml-1 fill-current" />
-                    </div>
-                  </div>
-
-                  {/* WebP badge */}
-                  <div className="absolute bottom-2 left-2.5 z-10 flex items-center gap-1 text-[10px] text-white/90 font-medium">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>HD 1080p · WebP</span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4 flex flex-col flex-1 justify-between">
-                  <div>
-                    <h3
-                      onClick={() => handleOpenVideo(video)}
-                      className="font-bold text-slate-900 text-sm leading-snug line-clamp-2 hover:text-[#1a3a6b] cursor-pointer transition-colors"
-                    >
-                      {video.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
-                      {video.description}
-                    </p>
-                  </div>
-
-                  {/* Bottom Action */}
-                  <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenVideo(video)}
-                      className="text-xs font-bold text-[#1a3a6b] hover:text-orange-600 flex items-center gap-1 group-hover:translate-x-1 transition-all"
-                    >
-                      Watch Video →
-                    </button>
-                    <a
-                      href={getWhatsAppLink(video)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors"
-                      title="Ask quote for this video on WhatsApp"
-                      aria-label="Ask on WhatsApp"
-                    >
-                      <MessageCircle className="w-4 h-4 fill-emerald-100" />
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {filteredVideos.map((video, idx) => (
+            <ShowcaseVideoCard
+              key={video._id || idx}
+              video={video}
+              idx={idx}
+              onOpen={() => handleOpenVideo(video)}
+              whatsappLink={getWhatsAppLink(video)}
+            />
+          ))}
         </div>
       </div>
 

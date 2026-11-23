@@ -41,16 +41,18 @@ export function getWebpImageUrl(url?: string, width?: number): string {
   return url;
 }
 
-/** Automatically get a high-quality WebP poster for Cloudinary or YouTube videos */
+/** Automatically get a high-quality WebP/JPEG poster for Cloudinary or YouTube videos */
 export function getWebpPosterUrl(videoUrl?: string, posterUrl?: string): string {
   if (posterUrl) {
     return getWebpImageUrl(posterUrl, 800);
   }
   if (videoUrl) {
     if (videoUrl.includes('res.cloudinary.com') && videoUrl.includes('/video/upload/')) {
+      // Snapshot frame at 1.5s so we never get a black opening frame (so_1.5)
+      if (videoUrl.includes('/upload/so_')) return videoUrl;
       return videoUrl
-        .replace('/video/upload/', '/video/upload/so_0,f_webp,q_auto,w_800/')
-        .replace(/\.[a-zA-Z0-9]+$/, '.webp');
+        .replace('/video/upload/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
+        .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
     }
     const ytId = extractYouTubeId(videoUrl);
     if (ytId) {
