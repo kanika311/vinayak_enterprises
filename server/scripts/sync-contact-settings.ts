@@ -11,6 +11,7 @@ const updates = [
   { key: 'companyPhone', value: '94160-29492', group: 'company' },
   { key: 'companyPhoneSecondary', value: '62801-28618', group: 'company' },
   { key: 'companyAddress', value: 'Ambala Cantt, Ambala, Haryana 133001, India', group: 'company' },
+  { key: 'gstin', value: '06AHLPA7723L1Z7', group: 'company' },
   { key: 'whatsappNumber', value: '9416029492', group: 'social' },
   { key: 'facebook', value: 'https://www.facebook.com/profile.php?id=61596718377937&sk=about', group: 'social' },
   { key: 'workingHours', value: 'Mon – Sat | 9:00 AM – 10:00 PM', group: 'company' },

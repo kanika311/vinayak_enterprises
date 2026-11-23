@@ -33,8 +33,8 @@ export function SiteLogo({ variant = 'header', className }: SiteLogoProps) {
     setTimeout(() => setIsPulsing(false), 800);
   };
 
-  const inkColor = isFooter ? '#ffffff' : '#1f3f73';
-  const cutoutColor = isFooter ? '#0f2744' : '#ffffff';
+  const inkColor = isFooter ? '#1f3f73' : '#1f3f73';
+  const cutoutColor = '#ffffff';
   const accentColor = '#f26b21';
 
   return (
@@ -180,20 +180,14 @@ export function SiteLogo({ variant = 'header', className }: SiteLogoProps) {
         {/* Text Lockup */}
         <div className="flex flex-col text-left leading-none tracking-tight">
           <span
-            className={cn(
-              'font-extrabold tracking-tight text-[15px] sm:text-[18px] md:text-[20px] font-sans transition-colors',
-              isFooter ? 'text-white' : 'text-[#1f3f73] group-hover:text-[#162f56]'
-            )}
+            className="font-extrabold tracking-tight text-[15px] sm:text-[18px] md:text-[20px] font-sans transition-colors text-[#1f3f73] group-hover:text-[#162f56]"
             style={{ fontFamily: 'Montserrat, Arial, sans-serif', letterSpacing: '0.02em' }}
           >
             VINAYAK ENTERPRISES
           </span>
           <div className="h-[2px] bg-[#f26b21] w-full my-[3px] sm:my-[4px] rounded-full transition-transform origin-left group-hover:scale-x-105" />
           <div
-            className={cn(
-              'flex items-center justify-between gap-1 text-[7px] sm:text-[8px] md:text-[9.5px] font-semibold tracking-wider',
-              isFooter ? 'text-slate-300' : 'text-[#1f3f73]/90'
-            )}
+            className="flex items-center justify-between gap-1 text-[7px] sm:text-[8px] md:text-[9.5px] font-semibold tracking-wider text-[#1f3f73]/90"
             style={{ fontFamily: 'Montserrat, Arial, sans-serif' }}
           >
             <span>MANUFACTURER</span>

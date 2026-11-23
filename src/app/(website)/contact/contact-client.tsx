@@ -10,7 +10,7 @@ import { apiPost } from '@/lib/api';
 import { PageHeader } from '@/components/website/page-header';
 import { ContactActions } from '@/components/website/contact-actions';
 import { fadeUp, staggerContainer, scaleIn } from '@/components/website/motion';
-import { Phone, Mail, MapPin, Clock, Building2, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Building2, Facebook, Instagram, MessageCircle, FileCheck } from 'lucide-react';
 import { useSiteContact } from '@/hooks/use-site-contact';
 import { whatsappChatUrl } from '@/lib/site-contact';
 
@@ -26,6 +26,7 @@ export function ContactClient() {
 
   const contactItems = [
     { icon: Building2, label: 'Business Name', value: site.name },
+    { icon: FileCheck, label: 'GST Identification (GSTIN)', value: '06AHLPA7723L1Z7 (Registered Manufacturer)' },
     { icon: MapPin, label: 'Factory & Registered Office', value: 'Ambala Cantt, Ambala, Haryana 133001, India' },
     {
       icon: Phone,

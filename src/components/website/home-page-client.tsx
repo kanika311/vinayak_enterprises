@@ -85,7 +85,11 @@ export function HomePageClient({
         <HeroBackground />
 
         {hasHeroVideo && (
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/55 to-transparent pointer-events-none z-[1]" />
+          <>
+            {/* Rich gradient overlay so text has high contrast and is readable over bright video */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/65 to-slate-950/35 pointer-events-none z-[1]" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-950/70 to-transparent pointer-events-none z-[1]" />
+          </>
         )}
 
         <div
@@ -93,53 +97,53 @@ export function HomePageClient({
             hasHeroVideo ? 'py-14 md:py-20' : 'py-12 md:py-20'
           }`}
         >
-          <div className={`w-full ${hasHeroVideo ? 'max-w-xl' : 'grid lg:grid-cols-2 gap-10 items-center'}`}>
+          <div className={`w-full ${hasHeroVideo ? 'max-w-2xl lg:max-w-3xl' : 'grid lg:grid-cols-2 gap-10 items-center'}`}>
             <motion.div
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
               className={hasHeroVideo ? 'drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]' : ''}
             >
-              {!hasHeroVideo && (
-                <motion.span
-                  variants={fadeUp}
-                  className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full mb-4 shadow-lg shadow-orange-500/40"
-                >
-                  MANUFACTURER · BULK SUPPLIER · DISTRIBUTOR
-                </motion.span>
-              )}
+              <motion.span
+                variants={fadeUp}
+                className="inline-flex items-center gap-1.5 bg-orange-600 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3.5 shadow-md border border-orange-400/30"
+              >
+                MANUFACTURER · BULK SUPPLIER · AMBALA
+              </motion.span>
 
               <motion.h1
                 variants={fadeUp}
-                className={`font-bold leading-tight mb-3 ${
-                  hasHeroVideo ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl' : 'text-3xl md:text-4xl lg:text-5xl mb-4'
-                }`}
+                className="font-extrabold tracking-tight leading-tight mb-3 sm:mb-4 text-white"
               >
-                Vinayak Enterprises: Scientific Instruments, Laboratory Equipment &amp; Anatomy Models Manufacturer in Ambala
+                <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white drop-shadow-md">
+                  Vinayak Enterprises
+                </span>
+                <span className="block text-base sm:text-lg md:text-xl font-semibold text-orange-400 mt-2 sm:mt-2.5 leading-snug drop-shadow-sm">
+                  Scientific Instruments, Laboratory Equipment &amp; Anatomy Models Manufacturer in Ambala
+                </span>
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
-                className={`mb-7 leading-relaxed ${
-                  hasHeroVideo ? 'text-white/90 text-base md:text-lg max-w-md' : 'text-blue-100 text-lg'
+                className={`mb-6 leading-relaxed ${
+                  hasHeroVideo ? 'text-white/90 text-sm sm:text-base md:text-lg max-w-xl' : 'text-blue-100 text-base md:text-lg max-w-xl'
                 }`}
               >
-                Scientific instruments, laboratory equipment, anatomy models &amp; medical training products —
-                manufactured in {SITE.location}.
+                Direct manufacturer &amp; bulk institutional supplier of precision scientific instruments, hospital training manikins, and educational lab apparatus across India.
               </motion.p>
 
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
                 <PulseCTA href="/products">View Products</PulseCTA>
                 <motion.div
-                  whileHover={{ scale: 1.06, y: -2 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 18 }}
                 >
                   <Link
                     href="/request-quote"
-                    className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-lg border-2 transition-colors ${
+                    className={`inline-flex items-center gap-2 font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border-2 transition-colors text-sm sm:text-base ${
                       hasHeroVideo
-                        ? 'border-white bg-white/10 text-white backdrop-blur-md hover:bg-white hover:text-slate-900'
+                        ? 'border-white bg-white/10 text-white backdrop-blur-md hover:bg-white hover:text-slate-900 shadow-sm'
                         : 'border-white/70 text-white hover:bg-white/15'
                     }`}
                   >
@@ -149,9 +153,9 @@ export function HomePageClient({
                 <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     href="/catalogues"
-                    className={`inline-flex items-center gap-2 font-semibold px-5 py-3 rounded-lg transition-colors ${
+                    className={`inline-flex items-center gap-2 font-semibold px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg transition-colors text-sm sm:text-base ${
                       hasHeroVideo
-                        ? 'bg-white/10 text-white hover:bg-white/20'
+                        ? 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-md border border-white/20'
                         : 'bg-white/10 text-white hover:bg-white/20'
                     }`}
                   >

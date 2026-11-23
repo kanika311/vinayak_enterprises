@@ -43,6 +43,7 @@ export default function SettingsPage() {
     { key: 'companyPhone', label: 'Primary Contact Phone', group: 'Company' },
     { key: 'companyPhoneSecondary', label: 'Secondary Contact Phone (Optional)', group: 'Company' },
     { key: 'companyAddress', label: 'Company Address', group: 'Company' },
+    { key: 'gstin', label: 'GST Number / GSTIN', group: 'Company' },
     { key: 'workingHours', label: 'Working Hours (short)', group: 'Company' },
     { key: 'whatsappNumber', label: 'WhatsApp Number', group: 'Social' },
     { key: 'facebook', label: 'Facebook Page URL', group: 'Social' },
@@ -90,7 +91,9 @@ export default function SettingsPage() {
                           ? '94160-29492'
                           : field.key === 'companyPhoneSecondary'
                             ? '62801-28618'
-                            : field.key === 'whatsappNumber'
+                            : field.key === 'gstin'
+                              ? '06AHLPA7723L1Z7'
+                              : field.key === 'whatsappNumber'
                               ? '9416029492'
                               : field.key === 'facebook'
                                 ? 'https://www.facebook.com/profile.php?id=...'

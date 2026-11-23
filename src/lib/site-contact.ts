@@ -9,6 +9,7 @@ export type SiteContact = {
   name: string;
   location: string;
   address: string;
+  gstin: string;
   phone: string;
   phoneTel: string;
   phoneSecondary?: string;
@@ -126,6 +127,7 @@ export function mapSettingsToSite(settings?: Record<string, unknown> | null): Si
     name: String(s.companyName || SITE.name),
     location: address,
     address,
+    gstin: String(s.gstin || SITE.gstin || '06AHLPA7723L1Z7'),
     phone: primaryPhone.display,
     phoneTel: primaryPhone.tel,
     phoneSecondary: secondaryPhone?.display,

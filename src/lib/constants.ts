@@ -6,6 +6,7 @@ export const SITE = {
   tagline: 'Manufacturer · Bulk Supplier · Distributor',
   location: 'Ambala Cantt, Ambala, Haryana 133001, India',
   address: 'Ambala Cantt, Ambala, Haryana 133001, India',
+  gstin: '06AHLPA7723L1Z7',
   phone: '+91 94160-29492',
   phoneTel: '+919416029492',
   email: 'vinayakenterprises52@gmail.com',
