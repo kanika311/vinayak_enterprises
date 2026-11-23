@@ -22,6 +22,7 @@ export type SiteContact = {
   facebook?: string;
   instagram?: string;
   linkedin?: string;
+  youtube?: string;
 };
 
 /** Digits only; take first valid phone if user entered multiple numbers; ensure India country code */
@@ -137,8 +138,9 @@ export function mapSettingsToSite(settings?: Record<string, unknown> | null): Si
     whatsapp: toWhatsAppNumber(whatsappRaw),
     workingHours: hours,
     workingHoursLong: hoursLong,
-    facebook: cleanUrl(s.facebook) || 'https://www.facebook.com/profile.php?id=61596718377937&sk=about',
-    instagram: cleanUrl(s.instagram),
-    linkedin: cleanUrl(s.linkedin),
+    facebook: cleanUrl(s.facebook) || SITE.facebook,
+    instagram: cleanUrl(s.instagram) || SITE.instagram,
+    linkedin: cleanUrl(s.linkedin) || SITE.linkedin,
+    youtube: cleanUrl(s.youtube) || SITE.youtube,
   };
 }

@@ -11,14 +11,19 @@ export const SITE = {
   phoneTel: '+919416029492',
   email: 'vinayakenterprises52@gmail.com',
   whatsapp: '919416029492',
+  facebook: 'https://www.facebook.com/profile.php?id=61596718377937&sk=about',
+  instagram: 'https://www.instagram.com/vinayak545027/',
+  linkedin: 'https://www.linkedin.com/company/vinayak-enterprises-ambala/',
+  youtube: 'https://www.youtube.com/@vinayakenterprises52',
   workingHours: 'Mon – Sat | 9:00 AM – 10:00 PM',
   workingHoursLong: 'Monday – Saturday, 9:00 AM – 10:00 PM',
 };
 
 export const SEO = {
-  title: 'Vinayak Enterprises | Scientific Instruments & Lab Equipment',
+  title:
+    'Vinayak Enterprises | Scientific Instruments, Laboratory Equipment & Human Anatomy Models Manufacturer Ambala',
   description:
-    'Vinayak Enterprises: Leading manufacturer & bulk supplier of laboratory equipment, anatomical models, microscopes & CPR manikins in Ambala, Haryana, India.',
+    'Vinayak Enterprises is a leading manufacturer & bulk supplier of scientific instruments, laboratory equipment, human anatomy models & microscopes in Ambala Cantt, Haryana, India.',
   keywords: [
     'Anatomical Models Manufacturer in India',
     'Laboratory Equipment Supplier in India',

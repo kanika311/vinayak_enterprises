@@ -117,6 +117,9 @@ const rootStructuredData = {
       ],
       sameAs: [
         'https://www.facebook.com/profile.php?id=61596718377937&sk=about',
+        'https://www.instagram.com/vinayak545027/',
+        'https://www.linkedin.com/company/vinayak-enterprises-ambala/',
+        'https://www.youtube.com/@vinayakenterprises52',
       ],
     },
     {

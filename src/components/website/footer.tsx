@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, Clock, Facebook, Instagram, MessageCircle, ShieldCheck, FileCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Linkedin, Youtube, MessageCircle, ShieldCheck, FileCheck } from 'lucide-react';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
 import { SiteLogo } from '@/components/website/site-logo';
@@ -13,7 +13,16 @@ export function WebsiteFooter() {
   const { site } = useSiteContact();
 
   return (
-    <footer className="bg-white text-slate-600 border-t border-slate-200 overflow-hidden" aria-label="Site Footer">
+    <footer
+      className="bg-white text-slate-600 border-t border-slate-200 overflow-hidden"
+      aria-label="Site Footer"
+      itemScope
+      itemType="https://schema.org/LocalBusiness"
+    >
+      <meta itemProp="name" content="Vinayak Enterprises" />
+      <meta itemProp="url" content="https://www.vinayakenterprisess.agency" />
+      <meta itemProp="image" content="https://www.vinayakenterprisess.agency/og-image.png" />
+      <meta itemProp="priceRange" content="₹₹ - ₹₹₹₹" />
       <div className="container mx-auto px-4 py-12">
         <motion.div
           initial="hidden"
@@ -45,7 +54,8 @@ export function WebsiteFooter() {
                   <a
                     href={site.facebook}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer me"
+                    itemProp="sameAs"
                     aria-label="Follow Vinayak Enterprises on Facebook"
                     className="w-9 h-9 rounded-full bg-slate-100 hover:bg-[#1877F2] text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 border border-slate-200"
                   >
@@ -56,17 +66,42 @@ export function WebsiteFooter() {
                   <a
                     href={site.instagram}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer me"
+                    itemProp="sameAs"
                     aria-label="Follow Vinayak Enterprises on Instagram"
                     className="w-9 h-9 rounded-full bg-slate-100 hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 border border-slate-200"
                   >
                     <Instagram className="w-4 h-4" />
                   </a>
                 )}
+                {site.linkedin && (
+                  <a
+                    href={site.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                    itemProp="sameAs"
+                    aria-label="Connect with Vinayak Enterprises on LinkedIn"
+                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-[#0A66C2] text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 border border-slate-200"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                )}
+                {site.youtube && (
+                  <a
+                    href={site.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                    itemProp="sameAs"
+                    aria-label="Subscribe to Vinayak Enterprises on YouTube"
+                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-[#FF0000] text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 border border-slate-200"
+                  >
+                    <Youtube className="w-4 h-4" />
+                  </a>
+                )}
                 <a
                   href={whatsappChatUrl(site.whatsapp)}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer me"
                   aria-label="Chat with Vinayak Enterprises on WhatsApp"
                   className="w-9 h-9 rounded-full bg-slate-100 hover:bg-[#25D366] text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 border border-slate-200"
                 >
@@ -116,9 +151,11 @@ export function WebsiteFooter() {
           <motion.div variants={fadeUp}>
             <h3 className="font-bold text-slate-900 mb-4 text-base">Contact Us</h3>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2.5">
+              <li className="flex items-start gap-2.5" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-orange-500" />
-                <span className="leading-snug text-slate-700">Ambala Cantt, Ambala, Haryana 133001, India</span>
+                <address className="not-italic leading-snug text-slate-700">
+                  <span itemProp="streetAddress">Ambala Cantt</span>, <span itemProp="addressLocality">Ambala</span>, <span itemProp="addressRegion">Haryana</span> <span itemProp="postalCode">133001</span>, <span itemProp="addressCountry">India</span>
+                </address>
               </li>
               <li className="flex items-center gap-2.5">
                 <FileCheck className="h-4 w-4 shrink-0 text-orange-500" />
@@ -129,7 +166,11 @@ export function WebsiteFooter() {
               {site.phones.map((phoneItem, idx) => (
                 <li key={idx} className="flex items-center gap-2.5">
                   <Phone className="h-4 w-4 shrink-0 text-orange-500" />
-                  <a href={`tel:${phoneItem.tel}`} className="hover:text-[#1a3a6b] text-slate-800 font-semibold transition-colors">
+                  <a
+                    href={`tel:${phoneItem.tel}`}
+                    itemProp="telephone"
+                    className="hover:text-[#1a3a6b] text-slate-800 font-semibold transition-colors"
+                  >
                     {phoneItem.display}
                   </a>
                   {idx === 0 && site.phones.length > 1 && (
@@ -148,6 +189,7 @@ export function WebsiteFooter() {
                 <Mail className="h-4 w-4 shrink-0 text-orange-500" />
                 <a
                   href={`mailto:${site.email}?subject=${encodeURIComponent('Enquiry - Vinayak Enterprises')}`}
+                  itemProp="email"
                   className="hover:text-orange-600 text-slate-700 font-medium break-all transition-colors"
                 >
                   {site.email}

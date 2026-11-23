@@ -14,12 +14,12 @@ interface Banner {
 
 const ROTATE_MS = 12000;
 
-/** Optimize Cloudinary video URL on the fly: format auto, eco compression, max 1280w */
+/** Optimize Cloudinary video URL on the fly: format auto, eco compression, max 960w, bitrate capped */
 export function getOptimizedVideoUrl(url?: string): string {
   if (!url) return '';
   if (url.includes('res.cloudinary.com') && url.includes('/video/upload/')) {
     if (url.includes('/upload/f_auto') || url.includes('/upload/q_auto')) return url;
-    return url.replace('/video/upload/', '/video/upload/f_auto,q_auto:eco,vc_auto,w_1280/');
+    return url.replace('/video/upload/', '/video/upload/f_auto,q_auto:eco,vc_auto,w_960,br_600k/');
   }
   return url;
 }
@@ -128,7 +128,7 @@ export function HeroBackground() {
               muted
               loop
               playsInline
-              preload="auto"
+              preload="none"
               onLoadedData={() => setIsVideoLoaded(true)}
               onCanPlay={() => setIsVideoLoaded(true)}
             />
