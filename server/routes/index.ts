@@ -73,6 +73,7 @@ router.delete('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.de
 
 // Catalogues
 router.get('/catalogues', moduleCtrl.getCatalogues);
+router.get('/catalogues/signature', protect, moduleCtrl.getCatalogueUploadSignature);
 router.post('/catalogues/upload', protect, authorize(PERMISSIONS.CATALOGUES), upload.single('file'), moduleCtrl.uploadCatalogueFile);
 router.post('/catalogues', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.createCatalogue);
 router.put('/catalogues/:id', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.updateCatalogue);

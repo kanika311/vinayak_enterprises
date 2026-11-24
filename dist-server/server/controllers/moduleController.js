@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVideoUploadSignature = exports.getShowcaseVideos = exports.getPublicVideos = exports.deleteBanner = exports.updateBanner = exports.createBanner = exports.uploadBannerVideo = exports.getBanners = exports.getPublicBanners = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.updateCatalogue = exports.createCatalogue = exports.uploadCatalogueFile = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
-exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.trackVideoView = exports.deleteShowcaseVideo = exports.updateShowcaseVideo = exports.createShowcaseVideo = exports.uploadShowcaseVideo = void 0;
+exports.getShowcaseVideos = exports.getPublicVideos = exports.deleteBanner = exports.updateBanner = exports.createBanner = exports.uploadBannerVideo = exports.getBanners = exports.getPublicBanners = exports.updateInquiry = exports.createInquiry = exports.getInquiries = exports.exportSubscribers = exports.subscribe = exports.getSubscribers = exports.deleteCustomer = exports.updateCustomer = exports.createCustomer = exports.getCustomers = exports.deleteTestimonial = exports.updateTestimonial = exports.submitTestimonial = exports.createTestimonial = exports.getTestimonials = exports.deleteCatalogue = exports.trackDownload = exports.updateCatalogue = exports.createCatalogue = exports.uploadCatalogueFile = exports.getCatalogueUploadSignature = exports.getCatalogues = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getCategoryBySlug = exports.getBlogById = exports.getBlogBySlug = exports.getBlogs = exports.getRFQReport = exports.updateRFQ = exports.createRFQ = exports.getRFQs = exports.assignLead = exports.addLeadNote = exports.updateLead = exports.createLead = exports.getLeads = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
+exports.getAnalytics = exports.trackEvent = exports.getRobotsTxt = exports.getSitemap = exports.upsertSEO = exports.getSEOEntries = exports.updateSettings = exports.getSettings = exports.getPublicSettings = exports.upsertPage = exports.getPageBySlug = exports.getPages = exports.deleteMedia = exports.uploadMedia = exports.getMedia = exports.trackVideoView = exports.deleteShowcaseVideo = exports.updateShowcaseVideo = exports.createShowcaseVideo = exports.uploadShowcaseVideo = exports.getVideoUploadSignature = void 0;
 const helpers_1 = require("../utils/helpers");
 const categoryService = __importStar(require("../services/categoryService"));
 const leadService = __importStar(require("../services/leadService"));
@@ -44,6 +44,7 @@ const catalogueService = __importStar(require("../services/catalogueService"));
 const miscService = __importStar(require("../services/miscService"));
 const bannerService = __importStar(require("../services/bannerService"));
 const videoService = __importStar(require("../services/videoService"));
+const cloudinaryService_1 = require("../services/cloudinaryService");
 // Categories
 exports.getCategories = (0, helpers_1.asyncHandler)(async (req, res) => {
     if (!req.user) {
@@ -146,6 +147,10 @@ exports.deleteBlog = (0, helpers_1.asyncHandler)(async (req, res) => {
 exports.getCatalogues = (0, helpers_1.asyncHandler)(async (req, res) => {
     const result = await catalogueService.getCatalogues(req.query);
     (0, helpers_1.sendResponse)(res, 200, result);
+});
+exports.getCatalogueUploadSignature = (0, helpers_1.asyncHandler)(async (_req, res) => {
+    const sig = (0, cloudinaryService_1.getCloudinarySignature)('catalogues');
+    (0, helpers_1.sendResponse)(res, 200, sig);
 });
 exports.uploadCatalogueFile = (0, helpers_1.asyncHandler)(async (req, res) => {
     if (!req.file) {

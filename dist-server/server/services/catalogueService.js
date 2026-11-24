@@ -23,7 +23,10 @@ const getCatalogues = async (query) => {
 exports.getCatalogues = getCatalogues;
 const createCatalogue = async (data) => {
     if (!data.slug)
-        data.slug = (0, helpers_1.generateSlug)(data.title);
+        data.slug = (0, helpers_1.generateSlug)(data.title) + '-' + Date.now().toString(36);
+    if (data.isActive) {
+        await Catalogue_1.default.updateMany({}, { isActive: false });
+    }
     return Catalogue_1.default.create(data);
 };
 exports.createCatalogue = createCatalogue;

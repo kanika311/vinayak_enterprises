@@ -9,6 +9,7 @@ import * as catalogueService from '../services/catalogueService';
 import * as miscService from '../services/miscService';
 import * as bannerService from '../services/bannerService';
 import * as videoService from '../services/videoService';
+import { getCloudinarySignature } from '../services/cloudinaryService';
 
 // Categories
 export const getCategories = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -132,6 +133,11 @@ export const deleteBlog = asyncHandler(async (req: AuthRequest, res: Response) =
 export const getCatalogues = asyncHandler(async (req: AuthRequest, res: Response) => {
   const result = await catalogueService.getCatalogues(req.query as Record<string, string>);
   sendResponse(res, 200, result);
+});
+
+export const getCatalogueUploadSignature = asyncHandler(async (_req: AuthRequest, res: Response) => {
+  const sig = getCloudinarySignature('catalogues');
+  sendResponse(res, 200, sig);
 });
 
 export const uploadCatalogueFile = asyncHandler(async (req: AuthRequest, res: Response) => {

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import axios from 'axios';
 import {
   UploadCloud,
   FileText,
@@ -46,6 +47,7 @@ export default function AdminCataloguesPage() {
   const [directUrl, setDirectUrl] = useState('');
   const [directFilename, setDirectFilename] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<number>(0);
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -84,24 +86,81 @@ export default function AdminCataloguesPage() {
     }
     setErrorMsg('');
     setIsUploading(true);
+    setUploadPercent(0);
     setUploadSuccess('');
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      if (title.trim()) formData.append('title', title.trim());
+      // 1. Try Direct Cloudinary Signed Upload (bypasses Vercel 4.5MB request limit!)
+      let directUploadDone = false;
+      try {
+        const sig = await apiGet<{
+          signature: string;
+          timestamp: number;
+          apiKey: string;
+          cloudName: string;
+          folder: string;
+        }>('/catalogues/signature');
 
-      await api.post('/catalogues/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+        if (sig?.signature && sig?.cloudName) {
+          const fd = new FormData();
+          fd.append('file', selectedFile);
+          fd.append('api_key', sig.apiKey);
+          fd.append('timestamp', String(sig.timestamp));
+          fd.append('signature', sig.signature);
+          fd.append('folder', sig.folder);
+
+          const cdnRes = await axios.post(
+            `https://api.cloudinary.com/v1_1/${sig.cloudName}/auto/upload`,
+            fd,
+            {
+              onUploadProgress: (progressEvent) => {
+                const total = progressEvent.total || selectedFile.size;
+                const percent = Math.min(99, Math.round((progressEvent.loaded * 100) / total));
+                setUploadPercent(percent);
+              },
+            }
+          );
+
+          if (cdnRes.data?.secure_url) {
+            setUploadPercent(100);
+            await api.post('/catalogues', {
+              title: title.trim() || selectedFile.name.replace(/\.pdf$/i, ''),
+              file: {
+                url: cdnRes.data.secure_url,
+                filename: selectedFile.name,
+                publicId: cdnRes.data.public_id,
+              },
+              category: 'All Products',
+              isActive: true,
+            });
+
+            directUploadDone = true;
+          }
+        }
+      } catch (directErr) {
+        console.warn('Direct Cloudinary upload error:', directErr);
+      }
+
+      // 2. Fallback to server upload route if direct upload was not completed
+      if (!directUploadDone) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        if (title.trim()) formData.append('title', title.trim());
+
+        await api.post('/catalogues/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
 
       setSelectedFile(null);
       setTitle('');
+      setUploadPercent(0);
       setUploadSuccess('Catalogue PDF uploaded and published successfully as the active live catalogue!');
       await queryClient.invalidateQueries({ queryKey: ['admin-catalogues'] });
       await queryClient.invalidateQueries({ queryKey: ['catalogues-public'] });
       setTimeout(() => setUploadSuccess(''), 5000);
     } catch (err: unknown) {
+      console.error('Upload failed:', err);
       const msg =
         err && typeof err === 'object' && 'response' in err
           ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -109,6 +168,7 @@ export default function AdminCataloguesPage() {
       setErrorMsg(msg || 'Upload failed');
     } finally {
       setIsUploading(false);
+      setUploadPercent(0);
     }
   };
 
@@ -270,6 +330,21 @@ export default function AdminCataloguesPage() {
                   )}
                 </div>
 
+                {isUploading && uploadPercent > 0 && (
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-blue-700 font-semibold">
+                      <span>Uploading to Cloud CDN...</span>
+                      <span>{uploadPercent}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-150"
+                        style={{ width: `${uploadPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {errorMsg && (
                   <div className="text-xs text-red-600 bg-red-50 border border-red-200 p-2.5 rounded-lg flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 shrink-0" />
@@ -292,7 +367,7 @@ export default function AdminCataloguesPage() {
                   {isUploading ? (
                     <>
                       <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Uploading &amp; Activating PDF...
+                      {uploadPercent > 0 ? `Uploading... ${uploadPercent}%` : 'Uploading & Activating PDF...'}
                     </>
                   ) : (
                     <>

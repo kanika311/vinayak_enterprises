@@ -17,7 +17,10 @@ export const getCatalogues = async (query: Record<string, string>) => {
 };
 
 export const createCatalogue = async (data: Record<string, unknown>) => {
-  if (!data.slug) data.slug = generateSlug(data.title as string);
+  if (!data.slug) data.slug = generateSlug(data.title as string) + '-' + Date.now().toString(36);
+  if (data.isActive) {
+    await Catalogue.updateMany({}, { isActive: false });
+  }
   return Catalogue.create(data);
 };
 
