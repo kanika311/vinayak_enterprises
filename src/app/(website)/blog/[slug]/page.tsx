@@ -6,10 +6,16 @@ import { BlogReader } from '@/components/website/blog-reader';
 import { SITE_URL } from '@/lib/site-url';
 import type { Blog } from '@/types';
 
-async function getBlogBySlug(slug: string): Promise<Blog | null> {
+async function getBlogBySlug(slug: string, incrementView = false): Promise<Blog | null> {
   try {
     await connectDatabase();
-    const doc = await BlogModel.findOne({ slug, status: 'published' }).lean();
+    const doc = incrementView
+      ? await BlogModel.findOneAndUpdate(
+          { slug, status: 'published' },
+          { $inc: { views: 1 } },
+          { new: true }
+        ).lean()
+      : await BlogModel.findOne({ slug, status: 'published' }).lean();
     if (!doc) return null;
     return JSON.parse(JSON.stringify(doc)) as Blog;
   } catch (err) {
@@ -86,7 +92,7 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const blog = await getBlogBySlug(slug);
+  const blog = await getBlogBySlug(slug, true);
 
   if (!blog) {
     return notFound();

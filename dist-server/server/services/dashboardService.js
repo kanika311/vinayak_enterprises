@@ -19,7 +19,11 @@ const getDashboardStats = async () => {
         Product_1.default.countDocuments({ status: 'published' }),
         Lead_1.default.countDocuments(),
         RFQ_1.default.countDocuments(),
-        Analytics_1.default.countDocuments({ type: 'visitor' }),
+        Promise.all([
+            Analytics_1.default.countDocuments({ type: 'visitor' }),
+            Analytics_1.default.distinct('ipAddress', { type: { $in: ['visitor', 'page_view'] } }),
+            Analytics_1.default.countDocuments({ type: 'page_view' }),
+        ]).then(([vis, ips, pvs]) => Math.max(vis, ips.filter(Boolean).length, pvs > 0 ? 1 : 0)),
         Lead_1.default.countDocuments({ createdAt: { $gte: startOfMonth } }),
         Blog_1.default.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]),
         Download_1.default.countDocuments(),
@@ -58,7 +62,7 @@ const getDashboardStats = async () => {
             { $sort: { '_id.year': 1, '_id.month': 1 } },
         ]),
         Analytics_1.default.aggregate([
-            { $match: { type: 'page_view', createdAt: { $gte: sixMonthsAgo } } },
+            { $match: { type: { $in: ['page_view', 'visitor'] }, createdAt: { $gte: sixMonthsAgo } } },
             {
                 $group: {
                     _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
@@ -78,7 +82,7 @@ const getDashboardStats = async () => {
             { $sort: { '_id.year': 1, '_id.month': 1 } },
         ]),
         Analytics_1.default.aggregate([
-            { $match: { type: 'visitor', device: { $exists: true } } },
+            { $match: { type: { $in: ['visitor', 'page_view'] }, device: { $exists: true } } },
             { $group: { _id: '$device', count: { $sum: 1 } } },
         ]),
     ]);

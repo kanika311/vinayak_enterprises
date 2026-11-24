@@ -397,7 +397,27 @@ export const getRobotsTxt = asyncHandler(async (_req: AuthRequest, res: Response
 
 // Analytics
 export const trackEvent = asyncHandler(async (req: AuthRequest, res: Response) => {
-  await miscService.trackEvent(req.body);
+  const ip =
+    (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+    req.socket.remoteAddress ||
+    '';
+  const userAgent = (req.headers['user-agent'] as string) || '';
+
+  let device = req.body?.device;
+  if (!device) {
+    if (/tablet|ipad|playbook|silk/i.test(userAgent)) device = 'tablet';
+    else if (/mobile|iphone|android|ipod|blackberry|opera mini|iemobile/i.test(userAgent)) device = 'mobile';
+    else device = 'desktop';
+  }
+
+  const payload = {
+    ...req.body,
+    ipAddress: ip,
+    browser: req.body?.browser || userAgent.slice(0, 150),
+    device,
+  };
+
+  await miscService.trackEvent(payload);
   sendResponse(res, 201, null, 'Event tracked');
 });
 

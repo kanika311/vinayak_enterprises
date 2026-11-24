@@ -366,7 +366,26 @@ exports.getRobotsTxt = (0, helpers_1.asyncHandler)(async (_req, res) => {
 });
 // Analytics
 exports.trackEvent = (0, helpers_1.asyncHandler)(async (req, res) => {
-    await miscService.trackEvent(req.body);
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+        req.socket.remoteAddress ||
+        '';
+    const userAgent = req.headers['user-agent'] || '';
+    let device = req.body?.device;
+    if (!device) {
+        if (/tablet|ipad|playbook|silk/i.test(userAgent))
+            device = 'tablet';
+        else if (/mobile|iphone|android|ipod|blackberry|opera mini|iemobile/i.test(userAgent))
+            device = 'mobile';
+        else
+            device = 'desktop';
+    }
+    const payload = {
+        ...req.body,
+        ipAddress: ip,
+        browser: req.body?.browser || userAgent.slice(0, 150),
+        device,
+    };
+    await miscService.trackEvent(payload);
     (0, helpers_1.sendResponse)(res, 201, null, 'Event tracked');
 });
 exports.getAnalytics = (0, helpers_1.asyncHandler)(async (req, res) => {

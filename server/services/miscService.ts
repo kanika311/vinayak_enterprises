@@ -7,6 +7,8 @@ import Page from '../models/Page';
 import Setting from '../models/Setting';
 import SEO from '../models/SEO';
 import Analytics from '../models/Analytics';
+import Blog from '../models/Blog';
+import Product from '../models/Product';
 import { AppError, getPagination, buildSort } from '../utils/helpers';
 import { uploadToCloudinary, getMediaType } from './cloudinaryService';
 
@@ -296,7 +298,27 @@ Sitemap: ${process.env.CLIENT_URL}/sitemap.xml`;
 };
 
 // Analytics
-export const trackEvent = async (data: Record<string, unknown>) => Analytics.create(data);
+export const trackEvent = async (data: Record<string, unknown>) => {
+  const event = await Analytics.create(data);
+
+  // If path is a blog post, increment blog real views
+  if (data.path && typeof data.path === 'string' && data.path.includes('/blog/')) {
+    const slug = data.path.split('/blog/')[1]?.split('?')[0]?.split('/')[0];
+    if (slug) {
+      await Blog.updateOne({ slug, status: 'published' }, { $inc: { views: 1 } }).catch(() => {});
+    }
+  }
+
+  // If path is a product detail, increment product real views
+  if (data.path && typeof data.path === 'string' && data.path.includes('/products/')) {
+    const slug = data.path.split('/products/')[1]?.split('?')[0]?.split('/')[0];
+    if (slug) {
+      await Product.updateOne({ slug }, { $inc: { views: 1 } }).catch(() => {});
+    }
+  }
+
+  return event;
+};
 
 export const getAnalytics = async (query: Record<string, string>) => {
   const filter: Record<string, unknown> = {};

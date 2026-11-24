@@ -46,6 +46,8 @@ const Page_1 = __importDefault(require("../models/Page"));
 const Setting_1 = __importDefault(require("../models/Setting"));
 const SEO_1 = __importDefault(require("../models/SEO"));
 const Analytics_1 = __importDefault(require("../models/Analytics"));
+const Blog_1 = __importDefault(require("../models/Blog"));
+const Product_1 = __importDefault(require("../models/Product"));
 const helpers_1 = require("../utils/helpers");
 const cloudinaryService_1 = require("./cloudinaryService");
 // Testimonials
@@ -335,7 +337,24 @@ Sitemap: ${process.env.CLIENT_URL}/sitemap.xml`;
 };
 exports.generateRobotsTxt = generateRobotsTxt;
 // Analytics
-const trackEvent = async (data) => Analytics_1.default.create(data);
+const trackEvent = async (data) => {
+    const event = await Analytics_1.default.create(data);
+    // If path is a blog post, increment blog real views
+    if (data.path && typeof data.path === 'string' && data.path.includes('/blog/')) {
+        const slug = data.path.split('/blog/')[1]?.split('?')[0]?.split('/')[0];
+        if (slug) {
+            await Blog_1.default.updateOne({ slug, status: 'published' }, { $inc: { views: 1 } }).catch(() => { });
+        }
+    }
+    // If path is a product detail, increment product real views
+    if (data.path && typeof data.path === 'string' && data.path.includes('/products/')) {
+        const slug = data.path.split('/products/')[1]?.split('?')[0]?.split('/')[0];
+        if (slug) {
+            await Product_1.default.updateOne({ slug }, { $inc: { views: 1 } }).catch(() => { });
+        }
+    }
+    return event;
+};
 exports.trackEvent = trackEvent;
 const getAnalytics = async (query) => {
     const filter = {};

@@ -7,9 +7,12 @@ import { SITE_URL } from '@/lib/site-url';
 import { FALLBACK_PRODUCTS } from '@/lib/fallback-data';
 import type { Product } from '@/types';
 
-async function getProductBySlug(slug: string): Promise<Product | null> {
+async function getProductBySlug(slug: string, incrementView = false): Promise<Product | null> {
   try {
     await connectDatabase();
+    if (incrementView) {
+      await ProductModel.updateOne({ slug }, { $inc: { views: 1 } }).catch(() => {});
+    }
     // 1. Try finding published product with populated category
     let doc = await ProductModel.findOne({
       slug,
@@ -104,7 +107,7 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getProductBySlug(slug, true);
 
   const categoryName = product && typeof product.category === 'object' ? product.category.name : '';
   const categorySlug = product && typeof product.category === 'object' ? product.category.slug : '';
