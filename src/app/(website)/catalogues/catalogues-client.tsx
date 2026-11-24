@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -149,8 +149,66 @@ export function CataloguesClient() {
   const isCloudinaryPdf = !!fileUrl && fileUrl.includes('res.cloudinary.com') && /\.pdf($|\?)/i.test(fileUrl);
 
   const totalPages = isCloudinaryPdf
-    ? activeCatalogue?.pageCount || 11
+    ? activeCatalogue?.pageCount && activeCatalogue.pageCount > 1
+      ? activeCatalogue.pageCount
+      : 11
     : DEFAULT_CATALOGUE_PAGES.length;
+
+  // Touch swipe handling for mobile
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNextPage();
+      } else {
+        handlePrevPage();
+      }
+    }
+    setTouchStartX(null);
+  };
+
+  // Keyboard navigation (ArrowLeft & ArrowRight)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        if (currentPage < totalPages) {
+          setFlipDirection('next');
+          playPageFlipSound();
+          setPageLoading(true);
+          setCurrentPage((p) => Math.min(totalPages, p + 1));
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (currentPage > 1) {
+          setFlipDirection('prev');
+          playPageFlipSound();
+          setPageLoading(true);
+          setCurrentPage((p) => Math.max(1, p - 1));
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [currentPage, totalPages]);
+
+  // Preload adjacent page images for instant turning
+  useEffect(() => {
+    if (!fileUrl || !isCloudinaryPdf) return;
+    const preload = (pg: number) => {
+      if (pg >= 1 && pg <= totalPages) {
+        const img = new Image();
+        img.src = getCloudinaryPageUrl(fileUrl, pg);
+      }
+    };
+    preload(currentPage + 1);
+    preload(currentPage - 1);
+  }, [currentPage, fileUrl, isCloudinaryPdf, totalPages]);
 
   // Track and trigger file download
   const handleDownload = () => {
@@ -262,21 +320,25 @@ export function CataloguesClient() {
             disabled={currentPage <= 1}
             aria-label="Previous Page"
             className={`
-              absolute -left-2 sm:-left-6 md:-left-8 z-30
-              h-11 w-11 sm:h-13 sm:w-13 rounded-full
-              bg-white/95 hover:bg-white text-slate-800
-              border border-slate-200 shadow-xl
-              flex items-center justify-center
+              absolute -left-3 sm:-left-7 md:-left-9 z-30
+              h-12 w-12 sm:h-14 sm:w-14 rounded-full
+              border-2 shadow-2xl flex items-center justify-center
               transition-all duration-200
-              hover:scale-110 active:scale-95
-              disabled:opacity-20 disabled:pointer-events-none
+              ${
+                currentPage <= 1
+                  ? 'bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed opacity-30 pointer-events-none'
+                  : 'bg-white hover:bg-[#1a3a6b] text-[#1a3a6b] hover:text-white border-slate-300 hover:border-[#1a3a6b] hover:scale-110 active:scale-95 cursor-pointer ring-4 ring-blue-50/70'
+              }
             `}
+            title="Previous Page (पिछला पृष्ठ)"
           >
-            <ChevronLeft className="h-6 w-6 text-slate-700" />
+            <ChevronLeft className="h-7 w-7" />
           </button>
 
           {/* Central Flipbook Card */}
           <div
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             className={`w-full max-w-[760px] relative rounded-xl shadow-2xl bg-white border border-slate-300/80 overflow-hidden transition-transform duration-200 ${
               isZoomed ? 'scale-110 sm:scale-125 z-40' : ''
             }`}
@@ -420,7 +482,7 @@ export function CataloguesClient() {
                 className="bg-black/85 hover:bg-black text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-xs flex items-center gap-1 transition-colors"
               >
                 <Maximize2 className="h-3 w-3" />
-                <span>फूल स्क्रीन पढ़ें</span>
+                <span>फुल स्क्रीन पढ़ें</span>
               </button>
             </div>
           </div>
@@ -431,23 +493,84 @@ export function CataloguesClient() {
             disabled={currentPage >= totalPages}
             aria-label="Next Page"
             className={`
-              absolute -right-2 sm:-right-6 md:-right-8 z-30
-              h-11 w-11 sm:h-13 sm:w-13 rounded-full
-              bg-white/95 hover:bg-white text-slate-800
-              border border-slate-200 shadow-xl
-              flex items-center justify-center
+              absolute -right-3 sm:-right-7 md:-right-9 z-30
+              h-12 w-12 sm:h-14 sm:w-14 rounded-full
+              border-2 shadow-2xl flex items-center justify-center
               transition-all duration-200
-              hover:scale-110 active:scale-95
-              disabled:opacity-20 disabled:pointer-events-none
+              ${
+                currentPage >= totalPages
+                  ? 'bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed opacity-30 pointer-events-none'
+                  : 'bg-[#1a3a6b] hover:bg-[#12284c] text-white border-[#1a3a6b] hover:scale-110 active:scale-95 cursor-pointer ring-4 ring-blue-200/80 shadow-blue-900/30'
+              }
             `}
+            title="Next Page (अगला पृष्ठ)"
           >
-            <ChevronRight className="h-6 w-6 text-slate-700" />
+            <ChevronRight className="h-7 w-7" />
           </button>
         </div>
 
+        {/* ========================================================= */}
+        {/* DEDICATED BOTTOM PAGE CONTROLS (Mobile & Desktop)         */}
+        {/* ========================================================= */}
+        <div className="mt-4 bg-white rounded-2xl border border-slate-200/90 p-3 sm:p-4 shadow-sm flex items-center justify-between gap-2 sm:gap-4 select-none">
+          {/* Previous Page Button */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePrevPage}
+            disabled={currentPage <= 1}
+            className="h-10 sm:h-11 px-3 sm:px-5 font-bold text-xs sm:text-sm border-slate-300 text-slate-700 hover:text-[#1a3a6b] hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            <span>पिछला पृष्ठ (Prev)</span>
+          </Button>
+
+          {/* Quick Page Jump Selector & Indicator */}
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline text-xs font-bold text-slate-500 uppercase tracking-wider">
+              पृष्ठ:
+            </span>
+            <div className="relative">
+              <select
+                value={currentPage}
+                onChange={(e) => {
+                  playPageFlipSound();
+                  setPageLoading(true);
+                  setFlipDirection(Number(e.target.value) > currentPage ? 'next' : 'prev');
+                  setCurrentPage(Number(e.target.value));
+                }}
+                className="appearance-none bg-slate-100 hover:bg-slate-200/80 border border-slate-300 text-[#1a3a6b] font-black text-xs sm:text-sm py-1.5 pl-3 pr-7 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#1a3a6b]"
+              >
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <option key={p} value={p}>
+                    पृष्ठ {p} / {totalPages}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500 text-xs">
+                ▼
+              </div>
+            </div>
+            <span className="text-xs font-extrabold text-slate-700">
+              / {totalPages}
+            </span>
+          </div>
+
+          {/* Next Page Button */}
+          <Button
+            type="button"
+            onClick={handleNextPage}
+            disabled={currentPage >= totalPages}
+            className="h-10 sm:h-11 px-4 sm:px-6 font-bold text-xs sm:text-sm bg-[#1a3a6b] hover:bg-[#12284c] text-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <span>अगला पृष्ठ (Next)</span>
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+
         {/* Subtitle helper under reader */}
-        <p className="text-center text-xs text-slate-500 mt-3 font-medium">
-          तीर (arrows) पर क्लिक करके पन्ने पलटें · Realistic page turning sound enabled
+        <p className="text-center text-xs text-slate-500 mt-2 font-medium">
+          तीर (arrows), स्वाइप (swipe) या नीचे दिए बटनों से पन्ने पलटें · Realistic paper turn sound enabled
         </p>
 
         {/* ========================================================= */}

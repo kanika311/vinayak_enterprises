@@ -69,6 +69,17 @@ export const getCloudinarySignature = (folder = 'showcase_videos') => {
   };
 };
 
+/** Fetch exact page count of a Cloudinary PDF */
+export const getCloudinaryPdfPageCount = async (publicId: string): Promise<number | null> => {
+  if (!ensureCloudinaryConfigured()) return null;
+  try {
+    const res = await cloudinary.api.resource(publicId, { pages: true, image_metadata: true });
+    return typeof res.pages === 'number' && res.pages > 0 ? res.pages : null;
+  } catch {
+    return null;
+  }
+};
+
 /** Convert any Cloudinary image to WebP with auto quality */
 export const toWebpUrl = (url: string): string => {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;

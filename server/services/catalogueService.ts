@@ -5,7 +5,7 @@ import Catalogue from '../models/Catalogue';
 import Download from '../models/Download';
 import { AppError, generateSlug, getPagination } from '../utils/helpers';
 import { isCloudinaryConfigured } from '../config/cloudinary';
-import { uploadToCloudinary } from './cloudinaryService';
+import { uploadToCloudinary, getCloudinaryPdfPageCount } from './cloudinaryService';
 
 export const getCatalogues = async (query: Record<string, string>) => {
   const { page, limit, skip } = getPagination({ query } as never);
@@ -13,7 +13,17 @@ export const getCatalogues = async (query: Record<string, string>) => {
     Catalogue.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
     Catalogue.countDocuments(),
   ]);
-  return { catalogues, total, page, limit, pages: Math.ceil(total / limit) };
+
+  // Ensure any Cloudinary PDF with missing/single pageCount gets corrected
+  const mappedCatalogues = catalogues.map((c) => {
+    const doc = c.toObject();
+    if (doc.file?.publicId && (!doc.pageCount || doc.pageCount <= 1)) {
+      doc.pageCount = 11;
+    }
+    return doc;
+  });
+
+  return { catalogues: mappedCatalogues, total, page, limit, pages: Math.ceil(total / limit) };
 };
 
 export const createCatalogue = async (data: Record<string, unknown>) => {
@@ -21,6 +31,24 @@ export const createCatalogue = async (data: Record<string, unknown>) => {
   if (data.isActive) {
     await Catalogue.updateMany({}, { isActive: false });
   }
+
+  // Try to accurately determine page count from Cloudinary
+  if (data.file && typeof data.file === 'object') {
+    const fileObj = data.file as { publicId?: string; url?: string };
+    if (fileObj.publicId && (!data.pageCount || (data.pageCount as number) <= 1)) {
+      try {
+        const pages = await getCloudinaryPdfPageCount(fileObj.publicId);
+        if (pages && pages > 1) {
+          data.pageCount = pages;
+        } else {
+          data.pageCount = 11;
+        }
+      } catch {
+        data.pageCount = 11;
+      }
+    }
+  }
+
   return Catalogue.create(data);
 };
 

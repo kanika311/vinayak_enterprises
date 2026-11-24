@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toWebpUrl = exports.getCloudinarySignature = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
+exports.toWebpUrl = exports.getCloudinaryPdfPageCount = exports.getCloudinarySignature = exports.getMediaType = exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
 const stream_1 = require("stream");
 const cloudinary_1 = __importStar(require("../config/cloudinary"));
 const helpers_1 = require("../utils/helpers");
@@ -94,6 +94,19 @@ const getCloudinarySignature = (folder = 'showcase_videos') => {
     };
 };
 exports.getCloudinarySignature = getCloudinarySignature;
+/** Fetch exact page count of a Cloudinary PDF */
+const getCloudinaryPdfPageCount = async (publicId) => {
+    if (!(0, cloudinary_1.ensureCloudinaryConfigured)())
+        return null;
+    try {
+        const res = await cloudinary_1.default.api.resource(publicId, { pages: true, image_metadata: true });
+        return typeof res.pages === 'number' && res.pages > 0 ? res.pages : null;
+    }
+    catch {
+        return null;
+    }
+};
+exports.getCloudinaryPdfPageCount = getCloudinaryPdfPageCount;
 /** Convert any Cloudinary image to WebP with auto quality */
 const toWebpUrl = (url) => {
     if (!url || !url.includes('res.cloudinary.com') || !url.includes('/image/upload/'))

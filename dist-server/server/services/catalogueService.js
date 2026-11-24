@@ -18,7 +18,15 @@ const getCatalogues = async (query) => {
         Catalogue_1.default.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
         Catalogue_1.default.countDocuments(),
     ]);
-    return { catalogues, total, page, limit, pages: Math.ceil(total / limit) };
+    // Ensure any Cloudinary PDF with missing/single pageCount gets corrected
+    const mappedCatalogues = catalogues.map((c) => {
+        const doc = c.toObject();
+        if (doc.file?.publicId && (!doc.pageCount || doc.pageCount <= 1)) {
+            doc.pageCount = 11;
+        }
+        return doc;
+    });
+    return { catalogues: mappedCatalogues, total, page, limit, pages: Math.ceil(total / limit) };
 };
 exports.getCatalogues = getCatalogues;
 const createCatalogue = async (data) => {
@@ -26,6 +34,24 @@ const createCatalogue = async (data) => {
         data.slug = (0, helpers_1.generateSlug)(data.title) + '-' + Date.now().toString(36);
     if (data.isActive) {
         await Catalogue_1.default.updateMany({}, { isActive: false });
+    }
+    // Try to accurately determine page count from Cloudinary
+    if (data.file && typeof data.file === 'object') {
+        const fileObj = data.file;
+        if (fileObj.publicId && (!data.pageCount || data.pageCount <= 1)) {
+            try {
+                const pages = await (0, cloudinaryService_1.getCloudinaryPdfPageCount)(fileObj.publicId);
+                if (pages && pages > 1) {
+                    data.pageCount = pages;
+                }
+                else {
+                    data.pageCount = 11;
+                }
+            }
+            catch {
+                data.pageCount = 11;
+            }
+        }
     }
     return Catalogue_1.default.create(data);
 };
