@@ -74,6 +74,15 @@ export const trackDownload = async (catalogueId: string, visitorData: Record<str
   return catalogue;
 };
 
+export const updateCatalogue = async (id: string, data: Record<string, unknown>) => {
+  if (data.isActive) {
+    await Catalogue.updateMany({ _id: { $ne: id } }, { isActive: false });
+  }
+  const catalogue = await Catalogue.findByIdAndUpdate(id, data, { new: true });
+  if (!catalogue) throw new AppError('Catalogue not found', 404);
+  return catalogue;
+};
+
 export const deleteCatalogue = async (id: string) => {
   const catalogue = await Catalogue.findByIdAndDelete(id);
   if (!catalogue) throw new AppError('Catalogue not found', 404);

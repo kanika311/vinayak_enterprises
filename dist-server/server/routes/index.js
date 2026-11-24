@@ -93,6 +93,7 @@ router.delete('/blogs/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PE
 router.get('/catalogues', moduleCtrl.getCatalogues);
 router.post('/catalogues/upload', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), upload_1.upload.single('file'), moduleCtrl.uploadCatalogueFile);
 router.post('/catalogues', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), moduleCtrl.createCatalogue);
+router.put('/catalogues/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), moduleCtrl.updateCatalogue);
 router.post('/catalogues/:id/download', moduleCtrl.trackDownload);
 router.delete('/catalogues/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), moduleCtrl.deleteCatalogue);
 // Testimonials

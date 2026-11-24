@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCatalogue = exports.trackDownload = exports.uploadCatalogue = exports.createCatalogue = exports.getCatalogues = void 0;
+exports.deleteCatalogue = exports.updateCatalogue = exports.trackDownload = exports.uploadCatalogue = exports.createCatalogue = exports.getCatalogues = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
 const crypto_1 = require("crypto");
@@ -75,6 +75,16 @@ const trackDownload = async (catalogueId, visitorData) => {
     return catalogue;
 };
 exports.trackDownload = trackDownload;
+const updateCatalogue = async (id, data) => {
+    if (data.isActive) {
+        await Catalogue_1.default.updateMany({ _id: { $ne: id } }, { isActive: false });
+    }
+    const catalogue = await Catalogue_1.default.findByIdAndUpdate(id, data, { new: true });
+    if (!catalogue)
+        throw new helpers_1.AppError('Catalogue not found', 404);
+    return catalogue;
+};
+exports.updateCatalogue = updateCatalogue;
 const deleteCatalogue = async (id) => {
     const catalogue = await Catalogue_1.default.findByIdAndDelete(id);
     if (!catalogue)

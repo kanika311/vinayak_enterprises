@@ -147,6 +147,11 @@ export const createCatalogue = asyncHandler(async (req: AuthRequest, res: Respon
   sendResponse(res, 201, catalogue);
 });
 
+export const updateCatalogue = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const catalogue = await catalogueService.updateCatalogue(getParam(req.params.id), req.body);
+  sendResponse(res, 200, catalogue, 'Catalogue updated successfully');
+});
+
 export const trackDownload = asyncHandler(async (req: AuthRequest, res: Response) => {
   const catalogue = await catalogueService.trackDownload(getParam(req.params.id), req.body);
   sendResponse(res, 200, catalogue);

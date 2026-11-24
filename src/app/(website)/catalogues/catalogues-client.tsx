@@ -14,14 +14,18 @@ import {
   MessageCircle,
   ZoomIn,
   ZoomOut,
-  RotateCw,
   Check,
   Copy,
   ExternalLink,
   BookOpen,
+  FileText,
+  Zap,
+  Sparkles,
+  ShieldCheck,
+  Building2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { apiGet } from '@/lib/api';
+import { apiGet, apiPost } from '@/lib/api';
 import { useSiteContact } from '@/hooks/use-site-contact';
 import { whatsappChatUrl } from '@/lib/site-contact';
 
@@ -75,7 +79,7 @@ function playPageFlipSound() {
   }
 }
 
-// Built-in high-resolution preview pages for default display
+// Built-in preview pages for default flipbook display
 const DEFAULT_CATALOGUE_PAGES = [
   {
     page: 1,
@@ -121,18 +125,16 @@ const DEFAULT_CATALOGUE_PAGES = [
 export function CataloguesClient() {
   const { site } = useSiteContact();
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(DEFAULT_CATALOGUE_PAGES.length);
-  const [isPdfMode, setIsPdfMode] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
+  const totalPages = DEFAULT_CATALOGUE_PAGES.length;
+  const [viewMode, setViewMode] = useState<'reader' | 'flipbook'>('reader');
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [flipDirection, setFlipDirection] = useState<'next' | 'prev'>('next');
+  const [downloading, setDownloading] = useState<'full' | 'compressed' | null>(null);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const readerContainerRef = useRef<HTMLDivElement>(null);
-  const pdfDocRef = useRef<any>(null);
 
   // Fetch active catalogue from API
   const { data } = useQuery({
@@ -143,95 +145,53 @@ export function CataloguesClient() {
   const activeCatalogue = data?.catalogues?.find((c) => c.isActive) || data?.catalogues?.[0];
   const fileUrl = activeCatalogue?.file?.url;
 
-  // Render PDF page onto canvas using PDF.js
-  const renderPdfPage = useCallback(
-    async (pdfDoc: any, pageNum: number) => {
-      try {
-        const page = await pdfDoc.getPage(pageNum);
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+  // Track download and initiate direct file save
+  const handleDownload = async (compressed = false) => {
+    if (!fileUrl) return;
+    setDownloading(compressed ? 'compressed' : 'full');
 
-        const containerWidth = readerContainerRef.current?.clientWidth || 700;
-        const unscaledViewport = page.getViewport({ scale: 1 });
-        const scale = (Math.min(containerWidth - 40, 800) / unscaledViewport.width) * (isZoomed ? 1.4 : 1.0);
-        const viewport = page.getViewport({ scale });
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        await page.render({ canvasContext: ctx, viewport }).promise;
-      } catch (err) {
-        console.error('Error rendering PDF page:', err);
-      }
-    },
-    [isZoomed]
-  );
-
-  // Load PDF if active catalogue has a valid PDF
-  useEffect(() => {
-    if (!fileUrl || !/\.pdf($|\?)/i.test(fileUrl)) {
-      setIsPdfMode(false);
-      setTotalPages(DEFAULT_CATALOGUE_PAGES.length);
-      return;
+    // Asynchronously track download in DB
+    if (activeCatalogue?._id) {
+      apiPost(`/catalogues/${activeCatalogue._id}/download`, {}).catch(() => {});
     }
 
-    let isMounted = true;
-    setPdfLoading(true);
-
-    const initPdf = async () => {
-      try {
-        // Load PDF.js from CDN dynamically
-        const pdfjs =
-          (window as any).pdfjsLib ||
-          (await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-            script.onload = () => {
-              const lib = (window as any).pdfjsLib;
-              lib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-              resolve(lib);
-            };
-            script.onerror = reject;
-            document.head.appendChild(script);
-          }));
-
-        const doc = await pdfjs.getDocument(fileUrl).promise;
-        if (!isMounted) return;
-        pdfDocRef.current = doc;
-        setTotalPages(doc.numPages);
-        setIsPdfMode(true);
-        setPdfLoading(false);
-        renderPdfPage(doc, 1);
-      } catch (e) {
-        console.warn('PDF load failed, falling back to viewer pages:', e);
-        if (isMounted) {
-          setIsPdfMode(false);
-          setPdfLoading(false);
-          setTotalPages(DEFAULT_CATALOGUE_PAGES.length);
-        }
+    let downloadUrl = fileUrl;
+    if (fileUrl.includes('res.cloudinary.com')) {
+      if (compressed) {
+        downloadUrl = fileUrl.includes('/upload/')
+          ? fileUrl.replace('/upload/', '/upload/fl_attachment,q_auto:eco/')
+          : fileUrl;
+      } else {
+        downloadUrl = fileUrl.includes('/upload/')
+          ? fileUrl.replace('/upload/', '/upload/fl_attachment/')
+          : fileUrl;
       }
-    };
+    }
 
-    initPdf();
+    const filename =
+      activeCatalogue?.file?.filename ||
+      (compressed
+        ? 'Vinayak-Enterprises-Catalogue-Compressed.pdf'
+        : 'Vinayak-Enterprises-Catalogue.pdf');
 
-    return () => {
-      isMounted = false;
-    };
-  }, [fileUrl, renderPdfPage]);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-  // Page turn handlers
+    setTimeout(() => setDownloading(null), 1500);
+  };
+
+  // Flipbook page turn handlers
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setFlipDirection('prev');
       playPageFlipSound();
-      const newPage = currentPage - 1;
-      setCurrentPage(newPage);
-      if (isPdfMode && pdfDocRef.current) {
-        renderPdfPage(pdfDocRef.current, newPage);
-      }
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -239,11 +199,7 @@ export function CataloguesClient() {
     if (currentPage < totalPages) {
       setFlipDirection('next');
       playPageFlipSound();
-      const newPage = currentPage + 1;
-      setCurrentPage(newPage);
-      if (isPdfMode && pdfDocRef.current) {
-        renderPdfPage(pdfDocRef.current, newPage);
-      }
+      setCurrentPage(currentPage + 1);
     }
   };
 
@@ -270,251 +226,405 @@ export function CataloguesClient() {
   // Pre-filled WhatsApp message for bulk inquiry
   const bulkWhatsAppMessage = `Namaste Vinayak Enterprises! Maine aapka product catalogue dekha hai. Mujhe institutional supply / bulk order ke liye quotation aur wholesale rates chahiye. Kripya details share karein.`;
 
+  // Determine iframe embed viewer URL for real PDF or interactive presentation
+  const isVisme = !!fileUrl && fileUrl.includes('visme.co');
+  const embedViewerUrl = fileUrl
+    ? isVisme
+      ? fileUrl
+      : fileUrl.startsWith('http')
+      ? `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`
+      : fileUrl
+    : '';
+
   return (
     <div
       ref={readerContainerRef}
       className={`min-h-screen bg-[#edf1f5] text-slate-900 transition-colors ${
-        isFullScreen ? 'p-2 sm:p-6 bg-slate-950 flex flex-col justify-center' : 'py-6 px-3 sm:px-6'
+        isFullScreen ? 'p-2 sm:p-6 bg-slate-950 flex flex-col justify-center' : 'py-8 px-3 sm:px-6'
       }`}
     >
-      <div className="max-w-4xl mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full space-y-6">
         {/* ========================================================= */}
-        {/* TOP STATUS BAR: Date + Controls                          */}
+        {/* TOP HERO HEADER & DOWNLOAD HUB                            */}
         {/* ========================================================= */}
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-3 px-2">
-          <div className="font-medium tracking-wide flex items-center gap-1.5 text-slate-600">
-            <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span>Vinayak Enterprises E-Catalogue</span>
-            <span className="hidden sm:inline text-slate-400">| Ambala Cantt</span>
-          </div>
+        {!isFullScreen && (
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-8 shadow-sm">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              {/* Title & Trust Badges */}
+              <div className="space-y-2 max-w-2xl">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-100 text-[#1a3a6b] font-bold">
+                    <ShieldCheck className="h-3.5 w-3.5" /> ISO Certified Quality
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#f26b21] font-bold">
+                    <Building2 className="h-3.5 w-3.5" /> Ambala Cantt Direct Mfg
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 font-bold">
+                    <Sparkles className="h-3.5 w-3.5" /> 2026 Edition
+                  </span>
+                </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsZoomed(!isZoomed)}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-medium"
-            >
-              {isZoomed ? <ZoomOut className="h-3.5 w-3.5" /> : <ZoomIn className="h-3.5 w-3.5" />}
-              <span>{isZoomed ? '100%' : 'Zoom'}</span>
-            </button>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+                  {activeCatalogue?.title || 'Vinayak Enterprises Official Product Catalogue'}
+                </h1>
 
-            <button
-              onClick={toggleFullScreen}
-              className="flex items-center gap-1 px-3 py-1 rounded-md bg-[#1a3a6b] text-white hover:bg-[#12284c] shadow-xs font-semibold text-xs"
-            >
-              {isFullScreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-              <span>{isFullScreen ? 'Exit Full' : 'फुल स्क्रीन पढ़ें'}</span>
-            </button>
-          </div>
-        </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Precision Optical Microscopes, Human Anatomy &amp; Skeleton Models, Adult/Infant CPR Training Manikins,
+                  and Institutional Laboratory Glassware &amp; Apparatus. Supplied across medical colleges, universities, and hospitals pan-India.
+                </p>
+              </div>
 
-        {/* ========================================================= */}
-        {/* CENTER FLIPBOOK VIEWER                                    */}
-        {/* ========================================================= */}
-        <div className="relative flex items-center justify-center select-none">
-          {/* Floating Left Circular Turn Arrow */}
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage <= 1}
-            aria-label="Previous Page"
-            className={`
-              absolute -left-2 sm:-left-6 md:-left-8 z-30
-              h-11 w-11 sm:h-13 sm:w-13 rounded-full
-              bg-white/95 hover:bg-white text-slate-800
-              border border-slate-200 shadow-xl
-              flex items-center justify-center
-              transition-all duration-200
-              hover:scale-110 active:scale-95
-              disabled:opacity-20 disabled:pointer-events-none
-            `}
-          >
-            <ChevronLeft className="h-6 w-6 text-slate-700" />
-          </button>
+              {/* Download & WhatsApp Action Buttons */}
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0 min-w-[240px]">
+                {fileUrl ? (
+                  <>
+                    {/* Primary: Full PDF Download */}
+                    <Button
+                      onClick={() => handleDownload(false)}
+                      disabled={downloading !== null}
+                      className="w-full h-11 bg-[#1a3a6b] hover:bg-[#12284c] text-white font-bold text-sm shadow-md"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {downloading === 'full' ? 'Downloading PDF...' : 'Download Full PDF'}
+                    </Button>
 
-          {/* Central Newspaper / Catalogue Card */}
-          <div
-            className="w-full max-w-[760px] relative rounded-xl shadow-2xl bg-white border border-slate-300/80 overflow-hidden"
-            style={{ perspective: '1200px' }}
-          >
-            {/* 3D Page Turn Animation wrapper */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPage}
-                initial={{
-                  rotateY: flipDirection === 'next' ? -20 : 20,
-                  opacity: 0.85,
-                  transformOrigin: flipDirection === 'next' ? 'left center' : 'right center',
-                }}
-                animate={{ rotateY: 0, opacity: 1 }}
-                exit={{
-                  rotateY: flipDirection === 'next' ? 20 : -20,
-                  opacity: 0.85,
-                  transformOrigin: flipDirection === 'next' ? 'right center' : 'left center',
-                }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="w-full"
-              >
-                {/* 1. PDF Canvas Mode (when admin uploaded real PDF) */}
-                {isPdfMode ? (
-                  <div className="relative min-h-[500px] sm:min-h-[640px] flex items-center justify-center bg-slate-50 overflow-auto">
-                    {pdfLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
-                        <div className="text-center">
-                          <div className="h-8 w-8 border-3 border-[#1a3a6b] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                          <p className="text-xs font-semibold text-slate-600">Rendering page...</p>
-                        </div>
-                      </div>
-                    )}
-                    <canvas ref={canvasRef} className="max-w-full h-auto mx-auto shadow-inner" />
-                  </div>
-                ) : (
-                  /* 2. Structured E-Paper Catalogue Pages (Default & Fallback) */
-                  <div className="min-h-[560px] sm:min-h-[660px] p-6 sm:p-10 flex flex-col justify-between bg-[#fffefc] border-t-4 border-[#1a3a6b]">
-                    {/* Page 1: Newspaper Style Cover */}
-                    {currentPage === 1 ? (
-                      <div className="text-center flex-1 flex flex-col justify-between py-4">
-                        {/* Masthead */}
-                        <div>
-                          <div className="border-b-2 border-black pb-2 mb-2 flex items-center justify-between text-[11px] font-bold tracking-widest text-slate-600 uppercase">
-                            <span>ISO CERTIFIED QUALITY</span>
-                            <span>PAN-INDIA INSTITUTIONAL SUPPLY</span>
-                            <span>AMBALA CANTT</span>
-                          </div>
-                          <h1
-                            className="text-3xl sm:text-5xl font-black text-[#1a3a6b] tracking-tight uppercase"
-                            style={{ fontFamily: 'Georgia, serif' }}
-                          >
-                            VINAYAK ENTERPRISES
-                          </h1>
-                          <div className="h-1 bg-[#f26b21] w-full my-2" />
-                          <p className="text-xs sm:text-sm font-bold tracking-wider text-slate-800 uppercase">
-                            Scientific Instruments · Laboratory Equipment · Human Anatomy &amp; CPR Manikins
-                          </p>
-                        </div>
+                    {/* Secondary: Compressed Download */}
+                    <Button
+                      onClick={() => handleDownload(true)}
+                      disabled={downloading !== null}
+                      variant="outline"
+                      className="w-full h-11 border-blue-300 text-blue-800 hover:bg-blue-50 font-bold text-sm shadow-xs flex items-center justify-center gap-1.5"
+                    >
+                      <Zap className="h-4 w-4 text-amber-500 fill-amber-500" />
+                      {downloading === 'compressed' ? 'Compressing & Downloading...' : 'Download Compressed PDF'}
+                    </Button>
+                  </>
+                ) : null}
 
-                        {/* Center Cover Feature */}
-                        <div className="my-8 p-6 bg-gradient-to-br from-blue-50/80 to-slate-100 rounded-2xl border border-blue-200/80 max-w-md mx-auto">
-                          <span className="text-5xl block mb-3">🔬 🦴 🩺</span>
-                          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif">
-                            Official Institutional Catalogue
-                          </h2>
-                          <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                            Serving medical colleges, university research labs, schools, and hospitals across India with precision manufacturing from Ambala Cantt.
-                          </p>
-                          <div className="mt-4 pt-3 border-t border-slate-200 text-xs font-semibold text-[#1a3a6b]">
-                            👉 Click &quot;Next &gt;&quot; or swipe to turn pages
-                          </div>
-                        </div>
-
-                        {/* Bottom Tagline */}
-                        <div className="border-t border-slate-200 pt-3 text-xs text-slate-500 font-medium">
-                          Ambala, Haryana, India · Phone: +91 94160-29492 · Email: vinayakenterprises52@gmail.com
-                        </div>
-                      </div>
-                    ) : (
-                      /* Pages 2, 3, 4: Structured Product Spread */
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          {/* Running Header */}
-                          <div className="border-b-2 border-slate-900 pb-2 mb-4 flex items-center justify-between text-[11px] font-bold text-slate-600 tracking-wider uppercase">
-                            <span className="text-[#1a3a6b]">
-                              {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.category}
-                            </span>
-                            <span>VINAYAK ENTERPRISES</span>
-                          </div>
-
-                          <h2
-                            className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-5 font-serif"
-                          >
-                            {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.title}
-                          </h2>
-
-                          {/* Newspaper Style 2-Column Grid */}
-                          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-                            {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.items?.map((it, idx) => (
-                              <div
-                                key={idx}
-                                className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-blue-300 hover:bg-blue-50/30 transition-all flex flex-col justify-between"
-                              >
-                                <div>
-                                  <div className="flex items-center gap-2 mb-1.5">
-                                    <span className="h-2 w-2 rounded-full bg-[#f26b21]" />
-                                    <h3 className="font-bold text-sm text-slate-900 leading-snug">
-                                      {it.name}
-                                    </h3>
-                                  </div>
-                                  <p className="text-xs text-slate-600 leading-relaxed pl-4">
-                                    {it.spec}
-                                  </p>
-                                </div>
-                                <div className="mt-3 pl-4 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-                                  <span className="font-bold text-green-700">Bulk supply available</span>
-                                  <span className="text-slate-400">Ambala Mfg</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Page Footer */}
-                        <div className="border-t border-slate-200 pt-4 mt-6 flex items-center justify-between text-xs text-slate-500">
-                          <span>Vinayak Enterprises · Bulk Inquiries: +91 94160-29492</span>
-                          <span className="font-semibold text-slate-700">Page {currentPage}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Bottom-Left Corner: Page Number Pill (As in user's newspaper image) */}
-            <div className="absolute bottom-3 left-3 z-20">
-              <span className="bg-black/85 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-xs tracking-wider">
-                पृष्ठ {currentPage} / {totalPages}
-              </span>
+                {/* WhatsApp Order / Inquire */}
+                <Button
+                  asChild
+                  className="w-full h-11 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm shadow-md shadow-green-600/20"
+                >
+                  <a
+                    href={whatsappChatUrl(site.whatsapp, bulkWhatsAppMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" /> WhatsApp Institutional Inquiry
+                  </a>
+                </Button>
+              </div>
             </div>
 
-            {/* Bottom-Right Corner: Fullscreen Button on Page */}
-            <div className="absolute bottom-3 right-3 z-20">
+            {/* Viewer Mode Tabs & Stats Bar */}
+            <div className="mt-6 pt-4 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-slate-700">Display View:</span>
+                {fileUrl && (
+                  <button
+                    onClick={() => setViewMode('reader')}
+                    className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
+                      viewMode === 'reader'
+                        ? 'bg-[#1a3a6b] text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <FileText className="h-3.5 w-3.5" /> PDF Online Reader
+                  </button>
+                )}
+                <button
+                  onClick={() => setViewMode('flipbook')}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
+                    viewMode === 'flipbook' || !fileUrl
+                      ? 'bg-[#1a3a6b] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <BookOpen className="h-3.5 w-3.5" /> 3D E-Paper Flipbook
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {activeCatalogue && (
+                  <span className="text-slate-500 hidden sm:inline">
+                    📊 {activeCatalogue.downloadCount} verified downloads
+                  </span>
+                )}
+                {fileUrl && (
+                  <a
+                    href={fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline font-semibold flex items-center gap-1"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Open Direct PDF
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* CENTER VIEWER: Embedded PDF Reader OR 3D Flipbook        */}
+        {/* ========================================================= */}
+        {fileUrl && viewMode === 'reader' ? (
+          /* MODE 1: Embedded Online PDF Reader */
+          <div className="w-full bg-white rounded-2xl border border-slate-300 shadow-xl overflow-hidden">
+            {/* Top Reader Controls */}
+            <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 font-medium">
+                <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="font-semibold truncate max-w-[260px] sm:max-w-md">
+                  {activeCatalogue?.title || 'Vinayak Enterprises Product Catalogue'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => handleDownload(true)}
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 px-2.5 text-xs text-amber-300 hover:text-white hover:bg-slate-800"
+                >
+                  <Zap className="mr-1 h-3.5 w-3.5" /> Compressed PDF
+                </Button>
+                <Button
+                  onClick={() => handleDownload(false)}
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 px-2.5 text-xs text-white hover:bg-slate-800"
+                >
+                  <Download className="mr-1 h-3.5 w-3.5" /> Download
+                </Button>
+                <button
+                  onClick={toggleFullScreen}
+                  className="p-1.5 rounded hover:bg-slate-800 text-white transition-colors"
+                  title="Toggle Fullscreen"
+                >
+                  {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Embedded Iframe */}
+            <div className="relative w-full h-[620px] sm:h-[820px] bg-slate-100">
+              <iframe
+                src={embedViewerUrl}
+                className="w-full h-full border-0"
+                title={activeCatalogue?.title || 'Product Catalogue PDF Viewer'}
+                allow="fullscreen"
+              />
+            </div>
+          </div>
+        ) : (
+          /* MODE 2: 3D Animated Flipbook */
+          <div>
+            {/* Status bar */}
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-3 px-2">
+              <div className="font-medium tracking-wide flex items-center gap-1.5 text-slate-600">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span>Vinayak Enterprises E-Catalogue</span>
+                <span className="hidden sm:inline text-slate-400">| Ambala Cantt</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsZoomed(!isZoomed)}
+                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-medium"
+                >
+                  {isZoomed ? <ZoomOut className="h-3.5 w-3.5" /> : <ZoomIn className="h-3.5 w-3.5" />}
+                  <span>{isZoomed ? '100%' : 'Zoom'}</span>
+                </button>
+
+                <button
+                  onClick={toggleFullScreen}
+                  className="flex items-center gap-1 px-3 py-1 rounded-md bg-[#1a3a6b] text-white hover:bg-[#12284c] shadow-xs font-semibold text-xs"
+                >
+                  {isFullScreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+                  <span>{isFullScreen ? 'Exit Full' : 'फुल स्क्रीन पढ़ें'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-center select-none">
+              {/* Turn left */}
               <button
-                onClick={toggleFullScreen}
-                className="bg-black/85 hover:bg-black text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-xs flex items-center gap-1 transition-colors"
+                onClick={handlePrevPage}
+                disabled={currentPage <= 1}
+                aria-label="Previous Page"
+                className={`
+                  absolute -left-2 sm:-left-6 md:-left-8 z-30
+                  h-11 w-11 sm:h-13 sm:w-13 rounded-full
+                  bg-white/95 hover:bg-white text-slate-800
+                  border border-slate-200 shadow-xl
+                  flex items-center justify-center
+                  transition-all duration-200
+                  hover:scale-110 active:scale-95
+                  disabled:opacity-20 disabled:pointer-events-none
+                `}
               >
-                <Maximize2 className="h-3 w-3" />
-                <span>फूल स्क्रीन पढ़ें</span>
+                <ChevronLeft className="h-6 w-6 text-slate-700" />
+              </button>
+
+              {/* Card */}
+              <div
+                className="w-full max-w-[760px] relative rounded-xl shadow-2xl bg-white border border-slate-300/80 overflow-hidden"
+                style={{ perspective: '1200px' }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentPage}
+                    initial={{
+                      rotateY: flipDirection === 'next' ? -20 : 20,
+                      opacity: 0.85,
+                      transformOrigin: flipDirection === 'next' ? 'left center' : 'right center',
+                    }}
+                    animate={{ rotateY: 0, opacity: 1 }}
+                    exit={{
+                      rotateY: flipDirection === 'next' ? 20 : -20,
+                      opacity: 0.85,
+                      transformOrigin: flipDirection === 'next' ? 'right center' : 'left center',
+                    }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    className="w-full"
+                  >
+                    <div className="min-h-[560px] sm:min-h-[660px] p-6 sm:p-10 flex flex-col justify-between bg-[#fffefc] border-t-4 border-[#1a3a6b]">
+                      {currentPage === 1 ? (
+                        <div className="text-center flex-1 flex flex-col justify-between py-4">
+                          <div>
+                            <div className="border-b-2 border-black pb-2 mb-2 flex items-center justify-between text-[11px] font-bold tracking-widest text-slate-600 uppercase">
+                              <span>ISO CERTIFIED QUALITY</span>
+                              <span>PAN-INDIA INSTITUTIONAL SUPPLY</span>
+                              <span>AMBALA CANTT</span>
+                            </div>
+                            <h2
+                              className="text-3xl sm:text-5xl font-black text-[#1a3a6b] tracking-tight uppercase"
+                              style={{ fontFamily: 'Georgia, serif' }}
+                            >
+                              VINAYAK ENTERPRISES
+                            </h2>
+                            <div className="h-1 bg-[#f26b21] w-full my-2" />
+                            <p className="text-xs sm:text-sm font-bold tracking-wider text-slate-800 uppercase">
+                              Scientific Instruments · Laboratory Equipment · Human Anatomy &amp; CPR Manikins
+                            </p>
+                          </div>
+
+                          <div className="my-8 p-6 bg-gradient-to-br from-blue-50/80 to-slate-100 rounded-2xl border border-blue-200/80 max-w-md mx-auto">
+                            <span className="text-5xl block mb-3">🔬 🦴 🩺</span>
+                            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif">
+                              Official Institutional Catalogue
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                              Serving medical colleges, university research labs, schools, and hospitals across India with precision manufacturing from Ambala Cantt.
+                            </p>
+                            <div className="mt-4 pt-3 border-t border-slate-200 text-xs font-semibold text-[#1a3a6b]">
+                              👉 Click &quot;Next &gt;&quot; or swipe to turn pages
+                            </div>
+                          </div>
+
+                          <div className="border-t border-slate-200 pt-3 text-xs text-slate-500 font-medium">
+                            Ambala, Haryana, India · Phone: +91 94160-29492 · Email: vinayakenterprises52@gmail.com
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="border-b-2 border-slate-900 pb-2 mb-4 flex items-center justify-between text-[11px] font-bold text-slate-600 tracking-wider uppercase">
+                              <span className="text-[#1a3a6b]">
+                                {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.category}
+                              </span>
+                              <span>VINAYAK ENTERPRISES</span>
+                            </div>
+
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-5 font-serif">
+                              {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.title}
+                            </h3>
+
+                            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                              {DEFAULT_CATALOGUE_PAGES[currentPage - 1]?.items?.map((it, idx) => (
+                                <div
+                                  key={idx}
+                                  className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-blue-300 hover:bg-blue-50/30 transition-all flex flex-col justify-between"
+                                >
+                                  <div>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                      <span className="h-2 w-2 rounded-full bg-[#f26b21]" />
+                                      <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                                        {it.name}
+                                      </h4>
+                                    </div>
+                                    <p className="text-xs text-slate-600 leading-relaxed pl-4">
+                                      {it.spec}
+                                    </p>
+                                  </div>
+                                  <div className="mt-3 pl-4 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-green-700">Bulk supply available</span>
+                                    <span className="text-slate-400">Ambala Mfg</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-slate-200 pt-4 mt-6 flex items-center justify-between text-xs text-slate-500">
+                            <span>Vinayak Enterprises · Bulk Inquiries: +91 94160-29492</span>
+                            <span className="font-semibold text-slate-700">Page {currentPage}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Page indicator pill */}
+                <div className="absolute bottom-3 left-3 z-20">
+                  <span className="bg-black/85 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-xs tracking-wider">
+                    पृष्ठ {currentPage} / {totalPages}
+                  </span>
+                </div>
+
+                <div className="absolute bottom-3 right-3 z-20">
+                  <button
+                    onClick={toggleFullScreen}
+                    className="bg-black/85 hover:bg-black text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-xs flex items-center gap-1 transition-colors"
+                  >
+                    <Maximize2 className="h-3 w-3" />
+                    <span>फूल स्क्रीन पढ़ें</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Turn right */}
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage >= totalPages}
+                aria-label="Next Page"
+                className={`
+                  absolute -right-2 sm:-right-6 md:-right-8 z-30
+                  h-11 w-11 sm:h-13 sm:w-13 rounded-full
+                  bg-white/95 hover:bg-white text-slate-800
+                  border border-slate-200 shadow-xl
+                  flex items-center justify-center
+                  transition-all duration-200
+                  hover:scale-110 active:scale-95
+                  disabled:opacity-20 disabled:pointer-events-none
+                `}
+              >
+                <ChevronRight className="h-6 w-6 text-slate-700" />
               </button>
             </div>
+
+            <p className="text-center text-xs text-slate-500 mt-3 font-medium">
+              तीर (arrows) पर क्लिक करके पन्ने पलटें · Realistic page turning sound enabled
+            </p>
           </div>
-
-          {/* Floating Right Circular Turn Arrow */}
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage >= totalPages}
-            aria-label="Next Page"
-            className={`
-              absolute -right-2 sm:-right-6 md:-right-8 z-30
-              h-11 w-11 sm:h-13 sm:w-13 rounded-full
-              bg-white/95 hover:bg-white text-slate-800
-              border border-slate-200 shadow-xl
-              flex items-center justify-center
-              transition-all duration-200
-              hover:scale-110 active:scale-95
-              disabled:opacity-20 disabled:pointer-events-none
-            `}
-          >
-            <ChevronRight className="h-6 w-6 text-slate-700" />
-          </button>
-        </div>
-
-        {/* Subtitle helper under reader */}
-        <p className="text-center text-xs text-slate-500 mt-3 font-medium">
-          तीर (arrows) पर क्लिक करके पन्ने पलटें · Realistic page turning sound enabled
-        </p>
+        )}
 
         {/* ========================================================= */}
         {/* BOTTOM ACTION BAR: Share & WhatsApp Bulk Message          */}
         {/* ========================================================= */}
-        <div className="mt-6 p-4 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Left: Share Action */}
           <div className="relative w-full sm:w-auto">
             <Button
@@ -569,14 +679,24 @@ export function CataloguesClient() {
             )}
           </div>
 
-          {/* Right: WhatsApp Bulk Inquiry & Download */}
+          {/* Right: Compressed Download & Full Download */}
           <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
             {fileUrl && (
-              <Button asChild variant="outline" className="h-11 px-4 text-xs font-semibold">
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" download>
+              <>
+                <Button
+                  onClick={() => handleDownload(true)}
+                  variant="outline"
+                  className="h-11 px-4 text-xs font-semibold border-amber-300 text-amber-900 hover:bg-amber-50"
+                >
+                  <Zap className="mr-1.5 h-3.5 w-3.5 text-amber-600 fill-amber-500" /> Download Compressed PDF
+                </Button>
+                <Button
+                  onClick={() => handleDownload(false)}
+                  className="h-11 px-5 text-xs font-bold bg-[#1a3a6b] hover:bg-[#12284c] text-white"
+                >
                   <Download className="mr-1.5 h-4 w-4" /> Download PDF
-                </a>
-              </Button>
+                </Button>
+              </>
             )}
 
             <Button
@@ -588,7 +708,7 @@ export function CataloguesClient() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="mr-2 h-5 w-5" /> WhatsApp Bulk Message / Rates
+                <MessageCircle className="mr-2 h-5 w-5" /> WhatsApp Institutional Rates
               </a>
             </Button>
           </div>

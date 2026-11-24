@@ -75,6 +75,7 @@ router.delete('/blogs/:id', protect, authorize(PERMISSIONS.BLOGS), moduleCtrl.de
 router.get('/catalogues', moduleCtrl.getCatalogues);
 router.post('/catalogues/upload', protect, authorize(PERMISSIONS.CATALOGUES), upload.single('file'), moduleCtrl.uploadCatalogueFile);
 router.post('/catalogues', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.createCatalogue);
+router.put('/catalogues/:id', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.updateCatalogue);
 router.post('/catalogues/:id/download', moduleCtrl.trackDownload);
 router.delete('/catalogues/:id', protect, authorize(PERMISSIONS.CATALOGUES), moduleCtrl.deleteCatalogue);
 

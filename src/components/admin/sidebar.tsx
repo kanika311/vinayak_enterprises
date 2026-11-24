@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, FolderTree, Users, BookOpen,
-  Settings, LogOut, Menu, X, ClipboardList, Star, Video, PlaySquare,
+  Settings, LogOut, Menu, X, ClipboardList, Star, Video, PlaySquare, FileText,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -36,6 +36,7 @@ const navGroups: NavGroup[] = [
     title: 'Content',
     items: [
       { href: `${ADMIN_BASE}/blogs`, label: 'Blogs', icon: BookOpen, description: 'Manage blog posts' },
+      { href: `${ADMIN_BASE}/catalogues`, label: 'Catalogues', icon: FileText, description: 'Upload and manage PDF catalogues' },
       { href: `${ADMIN_BASE}/banners`, label: 'Banner Videos', icon: Video, description: 'Homepage hero looping background videos' },
       { href: `${ADMIN_BASE}/videos`, label: 'Showcase Videos', icon: PlaySquare, description: 'Product demos & laboratory walkthroughs' },
       { href: `${ADMIN_BASE}/testimonials`, label: 'Testimonials', icon: Star, description: 'Approve client reviews' },

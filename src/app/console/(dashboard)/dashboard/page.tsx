@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Package, Users, ClipboardList, Eye, TrendingUp, BookOpen, Download,
   Monitor, Smartphone, Tablet, Plus, Bell, Star, Check, X, ArrowRight,
-  MessageCircle, ShieldAlert,
+  MessageCircle, ShieldAlert, FileText,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -35,6 +35,7 @@ function formatChartData(data: { _id: { year: number; month: number }; count: nu
 
 const quickActions = [
   { href: `${ADMIN_BASE}/products/new`, label: 'Add Product', icon: Package },
+  { href: `${ADMIN_BASE}/catalogues`, label: 'Upload Catalogue', icon: FileText },
   { href: `${ADMIN_BASE}/blogs/new`, label: 'New Blog Post', icon: BookOpen },
   { href: `${ADMIN_BASE}/categories`, label: 'Manage Categories', icon: Plus },
   { href: `${ADMIN_BASE}/leads`, label: 'Contact Forms', icon: Users },
