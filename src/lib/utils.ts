@@ -44,6 +44,13 @@ export function getWebpImageUrl(url?: string, width?: number): string {
 /** Automatically get a high-quality WebP/JPEG poster for Cloudinary or YouTube videos */
 export function getWebpPosterUrl(videoUrl?: string, posterUrl?: string): string {
   if (posterUrl) {
+    // If the saved poster has a black 0s frame (so_0), automatically upgrade to 1.5s frame
+    if (posterUrl.includes('res.cloudinary.com') && (posterUrl.includes('/so_0,') || posterUrl.includes('/so_0/'))) {
+      return posterUrl
+        .replace('/video/upload/so_0,f_webp', '/video/upload/so_1.5,f_auto')
+        .replace('/video/upload/so_0/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
+        .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+    }
     return getWebpImageUrl(posterUrl, 800);
   }
   if (videoUrl) {

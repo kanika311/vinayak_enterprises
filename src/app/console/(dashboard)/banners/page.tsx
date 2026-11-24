@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Upload, Video, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, Upload, Video, Eye, EyeOff, Pencil, X } from 'lucide-react';
 import { PageHeader } from '@/components/admin/page-header';
 import { LoadingSpinner, EmptyState } from '@/components/admin/loading';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,17 @@ export default function BannersPage() {
   const [videoPublicId, setVideoPublicId] = useState<string | undefined>();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+
+  // Edit banner state
+  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editOrder, setEditOrder] = useState(0);
+  const [editVideoUrl, setEditVideoUrl] = useState('');
+  const [editVideoPublicId, setEditVideoPublicId] = useState<string | undefined>();
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [editError, setEditError] = useState('');
+  const [editUploading, setEditUploading] = useState(false);
+  const editFileRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['banners'],
@@ -70,6 +81,60 @@ export default function BannersPage() {
       setError(msg);
     },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: { id: string; title: string; order: number; videoUrl: string; videoPublicId?: string; isActive: boolean }) =>
+      apiPut(`/banners/${data.id}`, {
+        title: data.title,
+        order: data.order,
+        videoUrl: data.videoUrl,
+        videoPublicId: data.videoPublicId,
+        isActive: data.isActive,
+      }),
+    onSuccess: () => {
+      invalidate();
+      setEditingBanner(null);
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to update banner';
+      setEditError(msg);
+    },
+  });
+
+  const openEditModal = (banner: Banner) => {
+    setEditingBanner(banner);
+    setEditTitle(banner.title);
+    setEditOrder(banner.order || 0);
+    setEditVideoUrl(banner.videoUrl);
+    setEditIsActive(banner.isActive);
+    setEditError('');
+  };
+
+  const handleEditUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setEditError('');
+    setEditUploading(true);
+    try {
+      const result = await apiUpload<{ url: string; publicId?: string }>(
+        '/banners/upload-video',
+        file,
+        'banners'
+      );
+      setEditVideoUrl(result.url);
+      setEditVideoPublicId(result.publicId);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Video upload failed (use MP4/WebM, max 50MB)';
+      setEditError(msg);
+    } finally {
+      setEditUploading(false);
+      if (editFileRef.current) editFileRef.current.value = '';
+    }
+  };
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
@@ -231,7 +296,15 @@ export default function BannersPage() {
                     {banner.isActive ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openEditModal(banner)}
+                    className="text-xs font-semibold gap-1 text-slate-700 hover:text-[#1a3a6b] hover:bg-blue-50 border-slate-200"
+                  >
+                    <Pencil className="h-3.5 w-3.5 text-blue-600" /> Edit
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -262,6 +335,135 @@ export default function BannersPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Edit Banner Modal */}
+      {editingBanner && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
+          onClick={() => setEditingBanner(null)}
+        >
+          <div
+            className="bg-white rounded-2xl overflow-hidden max-w-lg w-full shadow-2xl relative my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b bg-slate-50">
+              <div className="flex items-center gap-2">
+                <Video className="w-5 h-5 text-[#1a3a6b]" />
+                <h3 className="font-bold text-slate-900 text-base">Edit Hero Banner Video</h3>
+              </div>
+              <button
+                onClick={() => setEditingBanner(null)}
+                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+              {editError && (
+                <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                  {editError}
+                </div>
+              )}
+
+              {/* Video Preview */}
+              {editVideoUrl && (
+                <video
+                  src={editVideoUrl}
+                  className="w-full rounded-lg border bg-black aspect-video object-cover shadow-sm"
+                  muted
+                  loop
+                  playsInline
+                  controls
+                />
+              )}
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1 block">Title *</Label>
+                <Input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="e.g. Lab Showcase Reel"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1 block">Display Order</Label>
+                <Input
+                  type="number"
+                  value={editOrder}
+                  onChange={(e) => setEditOrder(Number(e.target.value) || 0)}
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1 block">Video URL</Label>
+                <Input
+                  value={editVideoUrl}
+                  onChange={(e) => setEditVideoUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div>
+                <input
+                  ref={editFileRef}
+                  type="file"
+                  accept="video/mp4,video/webm"
+                  className="hidden"
+                  onChange={handleEditUpload}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={editUploading}
+                  onClick={() => editFileRef.current?.click()}
+                  className="text-xs gap-1.5"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  {editUploading ? 'Uploading new video...' : 'Replace Video File (MP4/WebM)'}
+                </Button>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editIsActive}
+                    onChange={(e) => setEditIsActive(e.target.checked)}
+                    className="w-4 h-4 rounded text-[#1a3a6b]"
+                  />
+                  <span>Active (plays on Homepage hero)</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 p-4 border-t bg-slate-50">
+              <Button variant="outline" size="sm" onClick={() => setEditingBanner(null)}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                disabled={!editTitle.trim() || !editVideoUrl.trim() || updateMutation.isPending}
+                onClick={() =>
+                  updateMutation.mutate({
+                    id: editingBanner._id,
+                    title: editTitle.trim(),
+                    order: editOrder,
+                    videoUrl: editVideoUrl.trim(),
+                    videoPublicId: editVideoPublicId,
+                    isActive: editIsActive,
+                  })
+                }
+                className="bg-[#1a3a6b] hover:bg-[#152e55]"
+              >
+                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, Upload, Video, Play, Eye, EyeOff, Film, Link as LinkIcon,
-  CheckCircle, Sparkles, X, ExternalLink
+  CheckCircle, Sparkles, X, ExternalLink, Pencil, RefreshCw, Image as ImageIcon
 } from 'lucide-react';
 import { PageHeader } from '@/components/admin/page-header';
 import { LoadingSpinner, EmptyState } from '@/components/admin/loading';
@@ -52,6 +52,21 @@ export default function ShowcaseVideosPage() {
   // Preview Modal
   const [activePreview, setActivePreview] = useState<ShowcaseVideo | null>(null);
 
+  // Edit Modal State
+  const [editingVideo, setEditingVideo] = useState<ShowcaseVideo | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState<string>('Microscopes');
+  const [editDuration, setEditDuration] = useState('1:45');
+  const [editOrder, setEditOrder] = useState(0);
+  const [editVideoUrl, setEditVideoUrl] = useState('');
+  const [editPosterUrl, setEditPosterUrl] = useState('');
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [editIsFeatured, setEditIsFeatured] = useState(true);
+  const [editUploadingPoster, setEditUploadingPoster] = useState(false);
+  const [editError, setEditError] = useState('');
+  const editPosterFileRef = useRef<HTMLInputElement>(null);
+
   const { data: videos = [], isLoading } = useQuery({
     queryKey: ['admin-videos'],
     queryFn: () => apiGet<ShowcaseVideo[]>('/videos'),
@@ -61,6 +76,85 @@ export default function ShowcaseVideosPage() {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-videos'] });
     queryClient.invalidateQueries({ queryKey: ['videos-public'] });
+  };
+
+  const updateMutation = useMutation({
+    mutationFn: (data: {
+      id: string;
+      title: string;
+      description: string;
+      category: string;
+      duration: string;
+      order: number;
+      videoUrl: string;
+      posterUrl: string;
+      isActive: boolean;
+      isFeatured: boolean;
+    }) =>
+      apiPut(`/videos/${data.id}`, {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        duration: data.duration,
+        order: data.order,
+        videoUrl: data.videoUrl,
+        posterUrl: data.posterUrl,
+        isActive: data.isActive,
+        isFeatured: data.isFeatured,
+      }),
+    onSuccess: () => {
+      invalidate();
+      setEditingVideo(null);
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to update video';
+      setEditError(msg);
+    },
+  });
+
+  const openEditModal = (v: ShowcaseVideo) => {
+    setEditingVideo(v);
+    setEditTitle(v.title);
+    setEditDescription(v.description || '');
+    setEditCategory(v.category || 'Microscopes');
+    setEditDuration(v.duration || '1:45');
+    setEditOrder(v.order || 0);
+    setEditVideoUrl(v.videoUrl);
+    setEditPosterUrl(getWebpPosterUrl(v.videoUrl, v.posterUrl));
+    setEditIsActive(v.isActive);
+    setEditIsFeatured(v.isFeatured ?? true);
+    setEditError('');
+  };
+
+  const handleEditPosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setEditError('Please select a valid image file (JPG, PNG, WebP)');
+      return;
+    }
+    setEditUploadingPoster(true);
+    setEditError('');
+    try {
+      const res = await apiUpload<{ url: string }>('/products/upload-image', file);
+      if (res?.url) {
+        setEditPosterUrl(res.url);
+      }
+    } catch {
+      setEditError('Failed to upload thumbnail image');
+    } finally {
+      setEditUploadingPoster(false);
+      if (editPosterFileRef.current) editPosterFileRef.current.value = '';
+    }
+  };
+
+  const handleAutoCapturePoster = () => {
+    if (editVideoUrl) {
+      const auto = getWebpPosterUrl(editVideoUrl);
+      setEditPosterUrl(auto);
+    }
   };
 
   const createMutation = useMutation({
@@ -563,7 +657,7 @@ export default function ShowcaseVideosPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredVideos.map((video) => {
-            const poster = video.posterUrl || getWebpPosterUrl(video.videoUrl);
+            const poster = getWebpPosterUrl(video.videoUrl, video.posterUrl);
             return (
               <Card
                 key={video._id}
@@ -575,11 +669,20 @@ export default function ShowcaseVideosPage() {
                       src={poster}
                       alt={video.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-500">
-                      <Film className="w-12 h-12" />
-                    </div>
+                  ) : null}
+
+                  {/* Fallback video tag if poster fails or empty */}
+                  {!poster && (
+                    <video
+                      src={video.videoUrl}
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                      muted
+                    />
                   )}
 
                   {/* Play Overlay */}
@@ -623,6 +726,17 @@ export default function ShowcaseVideosPage() {
                     </span>
 
                     <div className="flex items-center gap-1">
+                      {/* Edit Button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditModal(video)}
+                        className="h-8 px-2.5 text-xs font-semibold gap-1 text-slate-700 hover:text-[#1a3a6b] hover:bg-blue-50 border-slate-200"
+                        title="Edit video, title, and banner"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-blue-600" /> Edit
+                      </Button>
+
                       <Button
                         size="sm"
                         variant="ghost"
@@ -664,6 +778,236 @@ export default function ShowcaseVideosPage() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Edit Showcase Video Modal */}
+      {editingVideo && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
+          onClick={() => setEditingVideo(null)}
+        >
+          <div
+            className="bg-white rounded-2xl overflow-hidden max-w-2xl w-full shadow-2xl relative my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b bg-slate-50">
+              <div className="flex items-center gap-2">
+                <Film className="w-5 h-5 text-[#1a3a6b]" />
+                <h3 className="font-bold text-slate-900 text-lg">Edit Showcase Video &amp; Banner</h3>
+              </div>
+              <button
+                onClick={() => setEditingVideo(null)}
+                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {editError && (
+                <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                  {editError}
+                </div>
+              )}
+
+              {/* Banner / Poster Thumbnail Preview & Custom Upload */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+                  Video Banner / Thumbnail Preview
+                </Label>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative aspect-video w-full sm:w-48 bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shrink-0 shadow-sm">
+                    {editPosterUrl ? (
+                      <img
+                        src={editPosterUrl}
+                        alt="Banner Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                        No Banner Image
+                      </div>
+                    )}
+                    <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+                      Banner
+                    </div>
+                  </div>
+
+                  <div className="flex-1 space-y-2 w-full">
+                    <input
+                      ref={editPosterFileRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditPosterUpload}
+                      className="hidden"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={editUploadingPoster}
+                        onClick={() => editPosterFileRef.current?.click()}
+                        className="text-xs gap-1.5 bg-white shadow-sm"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        {editUploadingPoster ? 'Uploading image...' : 'Upload Custom Banner Image'}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleAutoCapturePoster}
+                        className="text-xs gap-1.5 text-[#1a3a6b] hover:bg-blue-50"
+                        title="Auto-capture high-res frame from video"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        Auto-Capture Frame
+                      </Button>
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      Upload a custom banner image or auto-capture a crisp frame from the video.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Title & Category */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Video Title *</Label>
+                  <Input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="e.g. Human Skeleton Bones Demonstration"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Category *</Label>
+                  <select
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-[#1a3a6b]"
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Duration & Order */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Duration (e.g. 1:45)</Label>
+                  <Input
+                    value={editDuration}
+                    onChange={(e) => setEditDuration(e.target.value)}
+                    placeholder="1:45"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Display Order</Label>
+                  <Input
+                    type="number"
+                    value={editOrder}
+                    onChange={(e) => setEditOrder(Number(e.target.value) || 0)}
+                  />
+                </div>
+              </div>
+
+              {/* Video URL */}
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Video URL or YouTube Link *</Label>
+                <Input
+                  value={editVideoUrl}
+                  onChange={(e) => setEditVideoUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+
+              {/* Banner/Poster URL */}
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Banner / Poster Image URL</Label>
+                <Input
+                  value={editPosterUrl}
+                  onChange={(e) => setEditPosterUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">Description</Label>
+                <textarea
+                  rows={3}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-[#1a3a6b]"
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  placeholder="Describe what is shown in this video..."
+                />
+              </div>
+
+              {/* Status checkboxes */}
+              <div className="flex flex-wrap gap-6 pt-2 border-t border-slate-100">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editIsActive}
+                    onChange={(e) => setEditIsActive(e.target.checked)}
+                    className="w-4 h-4 rounded text-[#1a3a6b] focus:ring-[#1a3a6b]"
+                  />
+                  <span>Published (Active on site)</span>
+                </label>
+
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editIsFeatured}
+                    onChange={(e) => setEditIsFeatured(e.target.checked)}
+                    className="w-4 h-4 rounded text-[#1a3a6b] focus:ring-[#1a3a6b]"
+                  />
+                  <span>Featured on Homepage</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 border-t bg-slate-50">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditingVideo(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                disabled={!editTitle.trim() || !editVideoUrl.trim() || updateMutation.isPending}
+                onClick={() =>
+                  updateMutation.mutate({
+                    id: editingVideo._id,
+                    title: editTitle.trim(),
+                    description: editDescription.trim(),
+                    category: editCategory,
+                    duration: editDuration.trim(),
+                    order: editOrder,
+                    videoUrl: editVideoUrl.trim(),
+                    posterUrl: editPosterUrl.trim(),
+                    isActive: editIsActive,
+                    isFeatured: editIsFeatured,
+                  })
+                }
+                className="bg-[#1a3a6b] hover:bg-[#152e55]"
+              >
+                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 

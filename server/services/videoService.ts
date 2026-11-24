@@ -38,11 +38,11 @@ export const makeWebpPoster = (videoUrl: string, customPoster?: string): string 
     return customPoster;
   }
 
-  // If Cloudinary video: extract frame 0 as WebP
+  // If Cloudinary video: extract frame at 1.5s as high-res poster (avoids black opening frame at 0.0s)
   if (videoUrl && videoUrl.includes('res.cloudinary.com') && videoUrl.includes('/video/upload/')) {
     return videoUrl
-      .replace('/video/upload/', '/video/upload/so_0,f_webp,q_auto,w_800/')
-      .replace(/\.[a-zA-Z0-9]+$/, '.webp');
+      .replace('/video/upload/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
+      .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
   }
 
   // If YouTube: use HQ poster
