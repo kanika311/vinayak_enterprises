@@ -1,16 +1,41 @@
 import Product from '../models/Product';
-import '../models/Category';
+import Category from '../models/Category';
 import { AppError, generateSlug, getPagination, buildSort } from '../utils/helpers';
-import { FilterQuery } from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 
 export const getProducts = async (query: Record<string, string>) => {
   const { page, limit, skip } = getPagination({ query } as never);
   const filter: FilterQuery<typeof Product> = {};
 
-  if (query.status) filter.status = query.status;
-  if (query.category) filter.category = query.category;
-  if (query.search) {
-    filter.$text = { $search: query.search };
+  if (query.status) {
+    filter.status = query.status;
+  }
+
+  if (query.category && query.category.trim()) {
+    const catVal = query.category.trim();
+    if (mongoose.Types.ObjectId.isValid(catVal)) {
+      filter.category = catVal;
+    } else {
+      const catDoc = await Category.findOne({ slug: catVal }).select('_id').lean();
+      if (catDoc) {
+        filter.category = catDoc._id;
+      }
+    }
+  }
+
+  if (query.search && query.search.trim()) {
+    const rawSearch = query.search.trim();
+    const escaped = rawSearch.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    const regex = new RegExp(escaped, 'i');
+    filter.$or = [
+      { name: regex },
+      { description: regex },
+      { shortDescription: regex },
+      { sku: regex },
+      { subcategory: regex },
+      { 'specifications.value': regex },
+      { features: regex },
+    ];
   }
 
   const sort = buildSort(query.sortBy, query.order);

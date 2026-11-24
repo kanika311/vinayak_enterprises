@@ -5,17 +5,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadProductImage = exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductById = exports.getProductBySlug = exports.getProducts = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
-require("../models/Category");
+const Category_1 = __importDefault(require("../models/Category"));
 const helpers_1 = require("../utils/helpers");
+const mongoose_1 = __importDefault(require("mongoose"));
 const getProducts = async (query) => {
     const { page, limit, skip } = (0, helpers_1.getPagination)({ query });
     const filter = {};
-    if (query.status)
+    if (query.status) {
         filter.status = query.status;
-    if (query.category)
-        filter.category = query.category;
-    if (query.search) {
-        filter.$text = { $search: query.search };
+    }
+    if (query.category && query.category.trim()) {
+        const catVal = query.category.trim();
+        if (mongoose_1.default.Types.ObjectId.isValid(catVal)) {
+            filter.category = catVal;
+        }
+        else {
+            const catDoc = await Category_1.default.findOne({ slug: catVal }).select('_id').lean();
+            if (catDoc) {
+                filter.category = catDoc._id;
+            }
+        }
+    }
+    if (query.search && query.search.trim()) {
+        const rawSearch = query.search.trim();
+        const escaped = rawSearch.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        const regex = new RegExp(escaped, 'i');
+        filter.$or = [
+            { name: regex },
+            { description: regex },
+            { shortDescription: regex },
+            { sku: regex },
+            { subcategory: regex },
+            { 'specifications.value': regex },
+            { features: regex },
+        ];
     }
     const sort = (0, helpers_1.buildSort)(query.sortBy, query.order);
     const [products, total] = await Promise.all([
