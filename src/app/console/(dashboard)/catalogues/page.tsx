@@ -131,6 +131,7 @@ export default function AdminCataloguesPage() {
                 publicId: cdnRes.data.public_id,
               },
               category: 'All Products',
+              pageCount: cdnRes.data?.pages || 1,
               isActive: true,
             });
 

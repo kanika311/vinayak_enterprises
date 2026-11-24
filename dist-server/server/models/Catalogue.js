@@ -44,6 +44,7 @@ const catalogueSchema = new mongoose_1.Schema({
         filename: String,
     },
     category: String,
+    pageCount: { type: Number, default: 1 },
     downloadCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
 }, { timestamps: true });

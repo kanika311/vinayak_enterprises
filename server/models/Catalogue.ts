@@ -6,6 +6,7 @@ export interface ICatalogue extends Document {
   description?: string;
   file: { url: string; publicId?: string; filename?: string };
   category?: string;
+  pageCount?: number;
   downloadCount: number;
   isActive: boolean;
 }
@@ -21,6 +22,7 @@ const catalogueSchema = new Schema<ICatalogue>(
       filename: String,
     },
     category: String,
+    pageCount: { type: Number, default: 1 },
     downloadCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
   },
