@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { CataloguesClient } from './catalogues-client';
 import { SITE_URL } from '@/lib/site-url';
+import { connectDatabase } from '../../../../server/config/database';
+import CatalogueModel from '../../../../server/models/Catalogue';
+
+export const revalidate = 600; // 10 minutes cache
 
 export const metadata: Metadata = {
   title: 'Download Product Catalogue PDF | Vinayak Enterprises Ambala',
@@ -56,14 +60,29 @@ const breadcrumbData = {
   ],
 };
 
-export default function CataloguesPage() {
+async function getActiveCatalogue() {
+  try {
+    await connectDatabase();
+    const catalogue = await CatalogueModel.findOne({ isActive: true })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
+    return catalogue ? JSON.parse(JSON.stringify(catalogue)) : null;
+  } catch (error) {
+    console.warn('Could not SSR active catalogue:', error);
+    return null;
+  }
+}
+
+export default async function CataloguesPage() {
+  const initialCatalogue = await getActiveCatalogue();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-      <CataloguesClient />
+      <CataloguesClient initialCatalogue={initialCatalogue} />
     </>
   );
 }
