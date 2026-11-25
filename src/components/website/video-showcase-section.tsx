@@ -429,10 +429,7 @@ export function VideoShowcaseSection({ isHomepage = true, initialVideos }: Video
           </div>
         </div>
 
-        {/* Helper subtitle */}
-        <p className="text-center text-xs text-slate-400 mt-4 font-medium flex items-center justify-center gap-1.5">
-          <span>⟵ Drag, swipe or hover to pause auto-scroll ⟶</span>
-        </p>
+
       </div>
 
       {/* Interactive Video Playback Modal */}
