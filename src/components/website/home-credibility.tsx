@@ -38,6 +38,16 @@ export function WhyChooseUsSection() {
   return (
     <section className="py-14 bg-[#f7f5f2]" aria-labelledby="why-choose-heading">
       <div className="container mx-auto px-4">
+        {/* Single Centered Headline */}
+        <div className="text-center mb-10">
+          <h2
+            id="why-choose-heading"
+            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight"
+          >
+            Why Choose Us
+          </h2>
+        </div>
+
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -46,22 +56,12 @@ export function WhyChooseUsSection() {
           className="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-start"
         >
           <div>
-            <motion.p variants={fadeUp} className="text-orange-600 font-semibold text-sm uppercase tracking-wide mb-2">
-              Why Institutions Choose Us
-            </motion.p>
-            <motion.h2
-              id="why-choose-heading"
-              variants={fadeUp}
-              className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-4"
-            >
-              Professional B2B supply for science education &amp; healthcare training
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-6">
+            <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-6 text-sm sm:text-base">
               From Ambala Cantt — one of India&apos;s leading hubs for scientific instruments — Vinayak Enterprises
               delivers microscopes, anatomy models, CPR manikins and laboratory equipment with factory-direct pricing
               and institutional support.
             </motion.p>
-            <motion.ul variants={fadeUp} className="space-y-2 text-sm text-slate-700">
+            <motion.ul variants={fadeUp} className="space-y-2.5 text-sm text-slate-700">
               <li className="flex gap-2"><span className="text-orange-500 font-bold">•</span> Vilakshan Netra microscope series</li>
               <li className="flex gap-2"><span className="text-orange-500 font-bold">•</span> Anatomy &amp; skeleton models for medical colleges</li>
               <li className="flex gap-2"><span className="text-orange-500 font-bold">•</span> CPR &amp; rescue training dummies</li>

@@ -232,26 +232,24 @@ export function HomePageClient({
         </div>
       )}
 
-      {/* 4. FEATURED PRODUCTS (Clean, Uncluttered Grid) */}
+      {/* 4. FEATURED PRODUCTS (Clean, Single Centered Headline) */}
       <section className="py-14 md:py-18 bg-white" aria-labelledby="featured-products-heading">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-         
-              <h2
-                id="featured-products-heading"
-                className="text-2xl md:text-3xl font-extrabold text-[#1a3a6b] tracking-tight"
-              >
-                Featured Laboratory Equipment &amp; Anatomical Models
-              </h2>
-           
-            </div>
-            <Link
-              href="/products"
-              className="inline-flex items-center gap-1.5 font-bold text-sm text-[#1a3a6b] hover:text-orange-600 transition-colors shrink-0"
+          <div className="text-center mb-8">
+            <h2
+              id="featured-products-heading"
+              className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight"
             >
-              View All Products <ArrowRight className="h-4 w-4" />
-            </Link>
+              Products
+            </h2>
+            <div className="mt-2.5">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm text-orange-600 hover:text-orange-700 transition-colors"
+              >
+                View All Products <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
 
           {featured.length === 0 ? (
@@ -284,42 +282,40 @@ export function HomePageClient({
       {/* 7. TECHNICAL KNOWLEDGE & BLOG */}
       <section className="py-14 md:py-18 bg-slate-50 border-t border-slate-200 overflow-hidden" aria-labelledby="blog-heading">
         <div className="container mx-auto px-4">
-          {/* Header with simple "Blogs" heading, manual controls and View All Blogs button */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-            <div>
-              <h2 id="blog-heading" className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
-                Blogs
-              </h2>
-            </div>
+          {/* Header with single centered "Blogs" heading */}
+          <div className="text-center mb-6">
+            <h2 id="blog-heading" className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+              Blogs
+            </h2>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="mt-2.5 flex items-center justify-center gap-4">
               {/* Manual Left/Right Scroll Arrows */}
-              <div className="hidden sm:flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => handleBlogScroll('left')}
-                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
                   aria-label="Previous blog"
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleBlogScroll('right')}
-                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
                   aria-label="Next blog"
                 >
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
 
               {/* View All Blogs Button */}
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-1.5 bg-[#1a3a6b] hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all group shrink-0"
+                className="inline-flex items-center gap-1.5 bg-[#1a3a6b] hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all group"
               >
                 <span>View All Blogs</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>

@@ -111,15 +111,11 @@ export function ContactClient() {
           >
             {/* Form Top Header */}
             <div className="mb-6">
-              <span className="inline-block bg-orange-100 text-orange-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2">
-                Direct Manufacturer Inquiries
-              </span>
+           
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
                 Send an Inquiry or Request a Quotation
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
-                Connect directly with our manufacturing desk in Ambala Cantt. We provide institutional supply, bulk discounts, and GEM tenders across India.
-              </p>
+             
             </div>
 
             {/* Form Type Tabs */}

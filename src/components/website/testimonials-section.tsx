@@ -87,19 +87,15 @@ export function TestimonialsSection({
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
+          className="text-center mb-8"
         >
-          <div>
-          
-            <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-              What Our Customers Say
-            </motion.h2>
-           
-          </div>
-          <motion.div variants={fadeUp}>
-            <Button asChild className="bg-orange-500 hover:bg-orange-600 shrink-0 font-semibold">
+          <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+            Testimonials
+          </motion.h2>
+          <motion.div variants={fadeUp} className="mt-3">
+            <Button asChild size="sm" className="bg-orange-500 hover:bg-orange-600 font-semibold text-xs shadow-xs">
               <Link href="/share-experience">
-                <MessageSquarePlus className="mr-2 h-4 w-4" /> Share Your Experience
+                <MessageSquarePlus className="mr-1.5 h-3.5 w-3.5" /> Share Your Experience
               </Link>
             </Button>
           </motion.div>
