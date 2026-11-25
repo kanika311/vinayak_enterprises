@@ -9,7 +9,7 @@ import * as catalogueService from '../services/catalogueService';
 import * as miscService from '../services/miscService';
 import * as bannerService from '../services/bannerService';
 import * as videoService from '../services/videoService';
-import { getCloudinarySignature } from '../services/cloudinaryService';
+import { getCloudinarySignature, uploadToCloudinary } from '../services/cloudinaryService';
 
 // Categories
 export const getCategories = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -186,7 +186,23 @@ export const createTestimonial = asyncHandler(async (req: AuthRequest, res: Resp
 });
 
 export const submitTestimonial = asyncHandler(async (req: AuthRequest, res: Response) => {
-  await miscService.submitTestimonial(req.body);
+  let image: { url: string; publicId?: string } | undefined;
+  if (req.file) {
+    try {
+      const uploadRes = await uploadToCloudinary(req.file, 'testimonials');
+      image = { url: uploadRes.url, publicId: uploadRes.publicId };
+    } catch (uploadErr) {
+      console.warn('Testimonial image upload to Cloudinary failed:', uploadErr);
+    }
+  } else if (req.body.image) {
+    try {
+      image = typeof req.body.image === 'string' ? JSON.parse(req.body.image) : req.body.image;
+    } catch {
+      image = undefined;
+    }
+  }
+
+  await miscService.submitTestimonial({ ...req.body, image });
   sendResponse(res, 201, { submitted: true }, 'Thank you! Your review is awaiting approval.');
 });
 

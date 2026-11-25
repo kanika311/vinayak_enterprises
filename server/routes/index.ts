@@ -82,7 +82,7 @@ router.delete('/catalogues/:id', protect, authorize(PERMISSIONS.CATALOGUES), mod
 
 // Testimonials
 router.get('/testimonials', optionalAuth, moduleCtrl.getTestimonials);
-router.post('/testimonials/submit', testimonialValidation, validate, moduleCtrl.submitTestimonial);
+router.post('/testimonials/submit', upload.single('photo'), testimonialValidation, validate, moduleCtrl.submitTestimonial);
 router.post('/testimonials', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.createTestimonial);
 router.put('/testimonials/:id', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.updateTestimonial);
 router.delete('/testimonials/:id', protect, authorize(PERMISSIONS.TESTIMONIALS), moduleCtrl.deleteTestimonial);

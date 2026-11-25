@@ -44,8 +44,8 @@ export const apiGet = async <T>(url: string, params?: Record<string, unknown>) =
   return data.data;
 };
 
-export const apiPost = async <T>(url: string, body?: unknown) => {
-  const { data } = await api.post<{ success: boolean; data: T; message?: string }>(url, body);
+export const apiPost = async <T>(url: string, body?: unknown, config?: object) => {
+  const { data } = await api.post<{ success: boolean; data: T; message?: string }>(url, body, config);
   return data.data;
 };
 

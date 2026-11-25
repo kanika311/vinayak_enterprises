@@ -71,8 +71,8 @@ async function getHomePageData() {
         .limit(8)
         .lean(),
       TestimonialModel.find({ status: 'approved' })
-        .sort({ rating: -1, createdAt: -1 })
-        .limit(6)
+        .sort({ order: 1, createdAt: -1 })
+        .limit(50)
         .lean(),
       ShowcaseVideoModel.find({ isActive: true })
         .sort({ order: 1, createdAt: -1 })

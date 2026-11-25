@@ -99,7 +99,7 @@ router.post('/catalogues/:id/download', moduleCtrl.trackDownload);
 router.delete('/catalogues/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.CATALOGUES), moduleCtrl.deleteCatalogue);
 // Testimonials
 router.get('/testimonials', auth_1.optionalAuth, moduleCtrl.getTestimonials);
-router.post('/testimonials/submit', validators_1.testimonialValidation, validate_1.validate, moduleCtrl.submitTestimonial);
+router.post('/testimonials/submit', upload_1.upload.single('photo'), validators_1.testimonialValidation, validate_1.validate, moduleCtrl.submitTestimonial);
 router.post('/testimonials', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.createTestimonial);
 router.put('/testimonials/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.updateTestimonial);
 router.delete('/testimonials/:id', auth_1.protect, (0, auth_1.authorize)(constants_1.PERMISSIONS.TESTIMONIALS), moduleCtrl.deleteTestimonial);

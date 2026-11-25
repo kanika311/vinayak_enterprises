@@ -191,7 +191,25 @@ exports.createTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {
     (0, helpers_1.sendResponse)(res, 201, item);
 });
 exports.submitTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {
-    await miscService.submitTestimonial(req.body);
+    let image;
+    if (req.file) {
+        try {
+            const uploadRes = await (0, cloudinaryService_1.uploadToCloudinary)(req.file, 'testimonials');
+            image = { url: uploadRes.url, publicId: uploadRes.publicId };
+        }
+        catch (uploadErr) {
+            console.warn('Testimonial image upload to Cloudinary failed:', uploadErr);
+        }
+    }
+    else if (req.body.image) {
+        try {
+            image = typeof req.body.image === 'string' ? JSON.parse(req.body.image) : req.body.image;
+        }
+        catch {
+            image = undefined;
+        }
+    }
+    await miscService.submitTestimonial({ ...req.body, image });
     (0, helpers_1.sendResponse)(res, 201, { submitted: true }, 'Thank you! Your review is awaiting approval.');
 });
 exports.updateTestimonial = (0, helpers_1.asyncHandler)(async (req, res) => {

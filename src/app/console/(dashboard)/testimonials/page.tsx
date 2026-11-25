@@ -23,6 +23,7 @@ interface Testimonial {
   productName?: string;
   review: string;
   rating: number;
+  image?: { url: string; publicId?: string };
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 }
@@ -153,6 +154,18 @@ export default function TestimonialsPage() {
 
                 {t.productName && (
                   <p className="text-xs text-blue-600 mt-2">Purchased: <span className="font-medium">{t.productName}</span></p>
+                )}
+
+                {t.image?.url && (
+                  <div className="mt-2.5">
+                    <a href={t.image.url} target="_blank" rel="noopener noreferrer" className="inline-block" title="Click to view full photo">
+                      <img
+                        src={t.image.url}
+                        alt="Customer uploaded photo"
+                        className="h-20 w-auto rounded-lg border border-slate-200 object-cover shadow-2xs hover:opacity-90"
+                      />
+                    </a>
+                  </div>
                 )}
 
                 <p className="text-sm text-slate-600 mt-3 leading-relaxed">&ldquo;{t.review}&rdquo;</p>

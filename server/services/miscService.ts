@@ -24,7 +24,7 @@ export const createTestimonial = async (data: Record<string, unknown>) =>
 
 /** Public submission from the website — always starts as pending for admin review. */
 export const submitTestimonial = async (data: Record<string, unknown>) => {
-  const { name, company, designation, email, productName, review, rating } = data;
+  const { name, company, designation, email, productName, review, rating, image } = data;
   return Testimonial.create({
     name,
     company,
@@ -32,6 +32,7 @@ export const submitTestimonial = async (data: Record<string, unknown>) => {
     email,
     productName,
     review,
+    image,
     rating: rating ? Math.min(5, Math.max(1, Number(rating))) : 5,
     status: 'pending',
     isActive: true,
