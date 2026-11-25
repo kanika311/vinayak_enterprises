@@ -8,8 +8,12 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cached = global.mongooseCache ?? { conn: null, promise: null };
 global.mongooseCache = cached;
 const connectDatabase = async () => {
-    if (cached.conn)
+    if (cached.conn && mongoose_1.default.connection.readyState === 1)
         return cached.conn;
+    if (mongoose_1.default.connection.readyState !== 1) {
+        cached.conn = null;
+        cached.promise = null;
+    }
     const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/scientific_instruments';
     if (!cached.promise) {
         cached.promise = mongoose_1.default.connect(uri, {

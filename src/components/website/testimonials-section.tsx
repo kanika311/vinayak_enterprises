@@ -90,15 +90,11 @@ export function TestimonialsSection({
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
         >
           <div>
-            <motion.p variants={fadeUp} className="text-orange-600 font-semibold text-sm uppercase tracking-wide mb-1">
-              Client Feedback
-            </motion.p>
+          
             <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               What Our Customers Say
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-slate-600 text-sm mt-1">
-              Reviews from schools, colleges, hospitals &amp; laboratories we supply.
-            </motion.p>
+           
           </div>
           <motion.div variants={fadeUp}>
             <Button asChild className="bg-orange-500 hover:bg-orange-600 shrink-0 font-semibold">

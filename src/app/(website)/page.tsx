@@ -8,7 +8,9 @@ import ProductModel from '../../../server/models/Product';
 import CategoryModel from '../../../server/models/Category';
 import BlogModel from '../../../server/models/Blog';
 import TestimonialModel from '../../../server/models/Testimonial';
-import type { Product, Category, Blog } from '@/types';
+import ShowcaseVideoModel from '../../../server/models/ShowcaseVideo';
+import BannerModel from '../../../server/models/Banner';
+import type { Product, Category, Blog, ShowcaseVideo } from '@/types';
 import type { TestimonialItem } from '@/components/website/testimonials-section';
 
 export const revalidate = 1800; // 30 minutes
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
 async function getHomePageData() {
   try {
     await connectDatabase();
-    const [products, categories, blogs, testimonials] = await Promise.all([
+    const [products, categories, blogs, testimonials, videos, banners] = await Promise.all([
       ProductModel.find({ status: 'published' })
         .sort({ createdAt: -1 })
         .limit(8)
@@ -72,6 +74,13 @@ async function getHomePageData() {
         .sort({ rating: -1, createdAt: -1 })
         .limit(6)
         .lean(),
+      ShowcaseVideoModel.find({ isActive: true })
+        .sort({ order: 1, createdAt: -1 })
+        .limit(12)
+        .lean(),
+      BannerModel.find({ isActive: true, placement: 'hero' })
+        .sort({ order: 1 })
+        .lean(),
     ]);
 
     return {
@@ -79,6 +88,8 @@ async function getHomePageData() {
       categories: JSON.parse(JSON.stringify(categories)) as Category[],
       blogs: JSON.parse(JSON.stringify(blogs)) as Blog[],
       testimonials: JSON.parse(JSON.stringify(testimonials)) as TestimonialItem[],
+      videos: JSON.parse(JSON.stringify(videos)) as ShowcaseVideo[],
+      banners: JSON.parse(JSON.stringify(banners)),
     };
   } catch (error) {
     console.warn('Could not load homepage data from database on SSR:', error);
@@ -87,6 +98,8 @@ async function getHomePageData() {
       categories: [],
       blogs: [],
       testimonials: [],
+      videos: [],
+      banners: [],
     };
   }
 }
@@ -205,7 +218,7 @@ function JsonLd({ products }: { products: Product[] }) {
 }
 
 export default async function HomePage() {
-  const { products, categories, blogs, testimonials } = await getHomePageData();
+  const { products, categories, blogs, testimonials, videos, banners } = await getHomePageData();
 
   return (
     <>
@@ -215,6 +228,8 @@ export default async function HomePage() {
         initialCategories={categories}
         initialBlogs={blogs}
         initialTestimonials={testimonials}
+        initialVideos={videos}
+        initialBanners={banners}
       />
 
       {/* Semantic LLM & Search Engine Overview Section */}

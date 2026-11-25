@@ -145,6 +145,9 @@ exports.deleteBlog = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Catalogues
 exports.getCatalogues = (0, helpers_1.asyncHandler)(async (req, res) => {
+    if (!req.user) {
+        res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+    }
     const result = await catalogueService.getCatalogues(req.query);
     (0, helpers_1.sendResponse)(res, 200, result);
 });
@@ -338,7 +341,7 @@ exports.upsertPage = (0, helpers_1.asyncHandler)(async (req, res) => {
 });
 // Settings
 exports.getPublicSettings = (0, helpers_1.asyncHandler)(async (_req, res) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
     const settings = await miscService.getPublicSettings();
     (0, helpers_1.sendResponse)(res, 200, settings);
 });

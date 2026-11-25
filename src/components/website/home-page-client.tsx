@@ -33,6 +33,8 @@ export interface HomePageClientProps {
   initialCategories?: Category[];
   initialBlogs?: Blog[];
   initialTestimonials?: any[];
+  initialVideos?: any[];
+  initialBanners?: any[];
 }
 
 export function HomePageClient({
@@ -40,6 +42,8 @@ export function HomePageClient({
   initialCategories,
   initialBlogs,
   initialTestimonials,
+  initialVideos,
+  initialBanners,
 }: HomePageClientProps = {}) {
   const { data: productsData } = useQuery({
     queryKey: ['products-public', 'homepage'],
@@ -59,7 +63,7 @@ export function HomePageClient({
     initialData: initialBlogs?.length ? { blogs: initialBlogs } : undefined,
   });
 
-  const { data: banners = [] } = useHeroBanners();
+  const { data: banners = [] } = useHeroBanners(initialBanners);
   const hasHeroVideo = banners.length > 0;
 
   const rawProducts = productsData?.products || [];
@@ -143,7 +147,7 @@ export function HomePageClient({
         }`}
         aria-label="Introduction Hero"
       >
-        <HeroBackground />
+        <HeroBackground initialBanners={initialBanners} />
 
         {hasHeroVideo && (
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-950/45 pointer-events-none z-[1]" />
@@ -271,8 +275,8 @@ export function HomePageClient({
         </div>
       </section>
 
-      {/* 5. VIDEO DEMONSTRATIONS */}
-      <VideoShowcaseSection />
+      {/* 5. VIDEO DEMONSTRATIONS (Lazy poster, instant load) */}
+      <VideoShowcaseSection isHomepage initialVideos={initialVideos} />
 
       {/* 6. WHY CHOOSE US CREDIBILITY */}
       <WhyChooseUsSection />

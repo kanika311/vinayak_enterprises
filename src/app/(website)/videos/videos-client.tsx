@@ -76,7 +76,7 @@ const CATEGORY_TABS = [
   'General',
 ] as const;
 
-export function VideosClientPage() {
+export function VideosClientPage({ initialVideos }: { initialVideos?: ShowcaseVideo[] } = {}) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeVideo, setActiveVideo] = useState<ShowcaseVideo | null>(null);
@@ -84,6 +84,7 @@ export function VideosClientPage() {
   const { data: dbVideos, isLoading } = useQuery({
     queryKey: ['videos-public'],
     queryFn: () => apiGet<ShowcaseVideo[]>('/videos/public'),
+    initialData: initialVideos?.length ? initialVideos : undefined,
     staleTime: 5 * 60 * 1000,
   });
 

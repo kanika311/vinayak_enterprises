@@ -35,5 +35,6 @@ const analyticsSchema = new Schema<IAnalytics>(
 
 analyticsSchema.index({ createdAt: -1 });
 analyticsSchema.index({ type: 1, createdAt: -1 });
+analyticsSchema.index({ type: 1, ipAddress: 1 });
 
 export default mongoose.model<IAnalytics>('Analytics', analyticsSchema);

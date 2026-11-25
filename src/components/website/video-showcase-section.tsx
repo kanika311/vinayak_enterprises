@@ -87,34 +87,38 @@ export function ShowcaseVideoCard({
   onOpen: () => void;
   whatsappLink: string;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isYouTube = Boolean(extractYouTubeId(video.videoUrl));
   const autoPoster = video.posterUrl || getWebpPosterUrl(video.videoUrl);
   const streamUrl = getOptimizedVideoUrl(video.videoUrl);
 
   const handleMouseEnter = () => {
+    setIsHovered(true);
     if (videoRef.current && !isYouTube) {
       videoRef.current.play().catch(() => {});
     }
   };
 
-  useEffect(() => {
+  const handleMouseLeave = () => {
+    setIsHovered(false);
     if (videoRef.current && !isYouTube) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.pause();
     }
-  }, [isYouTube, streamUrl]);
+  };
 
   return (
     <div
       className="group flex flex-col h-full bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
       onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Video Preview Box with Autoplay Replay Mode */}
+      {/* Video Preview Box with Instant Poster Image & Hover Stream */}
       <div
         onClick={onOpen}
         className="relative aspect-video bg-slate-950 overflow-hidden cursor-pointer"
       >
-        {!isYouTube && streamUrl ? (
+        {isHovered && !isYouTube && streamUrl ? (
           <video
             ref={videoRef}
             src={streamUrl}
@@ -123,7 +127,7 @@ export function ShowcaseVideoCard({
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
         ) : autoPoster ? (
@@ -154,7 +158,7 @@ export function ShowcaseVideoCard({
           {!isYouTube && (
             <span className="inline-flex items-center gap-1 bg-black/75 backdrop-blur-md text-emerald-400 text-[10px] font-semibold px-2 py-0.5 rounded-full shadow">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Auto Preview
+              Preview
             </span>
           )}
           <span className="inline-block bg-black/75 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded shadow">
@@ -219,9 +223,10 @@ export function ShowcaseVideoCard({
 
 export interface VideoShowcaseSectionProps {
   isHomepage?: boolean;
+  initialVideos?: ShowcaseVideo[];
 }
 
-export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSectionProps = {}) {
+export function VideoShowcaseSection({ isHomepage = true, initialVideos }: VideoShowcaseSectionProps = {}) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeVideo, setActiveVideo] = useState<ShowcaseVideo | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -233,6 +238,7 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
   const { data: dbVideos } = useQuery({
     queryKey: ['videos-public'],
     queryFn: () => apiGet<ShowcaseVideo[]>('/videos/public'),
+    initialData: initialVideos?.length ? initialVideos : undefined,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -334,18 +340,13 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
         {/* Section Header with "View All Videos" Button & Manual Controls */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 bg-orange-500/10 text-orange-600 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2">
-              <ShieldCheck className="h-3.5 w-3.5" /> Video Showcase
-            </span>
             <h2
               id="videos-heading"
               className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight"
             >
               Videos
             </h2>
-            <p className="text-slate-500 text-sm mt-1 max-w-xl">
-              Watch live demonstrations of microscopes, anatomical models, CPR manikins &amp; laboratory equipment.
-            </p>
+          
           </div>
 
           <div className="flex items-center gap-3 shrink-0">

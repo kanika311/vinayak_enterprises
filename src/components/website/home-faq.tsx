@@ -16,15 +16,11 @@ export function HomeFAQSection() {
     <section className="py-16 bg-slate-50 border-t border-slate-200/80" aria-labelledby="faq-heading">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 mb-3">
-            <HelpCircle className="w-3.5 h-3.5" /> Frequently Asked Questions
-          </span>
+        
           <h2 id="faq-heading" className="text-2xl md:text-3xl font-bold text-[#1a3a6b]">
             Frequently Asked Questions
           </h2>
-          <p className="text-slate-600 mt-2 text-sm max-w-xl mx-auto">
-            Everything you need to know about our scientific instruments, anatomical models, CPR manikins, and institutional bulk orders.
-          </p>
+
         </div>
 
         <div className="space-y-3">

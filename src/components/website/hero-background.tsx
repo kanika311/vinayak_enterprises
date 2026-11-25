@@ -35,10 +35,11 @@ export function getAutoPosterUrl(videoUrl?: string, posterUrl?: string): string 
   return '';
 }
 
-export function useHeroBanners() {
+export function useHeroBanners(initialData?: Banner[]) {
   return useQuery({
     queryKey: ['banners-public'],
     queryFn: () => apiGet<Banner[]>('/banners/public', { placement: 'hero' }),
+    initialData: initialData?.length ? initialData : undefined,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -61,8 +62,8 @@ function FallbackGlow() {
   );
 }
 
-export function HeroBackground() {
-  const { data: banners = [] } = useHeroBanners();
+export function HeroBackground({ initialBanners }: { initialBanners?: Banner[] } = {}) {
+  const { data: banners = [] } = useHeroBanners(initialBanners);
   const [index, setIndex] = useState(0);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);

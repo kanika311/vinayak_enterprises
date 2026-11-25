@@ -47,27 +47,32 @@ export const getDashboardStats = async () => {
     Product.find({ status: 'published' })
       .sort({ enquiryCount: -1, views: -1 })
       .limit(5)
-      .select('name sku views enquiryCount images'),
+      .select('name sku views enquiryCount images')
+      .lean(),
     Product.find()
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('name sku status slug createdAt'),
+      .select('name sku status slug createdAt')
+      .lean(),
     Blog.find()
       .sort({ createdAt: -1 })
       .limit(5)
       .populate('author', 'name')
-      .select('title slug status views createdAt author'),
+      .select('title slug status views createdAt author')
+      .lean(),
     Lead.countDocuments({ status: 'new' }),
     RFQ.countDocuments({ status: 'pending' }),
     Testimonial.countDocuments({ status: 'pending' }),
     Lead.find()
       .sort({ createdAt: -1 })
       .limit(6)
-      .select('name company email phone productInterested status createdAt'),
+      .select('name company email phone productInterested status createdAt')
+      .lean(),
     Testimonial.find({ status: 'pending' })
       .sort({ createdAt: -1 })
       .limit(6)
-      .select('name company rating review createdAt'),
+      .select('name company rating review createdAt')
+      .lean(),
     Lead.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo } } },
       {

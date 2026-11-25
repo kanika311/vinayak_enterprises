@@ -52,4 +52,5 @@ const analyticsSchema = new mongoose_1.Schema({
 }, { timestamps: true });
 analyticsSchema.index({ createdAt: -1 });
 analyticsSchema.index({ type: 1, createdAt: -1 });
+analyticsSchema.index({ type: 1, ipAddress: 1 });
 exports.default = mongoose_1.default.model('Analytics', analyticsSchema);

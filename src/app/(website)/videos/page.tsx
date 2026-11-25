@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { VideosClientPage } from './videos-client';
 import { SITE_URL } from '@/lib/site-url';
+import { connectDatabase } from '../../../../server/config/database';
+import ShowcaseVideoModel from '../../../../server/models/ShowcaseVideo';
+import type { ShowcaseVideo } from '@/types';
+
+export const revalidate = 1800; // 30 minutes
 
 export const metadata: Metadata = {
   title: 'Equipment Demonstration & Laboratory Videos | Vinayak Enterprises',
@@ -56,14 +61,30 @@ const breadcrumbData = {
   ],
 };
 
-export default function VideosPage() {
+async function getVideosData(): Promise<ShowcaseVideo[]> {
+  try {
+    await connectDatabase();
+    const videos = await ShowcaseVideoModel.find({ isActive: true })
+      .sort({ order: 1, createdAt: -1 })
+      .limit(50)
+      .lean();
+    return JSON.parse(JSON.stringify(videos)) as ShowcaseVideo[];
+  } catch (error) {
+    console.warn('Could not load videos on SSR:', error);
+    return [];
+  }
+}
+
+export default async function VideosPage() {
+  const initialVideos = await getVideosData();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-      <VideosClientPage />
+      <VideosClientPage initialVideos={initialVideos} />
     </>
   );
 }

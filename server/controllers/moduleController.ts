@@ -131,6 +131,9 @@ export const deleteBlog = asyncHandler(async (req: AuthRequest, res: Response) =
 
 // Catalogues
 export const getCatalogues = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400');
+  }
   const result = await catalogueService.getCatalogues(req.query as Record<string, string>);
   sendResponse(res, 200, result);
 });
@@ -363,7 +366,7 @@ export const upsertPage = asyncHandler(async (req: AuthRequest, res: Response) =
 
 // Settings
 export const getPublicSettings = asyncHandler(async (_req: AuthRequest, res: Response) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
   const settings = await miscService.getPublicSettings();
   sendResponse(res, 200, settings);
 });

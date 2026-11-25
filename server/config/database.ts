@@ -14,7 +14,12 @@ const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: nul
 global.mongooseCache = cached;
 
 export const connectDatabase = async (): Promise<typeof mongoose> => {
-  if (cached.conn) return cached.conn;
+  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
+
+  if (mongoose.connection.readyState !== 1) {
+    cached.conn = null;
+    cached.promise = null;
+  }
 
   const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/scientific_instruments';
 
