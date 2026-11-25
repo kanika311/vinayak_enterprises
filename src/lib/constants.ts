@@ -106,7 +106,7 @@ export const MANUFACTURING_HIGHLIGHTS = [
 ];
 
 export const HOME_STATS = [
-  { value: '20+', label: 'Years Manufacturing' },
+  { value: '25+', label: 'Years (Since 2000)' },
   { value: '500+', label: 'Institutions Served' },
   { value: '100+', label: 'Product Variants' },
   { value: 'Pan-India', label: 'Supply Network' },
@@ -142,13 +142,13 @@ export const BUSINESS_INFO = [
 
 export const ABOUT_CONTENT = {
   intro:
-    'Vinayak Enterprises is an Ambala-based Manufacturer, Bulk Supplier, and Distributor of Scientific Instruments, Laboratory Equipment, Human Anatomy Models, Educational Teaching Aids, and Medical Training Products.',
+    'Established in the year 2000 in Ambala Cantt, Haryana — India’s historic scientific apparatus manufacturing hub — Vinayak Enterprises has completed over 25 years of dedicated manufacturing excellence. We design and fabricate high-precision scientific instruments, educational teaching aids, human anatomy models, research microscopes, and medical training simulators for institutions across India.',
   serving:
-    'We serve schools, colleges, universities, laboratories, hospitals, medical institutions, healthcare organizations, and research centers across India.',
+    'We serve over 500+ government and private medical colleges, nursing institutes, universities, CBSE/ICSE schools, hospitals, pharmaceutical laboratories, and research centres with factory-direct institutional supply.',
   focus:
-    'Our focus is on quality manufacturing, institutional supply, reliable service, and long-term customer relationships.',
+    'Our core focus is on in-house manufacturing quality, strict syllabus compliance, factory-direct pricing without distributor markups, and long-term institutional partnerships.',
   manufacturing:
-    'We manufacture high-quality scientific and educational products and support bulk procurement requirements for educational and healthcare institutions.',
+    'We operate a dedicated manufacturing and assembly facility in Ambala Cantt, adhering to high standards of optical alignment, medical-grade PVC casting, and secure shockproof packaging for pan-India dispatch.',
 };
 
 export const PRODUCT_CATEGORIES = [
