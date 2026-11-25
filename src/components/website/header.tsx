@@ -295,6 +295,15 @@ export function WebsiteHeader() {
             </Link>
 
             <Link
+              href="/videos"
+              className={`px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                pathname.startsWith('/videos') ? 'text-orange-600 font-bold' : 'text-slate-700 hover:text-orange-600'
+              }`}
+            >
+              Videos
+            </Link>
+
+            <Link
               href="/blog"
               className={`px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${
                 pathname.startsWith('/blog') ? 'text-orange-600 font-bold' : 'text-slate-700 hover:text-orange-600'

@@ -141,6 +141,7 @@ export function WebsiteFooter() {
             <ul className="space-y-2.5 text-sm">
               {[
                 { href: '/about', label: 'About Us' },
+                { href: '/videos', label: 'Showcase Videos' },
                 { href: '/blog', label: 'Blog' },
                 { href: '/contact', label: 'Contact Us' },
                 { href: '/catalogues', label: 'Download Catalogue' },

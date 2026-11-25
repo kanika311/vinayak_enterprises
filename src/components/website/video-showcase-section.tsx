@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X, ExternalLink, ShieldCheck, MessageCircle, FileText } from 'lucide-react';
+import { Play, X, ExternalLink, ShieldCheck, MessageCircle, FileText, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api';
 import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId, getOptimizedVideoUrl } from '@/lib/utils';
 import { SITE } from '@/lib/constants';
@@ -72,9 +73,10 @@ const CATEGORY_TABS = [
   'Anatomy Models',
   'CPR Manikins',
   'Lab Equipment',
+  'General',
 ] as const;
 
-function ShowcaseVideoCard({
+export function ShowcaseVideoCard({
   video,
   idx,
   onOpen,
@@ -103,12 +105,8 @@ function ShowcaseVideoCard({
   }, [isYouTube, streamUrl]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: idx * 0.08 }}
-      className="group flex flex-col bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
+    <div
+      className="group flex flex-col h-full bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
       onMouseEnter={handleMouseEnter}
     >
       {/* Video Preview Box with Autoplay Replay Mode */}
@@ -166,7 +164,7 @@ function ShowcaseVideoCard({
 
         {/* Play Button Overlay (Click to watch with sound) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-13 h-13 rounded-full bg-white/95 text-[#1a3a6b] shadow-2xl flex items-center justify-center group-hover:scale-115 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+          <div className="w-12 h-12 rounded-full bg-white/95 text-[#1a3a6b] shadow-2xl flex items-center justify-center group-hover:scale-115 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
             <Play className="w-5 h-5 ml-0.5 fill-current" />
           </div>
         </div>
@@ -189,7 +187,7 @@ function ShowcaseVideoCard({
           >
             {video.title}
           </h3>
-          <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+          <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
             {video.description}
           </p>
         </div>
@@ -215,13 +213,20 @@ function ShowcaseVideoCard({
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-export function VideoShowcaseSection() {
+export interface VideoShowcaseSectionProps {
+  isHomepage?: boolean;
+}
+
+export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSectionProps = {}) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeVideo, setActiveVideo] = useState<ShowcaseVideo | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: dbVideos } = useQuery({
     queryKey: ['videos-public'],
@@ -236,9 +241,57 @@ export function VideoShowcaseSection() {
       ? allVideos
       : allVideos.filter((v) => v.category === selectedCategory);
 
+  // Triplicate the videos array so horizontal auto-scroll loops smoothly without empty spaces
+  const displayVideos =
+    filteredVideos.length > 0
+      ? [...filteredVideos, ...filteredVideos, ...filteredVideos]
+      : [];
+
+  // Continuous smooth horizontal auto-scroll loop
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || !isHomepage || filteredVideos.length === 0) return;
+
+    let rafId: number;
+    let lastTime = performance.now();
+
+    const animate = (now: number) => {
+      const delta = now - lastTime;
+      lastTime = now;
+
+      if (!isPaused && container) {
+        // Smooth gliding speed (~40-45px/sec)
+        const scrollDelta = 0.045 * delta;
+        container.scrollLeft += scrollDelta;
+
+        // Seamless loop when reaching 2/3 of triplicated items
+        const thirdWidth = container.scrollWidth / 3;
+        if (container.scrollLeft >= thirdWidth * 2) {
+          container.scrollLeft -= thirdWidth;
+        }
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPaused, isHomepage, filteredVideos.length]);
+
+  // Manual scroll buttons
+  const handleScroll = (dir: 'left' | 'right') => {
+    const container = scrollRef.current;
+    if (!container) return;
+    setIsPaused(true);
+    const scrollAmount = 350;
+    container.scrollBy({
+      left: dir === 'right' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth',
+    });
+    setTimeout(() => setIsPaused(false), 3000);
+  };
+
   const handleOpenVideo = (video: ShowcaseVideo) => {
     setActiveVideo(video);
-    // Track view asynchronously if it has a real DB ID
     if (video._id && !video._id.startsWith('sample-')) {
       apiPost(`/videos/${video._id}/view`, {}).catch(() => {});
     }
@@ -251,7 +304,7 @@ export function VideoShowcaseSection() {
 
   return (
     <section
-      className="py-16 bg-gradient-to-b from-slate-50 via-white to-slate-50 border-y border-slate-200/80 relative overflow-hidden"
+      className="py-14 sm:py-18 bg-gradient-to-b from-slate-50 via-white to-slate-50 border-y border-slate-200/80 relative overflow-hidden"
       aria-labelledby="videos-heading"
     >
       {/* Decorative gradient glow */}
@@ -265,23 +318,62 @@ export function VideoShowcaseSection() {
       />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <h2
-            id="videos-heading"
-            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight"
-          >
-            Videos
-          </h2>
+        {/* Section Header with "View All Videos" Button & Manual Controls */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 bg-orange-500/10 text-orange-600 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2">
+              <ShieldCheck className="h-3.5 w-3.5" /> Video Showcase
+            </span>
+            <h2
+              id="videos-heading"
+              className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight"
+            >
+              Videos
+            </h2>
+            <p className="text-slate-500 text-sm mt-1 max-w-xl">
+              Watch live demonstrations of microscopes, anatomical models, CPR manikins &amp; laboratory equipment.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Manual Left/Right Scroll Arrows */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleScroll('left')}
+                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                aria-label="Previous video"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleScroll('right')}
+                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                aria-label="Next video"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* View All Videos Button */}
+            <Link
+              href="/videos"
+              className="inline-flex items-center gap-1.5 bg-[#1a3a6b] hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all group shrink-0"
+            >
+              <span>View All Videos</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
 
         {/* Category Pills Filter */}
-        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
           {CATEGORY_TABS.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer shadow-sm ${
+              className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer shadow-2xs ${
                 selectedCategory === cat
                   ? 'bg-[#1a3a6b] text-white shadow-blue-900/20 shadow-md scale-105'
                   : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
@@ -292,18 +384,41 @@ export function VideoShowcaseSection() {
           ))}
         </div>
 
-        {/* Videos Grid with Auto-Replay & Dynamic Auto-Banners */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredVideos.map((video, idx) => (
-            <ShowcaseVideoCard
-              key={video._id || idx}
-              video={video}
-              idx={idx}
-              onOpen={() => handleOpenVideo(video)}
-              whatsappLink={getWhatsAppLink(video)}
-            />
-          ))}
+        {/* ========================================================= */}
+        {/* HORIZONTAL AUTO-SCROLL VIDEO TRACK                        */}
+        {/* ========================================================= */}
+        <div className="relative -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div
+            ref={scrollRef}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => {
+              setTimeout(() => setIsPaused(false), 2500);
+            }}
+            className="flex gap-5 overflow-x-auto scrollbar-none py-3 scroll-smooth select-none cursor-grab active:cursor-grabbing"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {displayVideos.map((video, idx) => (
+              <div
+                key={`${video._id}-${idx}`}
+                className="w-[280px] sm:w-[320px] md:w-[350px] shrink-0"
+              >
+                <ShowcaseVideoCard
+                  video={video}
+                  idx={idx % filteredVideos.length}
+                  onOpen={() => handleOpenVideo(video)}
+                  whatsappLink={getWhatsAppLink(video)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Helper subtitle */}
+        <p className="text-center text-xs text-slate-400 mt-4 font-medium flex items-center justify-center gap-1.5">
+          <span>⟵ Drag, swipe or hover to pause auto-scroll ⟶</span>
+        </p>
       </div>
 
       {/* Interactive Video Playback Modal */}
@@ -335,7 +450,7 @@ export function VideoShowcaseSection() {
                 <button
                   type="button"
                   onClick={() => setActiveVideo(null)}
-                  className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                   aria-label="Close video player"
                 >
                   <X className="w-4 h-4" />
@@ -382,12 +497,12 @@ export function VideoShowcaseSection() {
                     <p className="text-slate-500">Manufactured at Ambala, Haryana · GST Invoice · Pan-India Dispatch</p>
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <a
+                    <Link
                       href={`/request-quote?product=${encodeURIComponent(activeVideo.title)}`}
                       className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 bg-[#1a3a6b] hover:bg-[#152e55] text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
                     >
                       <FileText className="w-3.5 h-3.5" /> Request Quote
-                    </a>
+                    </Link>
                     <a
                       href={getWhatsAppLink(activeVideo)}
                       target="_blank"

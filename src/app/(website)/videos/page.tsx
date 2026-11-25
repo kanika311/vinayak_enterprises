@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { VideoShowcaseSection } from '@/components/website/video-showcase-section';
+import { VideosClientPage } from './videos-client';
 import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
@@ -63,20 +63,7 @@ export default function VideosPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-      <div className="bg-[#1a3a6b] py-12 text-white text-center">
-        <div className="container mx-auto px-4 max-w-3xl">
-          <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 shadow">
-            VIDEO SHOWCASE
-          </span>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            Equipment Demonstrations &amp; Walkthroughs
-          </h1>
-          <p className="text-blue-100 text-sm md:text-base mt-2.5 max-w-xl mx-auto">
-            Explore live walkthroughs and product videos of our educational scientific instruments, medical training models and laboratory equipment.
-          </p>
-        </div>
-      </div>
-      <VideoShowcaseSection />
+      <VideosClientPage />
     </>
   );
 }
