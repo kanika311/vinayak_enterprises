@@ -114,49 +114,33 @@ export function VideosClientPage({ initialVideos }: { initialVideos?: ShowcaseVi
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* 1. HERO HEADER */}
-      <div className="bg-[#1a3a6b] text-white py-12 md:py-16 relative overflow-hidden">
-        {/* Subtle decorative glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 pt-6 md:pt-8">
+      {/* 1. TOP HEADER & BREADCRUMB */}
+      <div className="container mx-auto px-4 mb-5">
+        <nav className="flex items-center gap-2 text-xs text-slate-500 mb-3" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-[#1a3a6b] transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-orange-600 font-semibold">Videos</span>
+        </nav>
 
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          {/* Breadcrumb */}
-          <nav className="flex items-center justify-center gap-2 text-xs text-blue-200 mb-4" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-orange-400 font-semibold">Videos</span>
-          </nav>
-
-          <span className="inline-block bg-orange-500 text-white text-[11px] font-bold px-3 py-1 rounded-full mb-3 shadow uppercase tracking-wider">
-            All Demonstration Videos
-          </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-3">
-            Equipment Demonstrations &amp; Walkthroughs
-          </h1>
-          <p className="text-blue-100 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-            Browse our full library of product demonstrations, anatomical model assembly reels, research microscopes, and hospital training apparatus.
-          </p>
-
-          {/* Quick Stats in Header */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-blue-200">
-            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> High-Definition 1080p
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span className="inline-block bg-orange-100 text-orange-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1">
+              Demonstration Videos
             </span>
-            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              🔬 Medical &amp; Science Lab Gear
-            </span>
-            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              🇮🇳 Ambala Cantt Direct Manufacturing
-            </span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+              Equipment Demonstration Videos
+            </h1>
           </div>
+          <p className="text-xs sm:text-sm text-slate-500 max-w-md">
+            HD video walkthroughs of microscopes, anatomical models, CPR manikins, and laboratory equipment.
+          </p>
         </div>
       </div>
 
-      {/* 2. FILTER & SEARCH BAR */}
-      <div className="container mx-auto px-4 -mt-6 relative z-20">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200/80 p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* 2. SEARCH BAR & CATEGORY FILTERS (At the top) */}
+      <div className="container mx-auto px-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3.5 sm:p-4 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Search Input */}
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -171,7 +155,7 @@ export function VideosClientPage({ initialVideos }: { initialVideos?: ShowcaseVi
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -198,7 +182,7 @@ export function VideosClientPage({ initialVideos }: { initialVideos?: ShowcaseVi
       </div>
 
       {/* 3. VIDEO GRID & COUNT */}
-      <div className="container mx-auto px-4 mt-8">
+      <div className="container mx-auto px-4">
         {/* Count & Status */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-xs sm:text-sm font-semibold text-slate-600">
