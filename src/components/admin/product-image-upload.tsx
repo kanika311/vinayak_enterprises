@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { apiUpload } from '@/lib/api';
+import { compressImageToWebp } from '@/lib/client-compress';
 
 export interface ProductImage {
   url: string;
@@ -57,7 +58,8 @@ export function ProductImageUpload({ images, onChange, productName }: ProductIma
 
     try {
       const uploadPromises = validFiles.map(async (file) => {
-        const result = await apiUpload<{ url: string; publicId?: string }>('/products/upload-image', file);
+        const compressed = await compressImageToWebp(file, 1600, 1600, 0.82);
+        const result = await apiUpload<{ url: string; publicId?: string }>('/products/upload-image', compressed);
         setUploadProgress((prev) => (prev ? { ...prev, done: prev.done + 1 } : null));
         return {
           url: result.url,

@@ -15,7 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { apiGet, apiPost, apiPut, apiDelete, apiUpload } from '@/lib/api';
-import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId } from '@/lib/utils';
+import { getWebpPosterUrl, getYouTubeEmbedUrl, extractYouTubeId, getOptimizedVideoUrl } from '@/lib/utils';
+import { compressImageToWebp } from '@/lib/client-compress';
 import type { ShowcaseVideo } from '@/types';
 
 const CATEGORIES = [
@@ -138,7 +139,8 @@ export default function ShowcaseVideosPage() {
     setEditUploadingPoster(true);
     setEditError('');
     try {
-      const res = await apiUpload<{ url: string }>('/products/upload-image', file);
+      const compressed = await compressImageToWebp(file, 800, 800, 0.85);
+      const res = await apiUpload<{ url: string }>('/products/upload-image', compressed);
       if (res?.url) {
         setEditPosterUrl(res.url);
       }
@@ -266,7 +268,8 @@ export default function ShowcaseVideosPage() {
 
           if (cdnRes.data?.secure_url) {
             setUploadPercent(100);
-            setVideoUrl(cdnRes.data.secure_url);
+            const optimizedWebm = getOptimizedVideoUrl(cdnRes.data.secure_url, 'webm');
+            setVideoUrl(optimizedWebm);
             setVideoPublicId(cdnRes.data.public_id);
             setPosterUrl(getWebpPosterUrl(cdnRes.data.secure_url));
             uploadSuccess = true;
@@ -294,7 +297,8 @@ export default function ShowcaseVideosPage() {
           file,
           'showcase_videos'
         );
-        setVideoUrl(result.url);
+        const optimizedWebm = getOptimizedVideoUrl(result.url, 'webm');
+        setVideoUrl(optimizedWebm);
         setVideoPublicId(result.publicId);
         setPosterUrl(result.posterUrl || getWebpPosterUrl(result.url));
       }

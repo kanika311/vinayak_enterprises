@@ -47,19 +47,19 @@ export function getWebpPosterUrl(videoUrl?: string, posterUrl?: string): string 
     // If the saved poster has a black 0s frame (so_0), automatically upgrade to 1.5s frame
     if (posterUrl.includes('res.cloudinary.com') && (posterUrl.includes('/so_0,') || posterUrl.includes('/so_0/'))) {
       return posterUrl
-        .replace('/video/upload/so_0,f_webp', '/video/upload/so_1.5,f_auto')
-        .replace('/video/upload/so_0/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
-        .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+        .replace('/video/upload/so_0,f_webp', '/video/upload/so_1.5,f_webp')
+        .replace('/video/upload/so_0/', '/video/upload/so_1.5,f_webp,q_auto,w_800/')
+        .replace(/\.[a-zA-Z0-9]+$/, '.webp');
     }
     return getWebpImageUrl(posterUrl, 800);
   }
   if (videoUrl) {
     if (videoUrl.includes('res.cloudinary.com') && videoUrl.includes('/video/upload/')) {
-      // Snapshot frame at 1.5s so we never get a black opening frame (so_1.5)
+      // Snapshot frame at 1.5s as WebP so we never get a black opening frame (so_1.5)
       if (videoUrl.includes('/upload/so_')) return videoUrl;
       return videoUrl
-        .replace('/video/upload/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
-        .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+        .replace('/video/upload/', '/video/upload/so_1.5,f_webp,q_auto,w_800/')
+        .replace(/\.[a-zA-Z0-9]+$/, '.webp');
     }
     const ytId = extractYouTubeId(videoUrl);
     if (ytId) {
@@ -69,12 +69,17 @@ export function getWebpPosterUrl(videoUrl?: string, posterUrl?: string): string 
   return '';
 }
 
-/** Optimize Cloudinary streaming video */
-export function getOptimizedVideoUrl(url?: string): string {
+/** Optimize Cloudinary streaming video for high-performance WebM/MP4 with 80%+ compression */
+export function getOptimizedVideoUrl(url?: string, format: 'webm' | 'mp4' | 'auto' = 'webm'): string {
   if (!url) return '';
   if (url.includes('res.cloudinary.com') && url.includes('/video/upload/')) {
-    if (url.includes('/upload/f_auto') || url.includes('/upload/q_auto')) return url;
-    return url.replace('/video/upload/', '/video/upload/f_auto,q_auto:eco,vc_auto,w_1280/');
+    if (url.includes('/upload/f_webm') || url.includes('/upload/f_auto') || url.includes('/upload/f_mp4')) {
+      return url;
+    }
+    const fmt = format === 'webm' ? 'f_webm' : format === 'mp4' ? 'f_mp4' : 'f_auto';
+    const ext = format === 'webm' ? '.webm' : format === 'mp4' ? '.mp4' : '';
+    const base = url.replace('/video/upload/', `/video/upload/${fmt},q_auto:eco,vc_auto,w_854/`);
+    return ext ? base.replace(/\.[a-zA-Z0-9]+$/, ext) : base;
   }
   return url;
 }

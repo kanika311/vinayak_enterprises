@@ -38,11 +38,11 @@ export const makeWebpPoster = (videoUrl: string, customPoster?: string): string 
     return customPoster;
   }
 
-  // If Cloudinary video: extract frame at 1.5s as high-res poster (avoids black opening frame at 0.0s)
+  // If Cloudinary video: extract frame at 1.5s as high-res WebP poster (avoids black opening frame at 0.0s)
   if (videoUrl && videoUrl.includes('res.cloudinary.com') && videoUrl.includes('/video/upload/')) {
     return videoUrl
-      .replace('/video/upload/', '/video/upload/so_1.5,f_auto,q_auto,w_800/')
-      .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+      .replace('/video/upload/', '/video/upload/so_1.5,f_webp,q_auto,w_800/')
+      .replace(/\.[a-zA-Z0-9]+$/, '.webp');
   }
 
   // If YouTube: use HQ poster
@@ -54,11 +54,14 @@ export const makeWebpPoster = (videoUrl: string, customPoster?: string): string 
   return '';
 };
 
-/** Optimize Cloudinary video URL for streaming (f_auto, q_auto:eco) */
-export const optimizeCloudinaryVideo = (url: string): string => {
+/** Optimize Cloudinary video URL for ultra-fast streaming in WebM format (80%+ compression) */
+export const optimizeCloudinaryVideo = (url: string, format: 'webm' | 'mp4' | 'auto' = 'webm'): string => {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/video/upload/')) return url;
-  if (url.includes('/upload/f_auto') || url.includes('/upload/q_auto')) return url;
-  return url.replace('/video/upload/', '/video/upload/f_auto,q_auto:eco,vc_auto,w_1280/');
+  if (url.includes('/upload/f_webm') || url.includes('/upload/f_auto') || url.includes('/upload/f_mp4')) return url;
+  const fmt = format === 'webm' ? 'f_webm' : format === 'mp4' ? 'f_mp4' : 'f_auto';
+  const ext = format === 'webm' ? '.webm' : format === 'mp4' ? '.mp4' : '';
+  const base = url.replace('/video/upload/', `/video/upload/${fmt},q_auto:eco,vc_auto,w_854/`);
+  return ext ? base.replace(/\.[a-zA-Z0-9]+$/, ext) : base;
 };
 
 /** Save video file locally if Cloudinary is not configured */

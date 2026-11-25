@@ -8,6 +8,7 @@ import { LoadingSpinner } from '@/components/admin/loading';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { apiGet, apiUpload, apiDelete } from '@/lib/api';
+import { compressImageToWebp } from '@/lib/client-compress';
 
 interface MediaItem { _id: string; name: string; type: string; url: string; size?: number; mimeType?: string; }
 
@@ -30,9 +31,14 @@ export default function MediaPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['media'] }),
   });
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) uploadMutation.mutate(file);
+    if (file) {
+      const toUpload = file.type.startsWith('image/')
+        ? await compressImageToWebp(file, 1600, 1600, 0.82)
+        : file;
+      uploadMutation.mutate(toUpload);
+    }
   };
 
   return (

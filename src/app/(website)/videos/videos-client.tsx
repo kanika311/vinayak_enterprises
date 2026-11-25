@@ -15,12 +15,12 @@ import type { ShowcaseVideo } from '@/types';
 const CURATED_DEFAULT_VIDEOS: ShowcaseVideo[] = [
   {
     _id: 'sample-video-1',
-    title: 'Vilakshan Netra Binocular Research Microscope Demonstration',
-    description: 'High-power 1600x magnification walkthrough with quadruple revolving nosepiece, LED illumination and mechanical stage control for medical colleges.',
-    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/v1785066120/showcase_videos/microscope_demo.mp4',
-    posterUrl: 'https://res.cloudinary.com/dd29usied/image/upload/f_webp,q_auto,w_800/v1785065986/products/catalog/tljlusfoz45gowdaxczk.webp',
-    category: 'Microscopes',
-    duration: '2:15',
+    title: 'Vinayak Enterprises Manufacture Process',
+    description: 'Precision engineering, casting and hand-crafting process of scientific apparatus and anatomical models at our Ambala Cantt facility.',
+    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/f_webm,q_auto:eco,w_854/v1795351686/showcase_videos/kzarq1dhcddpdwmlieud.webm',
+    posterUrl: 'https://res.cloudinary.com/dd29usied/video/upload/so_1.5,f_webp,q_auto,w_800/v1795351686/showcase_videos/kzarq1dhcddpdwmlieud.webp',
+    category: 'General',
+    duration: '1:45',
     isFeatured: true,
     isActive: true,
     order: 1,
@@ -28,12 +28,12 @@ const CURATED_DEFAULT_VIDEOS: ShowcaseVideo[] = [
   },
   {
     _id: 'sample-video-2',
-    title: 'Full Size Articulated Human Skeleton Assembly & Joint Movement',
-    description: 'Life-size 5 ft 2 in medical PVC skeleton demonstration featuring removable skull, articulated limbs, and flexible spinal column for anatomy classrooms.',
-    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/v1785066125/showcase_videos/skeleton_demo.mp4',
-    posterUrl: 'https://res.cloudinary.com/dd29usied/image/upload/f_webp,q_auto,w_800/v1785065974/products/catalog/l4zckbklllzijum1ehbq.webp',
+    title: 'Heart Label Tour Reel',
+    description: 'Detailed anatomical walkthrough of the human heart model with labelled cardiac chambers, mitral & tricuspid valves.',
+    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/f_webm,q_auto:eco,w_854/v1795436076/showcase_videos/zpumz9kbezdjweef3ors.webm',
+    posterUrl: 'https://res.cloudinary.com/dd29usied/video/upload/so_1.5,f_webp,q_auto,w_800/v1795436076/showcase_videos/zpumz9kbezdjweef3ors.webp',
     category: 'Anatomy Models',
-    duration: '1:50',
+    duration: '1:20',
     isFeatured: true,
     isActive: true,
     order: 2,
@@ -41,12 +41,12 @@ const CURATED_DEFAULT_VIDEOS: ShowcaseVideo[] = [
   },
   {
     _id: 'sample-video-3',
-    title: 'Adult CPR Training Manikin Chest Compression & AED Simulation',
-    description: 'Hands-on BLS/ACLS training walkthrough demonstrating compression depth feedback, airway management, and realistic chest rise.',
-    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/v1785066130/showcase_videos/cpr_demo.mp4',
-    posterUrl: 'https://res.cloudinary.com/dd29usied/image/upload/f_webp,q_auto,w_800/v1785066000/products/catalog/hyvmsc0zmm5cdar6jg4z.webp',
-    category: 'CPR Manikins',
-    duration: '2:40',
+    title: 'Skeleton Bones Articulation Reel',
+    description: 'Full articulated human skeleton demonstration displaying spinal vertebrae, thoracic cage, and movable joint articulation.',
+    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/f_webm,q_auto:eco,w_854/v1795436433/showcase_videos/esvn9xmjvxnhvtoq1bi5.webm',
+    posterUrl: 'https://res.cloudinary.com/dd29usied/video/upload/so_1.5,f_webp,q_auto,w_800/v1795436433/showcase_videos/esvn9xmjvxnhvtoq1bi5.webp',
+    category: 'Anatomy Models',
+    duration: '1:30',
     isFeatured: true,
     isActive: true,
     order: 3,
@@ -54,12 +54,12 @@ const CURATED_DEFAULT_VIDEOS: ShowcaseVideo[] = [
   },
   {
     _id: 'sample-video-4',
-    title: 'Laboratory Water Distillation Unit & Borosilicate Glassware Setup',
-    description: 'Demonstration of stainless steel double distillation apparatus and precision lab glassware engineered for chemistry and pharmacy research.',
-    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/v1785066135/showcase_videos/lab_distillation_demo.mp4',
-    posterUrl: 'https://res.cloudinary.com/dd29usied/image/upload/f_webp,q_auto,w_800/v1785066014/products/catalog/fng8fr7vhlxf7cfgg9aw.webp',
-    category: 'Lab Equipment',
-    duration: '1:35',
+    title: 'Adult CPR Training Simulation',
+    description: 'Comprehensive CPR manikin training protocol demonstrating chest compression depth feedback and emergency ventilation technique.',
+    videoUrl: 'https://res.cloudinary.com/dd29usied/video/upload/f_webm,q_auto:eco,w_854/v1795528471/showcase_videos/zoszunxijqejdtazmuvt.webm',
+    posterUrl: 'https://res.cloudinary.com/dd29usied/video/upload/so_1.5,f_webp,q_auto,w_800/v1795528471/showcase_videos/zoszunxijqejdtazmuvt.webp',
+    category: 'CPR Manikins',
+    duration: '2:10',
     isFeatured: true,
     isActive: true,
     order: 4,
@@ -401,12 +401,13 @@ export function VideosClientPage({ initialVideos }: { initialVideos?: ShowcaseVi
                   />
                 ) : (
                   <video
-                    src={activeVideo.videoUrl}
                     controls
                     autoPlay
                     poster={activeVideo.posterUrl || getWebpPosterUrl(activeVideo.videoUrl)}
                     className="w-full h-full object-contain"
                   >
+                    <source src={getOptimizedVideoUrl(activeVideo.videoUrl, 'webm')} type="video/webm" />
+                    <source src={getOptimizedVideoUrl(activeVideo.videoUrl, 'mp4')} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 )}

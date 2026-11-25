@@ -6,6 +6,7 @@ import { ImagePlus, Link2, Loader2, Trash2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiUpload } from '@/lib/api';
+import { compressImageToWebp } from '@/lib/client-compress';
 
 export interface FeaturedImage {
   url: string;
@@ -36,7 +37,8 @@ export function FeaturedImageUpload({ value, onChange, endpoint = '/blogs/upload
     setError('');
     setUploading(true);
     try {
-      const result = await apiUpload<{ url: string; publicId?: string }>(endpoint, file);
+      const compressed = await compressImageToWebp(file, 1600, 1600, 0.82);
+      const result = await apiUpload<{ url: string; publicId?: string }>(endpoint, compressed);
       onChange({ url: result.url, publicId: result.publicId });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Upload failed';

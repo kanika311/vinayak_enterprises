@@ -47,14 +47,39 @@ const uploadToCloudinary = (file, folder = 'scientific-instruments') => {
     if (!(0, cloudinary_1.ensureCloudinaryConfigured)()) {
         return Promise.reject(new Error('Cloudinary is not configured'));
     }
+    const isVideo = file.mimetype.startsWith('video/');
+    const isImage = file.mimetype.startsWith('image/');
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary_1.default.uploader.upload_stream({
             folder,
-            resource_type: file.mimetype.startsWith('video/') ? 'video' : 'auto',
+            resource_type: isVideo ? 'video' : isImage ? 'image' : 'auto',
+            ...(isVideo
+                ? {
+                    eager: [
+                        { format: 'webm', quality: 'auto:eco', width: 854, crop: 'limit' },
+                        { format: 'mp4', quality: 'auto:eco', width: 854, crop: 'limit' },
+                    ],
+                    eager_async: true,
+                }
+                : isImage
+                    ? {
+                        format: 'webp',
+                        transformation: [{ quality: 'auto:good', fetch_format: 'webp', width: 1600, crop: 'limit' }],
+                    }
+                    : {}),
         }, (error, result) => {
             if (error || !result)
                 return reject(error);
-            resolve({ url: result.secure_url, publicId: result.public_id });
+            let finalUrl = result.secure_url;
+            if (isVideo) {
+                finalUrl = result.secure_url
+                    .replace('/video/upload/', '/video/upload/f_webm,q_auto:eco,w_854/')
+                    .replace(/\.[a-zA-Z0-9]+$/, '.webm');
+            }
+            else if (isImage && result.secure_url.includes('/image/upload/')) {
+                finalUrl = (0, exports.toWebpUrl)(result.secure_url);
+            }
+            resolve({ url: finalUrl, publicId: result.public_id });
         });
         bufferToStream(file.buffer).pipe(uploadStream);
     });
