@@ -232,27 +232,27 @@ export function WebsiteHeader() {
               Home
             </Link>
 
-            {/* Our Products Dropdown */}
+            {/* Our Products Link & Dropdown */}
             <div
               ref={dropdownRef}
-              className="relative"
+              className="relative flex items-center"
               onMouseEnter={() => setProductsOpen(true)}
               onMouseLeave={() => setProductsOpen(false)}
             >
-              <button
-                type="button"
-                onClick={() => setProductsOpen((prev) => !prev)}
+              <Link
+                href="/products"
+                onClick={() => setProductsOpen(false)}
                 className={`flex items-center gap-1 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${
                   pathname.startsWith('/products') || pathname.startsWith('/categories') || productsOpen
                     ? 'text-orange-600 font-bold'
                     : 'text-slate-700 hover:text-orange-600'
                 }`}
               >
-                Our Products
+                <span>Our Products</span>
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-200 ${productsOpen ? 'rotate-180 text-orange-600' : 'text-slate-400'}`}
                 />
-              </button>
+              </Link>
               <AnimatePresence>
                 {productsOpen && (
                   <motion.div
@@ -262,6 +262,15 @@ export function WebsiteHeader() {
                     transition={{ duration: 0.15 }}
                     className="absolute top-full left-0 w-72 bg-white border border-slate-200 shadow-xl rounded-xl py-2 z-50 mt-1"
                   >
+                    <Link
+                      href="/products"
+                      onClick={() => setProductsOpen(false)}
+                      className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-orange-600 hover:bg-orange-50 transition-colors border-b border-slate-100 mb-1"
+                    >
+                      <span>All Products (View All)</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+
                     {PRODUCT_CATEGORIES.map((cat) => (
                       <Link
                         key={cat.slug}
@@ -412,7 +421,13 @@ export function WebsiteHeader() {
                   {/* Expandable Product Categories in Mobile Menu */}
                   <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5 space-y-1">
                     <div className="flex items-center justify-between px-2 py-1 text-xs font-bold uppercase tracking-wider text-[#1a3a6b]">
-                      <span>Our Products</span>
+                      <Link
+                        href="/products"
+                        onClick={() => setMobileOpen(false)}
+                        className="hover:text-orange-600 transition-colors"
+                      >
+                        Our Products
+                      </Link>
                       <Link
                         href="/products"
                         onClick={() => setMobileOpen(false)}
