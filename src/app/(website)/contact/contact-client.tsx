@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiPost } from '@/lib/api';
-import { PageHeader } from '@/components/website/page-header';
 import { ContactActions } from '@/components/website/contact-actions';
 import { fadeUp, staggerContainer, scaleIn } from '@/components/website/motion';
 import { Phone, Mail, MapPin, Clock, Building2, Facebook, Instagram, MessageCircle, FileCheck } from 'lucide-react';
@@ -92,16 +92,108 @@ export function ContactClient() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <PageHeader title="Contact Us" subtitle="Manufacturer · Bulk Supplier · Distributor — Ambala, Haryana" dark />
+    <div className="bg-slate-50 min-h-screen py-6 md:py-8">
+      <div className="container mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-[#1a3a6b] transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-orange-600 font-semibold">Contact Us</span>
+        </nav>
 
-      <div className="container mx-auto px-4 py-8">
-        <ContactActions className="mb-10 justify-center" />
-      </div>
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
+          {/* 1. Form Section (Appears directly at the TOP on mobile & desktop) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="order-1 lg:order-2 lg:col-span-2 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-sm"
+          >
+            {/* Form Top Header */}
+            <div className="mb-6">
+              <span className="inline-block bg-orange-100 text-orange-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2">
+                Direct Manufacturer Inquiries
+              </span>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+                Send an Inquiry or Request a Quotation
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                Connect directly with our manufacturing desk in Ambala Cantt. We provide institutional supply, bulk discounts, and GEM tenders across India.
+              </p>
+            </div>
 
-      <div className="container mx-auto px-4 pb-12">
-        <div className="grid lg:grid-cols-3 gap-10">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="space-y-4">
+            {/* Form Type Tabs */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {(['inquiry', 'quote', 'catalogue'] as FormType[]).map((type) => (
+                <Button
+                  key={type}
+                  type="button"
+                  variant={formType === type ? 'default' : 'outline'}
+                  className={formType === type ? 'bg-[#1a3a6b]' : ''}
+                  onClick={() => { setFormType(type); setSent(false); setError(''); }}
+                >
+                  {formTitles[type]}
+                </Button>
+              ))}
+            </div>
+
+            <AnimatePresence mode="wait">
+              {sent ? (
+                <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-10">
+                  <p className="text-5xl mb-4">✅</p>
+                  <h2 className="text-xl font-bold text-slate-900">Request Submitted!</h2>
+                  <p className="text-slate-500 mt-2">Our team will contact you at {site.phone} or {site.email} shortly.</p>
+                </motion.div>
+              ) : (
+                <motion.form key={formType} onSubmit={handleSubmit} className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
+                  {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{error}</p>}
+                  <motion.p variants={fadeUp} className="text-sm text-slate-500">
+                    {formType === 'inquiry' && 'Send us a general enquiry about products or institutional supply.'}
+                    {formType === 'quote' && 'Request a competitive quotation for bulk or institutional orders.'}
+                    {formType === 'catalogue' && 'Request our latest product catalogue and price list.'}
+                  </motion.p>
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    {[
+                      { key: 'name', label: 'Name *', type: 'text', required: true },
+                      { key: 'company', label: 'Institution / Company', type: 'text', required: false },
+                      { key: 'email', label: 'Email *', type: 'email', required: true },
+                      { key: 'phone', label: 'Phone *', type: 'tel', required: true },
+                    ].map((field) => (
+                      <motion.div key={field.key} variants={fadeUp}>
+                        <Label>{field.label}</Label>
+                        <Input
+                          required={field.required}
+                          type={field.type}
+                          value={form[field.key as keyof typeof form]}
+                          onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                  <motion.div variants={fadeUp}>
+                    <Label>Message *</Label>
+                    <Textarea rows={5} required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={
+                      formType === 'catalogue' ? 'Mention product categories you are interested in...' : 'Describe your requirements...'
+                    } />
+                  </motion.div>
+                  <motion.div variants={fadeUp}>
+                    <Button type="submit" className="bg-orange-500 hover:bg-orange-600 font-bold px-8" disabled={loading}>
+                      {loading ? 'Sending...' : `Submit ${formTitles[formType]}`}
+                    </Button>
+                  </motion.div>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* 2. Direct Contact Information & Quick Actions (Sidebar on desktop, below form on mobile) */}
+          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="order-2 lg:order-1 lg:col-span-1 space-y-4">
+            {/* Quick Action Buttons */}
+            <div className="bg-white rounded-xl border p-4 shadow-xs">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Connect</p>
+              <ContactActions className="gap-2.5" />
+            </div>
+
             {contactItems.map((item) => (
               <motion.div
                 key={item.label}
@@ -166,75 +258,6 @@ export function ContactClient() {
                 </div>
               </motion.div>
             )}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-2 bg-white rounded-2xl border p-8 shadow-sm"
-          >
-            <div className="flex flex-wrap gap-2 mb-6">
-              {(['inquiry', 'quote', 'catalogue'] as FormType[]).map((type) => (
-                <Button
-                  key={type}
-                  type="button"
-                  variant={formType === type ? 'default' : 'outline'}
-                  className={formType === type ? 'bg-[#1a3a6b]' : ''}
-                  onClick={() => { setFormType(type); setSent(false); setError(''); }}
-                >
-                  {formTitles[type]}
-                </Button>
-              ))}
-            </div>
-
-            <AnimatePresence mode="wait">
-              {sent ? (
-                <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-10">
-                  <p className="text-5xl mb-4">✅</p>
-                  <h2 className="text-xl font-bold text-slate-900">Request Submitted!</h2>
-                  <p className="text-slate-500 mt-2">Our team will contact you at {site.phone} or {site.email} shortly.</p>
-                </motion.div>
-              ) : (
-                <motion.form key={formType} onSubmit={handleSubmit} className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
-                  {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{error}</p>}
-                  <motion.p variants={fadeUp} className="text-sm text-slate-500">
-                    {formType === 'inquiry' && 'Send us a general enquiry about products or institutional supply.'}
-                    {formType === 'quote' && 'Request a competitive quotation for bulk or institutional orders.'}
-                    {formType === 'catalogue' && 'Request our latest product catalogue and price list.'}
-                  </motion.p>
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    {[
-                      { key: 'name', label: 'Name *', type: 'text', required: true },
-                      { key: 'company', label: 'Institution / Company', type: 'text', required: false },
-                      { key: 'email', label: 'Email *', type: 'email', required: true },
-                      { key: 'phone', label: 'Phone *', type: 'tel', required: true },
-                    ].map((field) => (
-                      <motion.div key={field.key} variants={fadeUp}>
-                        <Label>{field.label}</Label>
-                        <Input
-                          required={field.required}
-                          type={field.type}
-                          value={form[field.key as keyof typeof form]}
-                          onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                  <motion.div variants={fadeUp}>
-                    <Label>Message *</Label>
-                    <Textarea rows={5} required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={
-                      formType === 'catalogue' ? 'Mention product categories you are interested in...' : 'Describe your requirements...'
-                    } />
-                  </motion.div>
-                  <motion.div variants={fadeUp}>
-                    <Button type="submit" className="bg-orange-500 hover:bg-orange-600" disabled={loading}>
-                      {loading ? 'Sending...' : `Submit ${formTitles[formType]}`}
-                    </Button>
-                  </motion.div>
-                </motion.form>
-              )}
-            </AnimatePresence>
           </motion.div>
         </div>
       </div>
