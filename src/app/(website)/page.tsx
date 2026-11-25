@@ -66,7 +66,7 @@ async function getHomePageData() {
         .lean(),
       BlogModel.find({ status: 'published' })
         .sort({ publishedAt: -1, createdAt: -1 })
-        .limit(3)
+        .limit(8)
         .lean(),
       TestimonialModel.find({ status: 'approved' })
         .sort({ rating: -1, createdAt: -1 })

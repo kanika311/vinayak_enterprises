@@ -1,11 +1,12 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { ShieldCheck, CheckCircle2, ArrowRight, FileText, PhoneCall } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, ArrowRight, FileText, PhoneCall, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/website/product-card';
 import { HeroBackground, useHeroBanners } from '@/components/website/hero-background';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
@@ -54,7 +55,7 @@ export function HomePageClient({
 
   const { data: blogsData } = useQuery({
     queryKey: ['blogs-public', 'homepage'],
-    queryFn: () => apiGet<{ blogs: Blog[] }>('/blogs', { status: 'published', limit: 3 }),
+    queryFn: () => apiGet<{ blogs: Blog[] }>('/blogs', { status: 'published', limit: 8 }),
     initialData: initialBlogs?.length ? { blogs: initialBlogs } : undefined,
   });
 
@@ -67,6 +68,69 @@ export function HomePageClient({
 
   const rawBlogs = blogsData?.blogs || [];
   const blogs = rawBlogs.length > 0 ? rawBlogs : (initialBlogs?.length ? initialBlogs : FALLBACK_BLOGS);
+
+  // Horizontal auto-scroll controller for Blogs section (unique blogs, no repeat)
+  const blogScrollRef = useRef<HTMLDivElement>(null);
+  const [blogPaused, setBlogPaused] = useState(false);
+  const [blogScrollDirection, setBlogScrollDirection] = useState<'forward' | 'backward'>('forward');
+  const isBlogTransitioningRef = useRef(false);
+
+  useEffect(() => {
+    const container = blogScrollRef.current;
+    if (!container || blogs.length <= 1) return;
+
+    let rafId: number;
+    let lastTime = performance.now();
+
+    const animate = (now: number) => {
+      const delta = now - lastTime;
+      lastTime = now;
+
+      if (!blogPaused && !isBlogTransitioningRef.current && container) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+
+        if (maxScroll > 10) {
+          const speed = 0.038 * delta;
+
+          if (blogScrollDirection === 'forward') {
+            container.scrollLeft += speed;
+            if (container.scrollLeft >= maxScroll - 2) {
+              isBlogTransitioningRef.current = true;
+              setTimeout(() => {
+                setBlogScrollDirection('backward');
+                isBlogTransitioningRef.current = false;
+              }, 2200);
+            }
+          } else {
+            container.scrollLeft -= speed;
+            if (container.scrollLeft <= 2) {
+              isBlogTransitioningRef.current = true;
+              setTimeout(() => {
+                setBlogScrollDirection('forward');
+                isBlogTransitioningRef.current = false;
+              }, 2200);
+            }
+          }
+        }
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [blogPaused, blogs.length, blogScrollDirection]);
+
+  const handleBlogScroll = (dir: 'left' | 'right') => {
+    const container = blogScrollRef.current;
+    if (!container) return;
+    setBlogPaused(true);
+    const amount = 350;
+    container.scrollBy({
+      left: dir === 'right' ? amount : -amount,
+      behavior: 'smooth',
+    });
+    setTimeout(() => setBlogPaused(false), 2500);
+  };
 
   return (
     <div className="bg-white">
@@ -214,60 +278,116 @@ export function HomePageClient({
       <WhyChooseUsSection />
 
       {/* 7. TECHNICAL KNOWLEDGE & BLOG */}
-      <section className="py-14 md:py-18 bg-slate-50 border-t border-slate-200" aria-labelledby="blog-heading">
+      <section className="py-14 md:py-18 bg-slate-50 border-t border-slate-200 overflow-hidden" aria-labelledby="blog-heading">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          {/* Header with simple "Blogs" heading, manual controls and View All Blogs button */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
             <div>
-           
-              <h2 id="blog-heading" className="text-2xl md:text-3xl font-extrabold text-[#1a3a6b] tracking-tight">
-                Latest Laboratory &amp; Anatomy Guides
+              <h2 id="blog-heading" className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a3a6b] tracking-tight">
+                Blogs
               </h2>
-
             </div>
-            <Link
-              href="/blog"
-              className="text-sm font-bold text-orange-600 hover:text-orange-700 inline-flex items-center gap-1 shrink-0"
-            >
-              View All Guides <ArrowRight className="h-4 w-4" />
-            </Link>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Manual Left/Right Scroll Arrows */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleBlogScroll('left')}
+                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                  aria-label="Previous blog"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBlogScroll('right')}
+                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                  aria-label="Next blog"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* View All Blogs Button */}
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 bg-[#1a3a6b] hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all group shrink-0"
+              >
+                <span>View All Blogs</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
 
+          {/* Horizontal Scrolling Track for Blogs (No repeat, unique cards) */}
           {blogs.length > 0 && (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogs.map((blog) => (
-                <Link
-                  key={blog._id}
-                  href={`/blog/${blog.slug}`}
-                  className="group flex flex-col h-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-                >
-                  <div className="aspect-[16/10] bg-slate-50 flex items-center justify-center overflow-hidden relative">
-                    {blog.featuredImage?.url ? (
-                      <Image
-                        src={blog.featuredImage.url}
-                        alt={blog.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <span className="text-5xl">📖</span>
-                    )}
+            <div className="relative -mx-4 px-4 sm:mx-0 sm:px-0">
+              <div
+                ref={blogScrollRef}
+                onMouseEnter={() => setBlogPaused(true)}
+                onMouseLeave={() => setBlogPaused(false)}
+                onTouchStart={() => setBlogPaused(true)}
+                onTouchEnd={() => {
+                  setTimeout(() => setBlogPaused(false), 2500);
+                }}
+                className="flex gap-5 overflow-x-auto scrollbar-none py-3 scroll-smooth select-none cursor-grab active:cursor-grabbing"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {blogs.map((blog, idx) => (
+                  <div
+                    key={blog._id || idx}
+                    className="w-[280px] sm:w-[320px] md:w-[350px] shrink-0"
+                  >
+                    <Link
+                      href={`/blog/${blog.slug}`}
+                      className="group flex flex-col h-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className="aspect-[16/10] bg-slate-50 flex items-center justify-center overflow-hidden relative">
+                        {blog.featuredImage?.url ? (
+                          <Image
+                            src={blog.featuredImage.url}
+                            alt={blog.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 350px"
+                            className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.04]"
+                          />
+                        ) : (
+                          <span className="text-5xl">📖</span>
+                        )}
+                        <div className="absolute top-2.5 left-2.5">
+                          <span className="bg-[#1a3a6b] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                            Lab Guide
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
+                        <div>
+                          <h3 className="font-bold text-slate-900 group-hover:text-[#1a3a6b] line-clamp-2 leading-snug text-sm sm:text-base">
+                            {blog.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                            {blog.excerpt || blog.content.slice(0, 100)}
+                          </p>
+                        </div>
+                        <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                          <span>{formatDate(blog.publishedAt || blog.createdAt)}</span>
+                          <span className="font-bold text-orange-600 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+                            Read Guide →
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-bold text-slate-900 group-hover:text-[#1a3a6b] line-clamp-2 leading-snug">
-                      {blog.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-2 line-clamp-2 flex-1">
-                      {blog.excerpt || blog.content.slice(0, 100)}
-                    </p>
-                    <p className="text-[11px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
-                      Published {formatDate(blog.publishedAt || blog.createdAt)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                ))}
+              </div>
             </div>
           )}
+
+          {/* Helper subtitle */}
+          <p className="text-center text-xs text-slate-400 mt-4 font-medium flex items-center justify-center gap-1.5">
+            <span>⟵ Drag, swipe or hover to pause auto-scroll ⟶</span>
+          </p>
         </div>
       </section>
 

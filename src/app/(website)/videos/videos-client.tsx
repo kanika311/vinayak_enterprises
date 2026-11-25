@@ -344,9 +344,7 @@ export function VideosClientPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Need a Custom Video Demonstration?
             </h2>
-            <p className="text-blue-100 text-xs sm:text-sm mt-2 leading-relaxed">
-              Medical colleges, universities, and institutions can request custom video walkthroughs of any specific apparatus, dissection model, or microscope before issuing tender purchase orders.
-            </p>
+
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
