@@ -169,18 +169,14 @@ export function HomePageClient({
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 block mb-1">
-                Product Catalog
-              </span>
+         
               <h2
                 id="featured-products-heading"
                 className="text-2xl md:text-3xl font-extrabold text-[#1a3a6b] tracking-tight"
               >
                 Featured Laboratory Equipment &amp; Anatomical Models
               </h2>
-              <p className="text-slate-500 text-sm mt-1 max-w-xl">
-                Microscopes, life-size human skeletons, CPR manikins &amp; biology lab models ready for institutional dispatch.
-              </p>
+           
             </div>
             <Link
               href="/products"
@@ -222,15 +218,11 @@ export function HomePageClient({
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 block mb-1">
-                Educational Resources
-              </span>
+           
               <h2 id="blog-heading" className="text-2xl md:text-3xl font-extrabold text-[#1a3a6b] tracking-tight">
                 Latest Laboratory &amp; Anatomy Guides
               </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                Technical manuals and buying guides for school, college, and university laboratories.
-              </p>
+
             </div>
             <Link
               href="/blog"
@@ -291,9 +283,9 @@ export function HomePageClient({
           <h2 id="cta-heading" className="text-2xl md:text-3xl font-extrabold mb-3 tracking-tight">
             Need Bulk Institutional Pricing or Government Tender Support?
           </h2>
-          <p className="text-slate-200 mb-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+          {/* <p className="text-slate-200 mb-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
             Send us your apparatus list or requirements. We provide itemized GST quotations, product datasheets, and tender compliance documentation.
-          </p>
+          </p> */}
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/request-quote"

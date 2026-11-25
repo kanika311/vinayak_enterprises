@@ -225,6 +225,8 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeVideo, setActiveVideo] = useState<ShowcaseVideo | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState<'forward' | 'backward'>('forward');
+  const isTransitioningRef = useRef(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -241,16 +243,10 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
       ? allVideos
       : allVideos.filter((v) => v.category === selectedCategory);
 
-  // Triplicate the videos array so horizontal auto-scroll loops smoothly without empty spaces
-  const displayVideos =
-    filteredVideos.length > 0
-      ? [...filteredVideos, ...filteredVideos, ...filteredVideos]
-      : [];
-
-  // Continuous smooth horizontal auto-scroll loop
+  // Smooth horizontal auto-scroll across unique videos (No repeated duplicate cards)
   useEffect(() => {
     const container = scrollRef.current;
-    if (!container || !isHomepage || filteredVideos.length === 0) return;
+    if (!container || !isHomepage || filteredVideos.length <= 1) return;
 
     let rafId: number;
     let lastTime = performance.now();
@@ -259,15 +255,32 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
       const delta = now - lastTime;
       lastTime = now;
 
-      if (!isPaused && container) {
-        // Smooth gliding speed (~40-45px/sec)
-        const scrollDelta = 0.045 * delta;
-        container.scrollLeft += scrollDelta;
+      if (!isPaused && !isTransitioningRef.current && container) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
 
-        // Seamless loop when reaching 2/3 of triplicated items
-        const thirdWidth = container.scrollWidth / 3;
-        if (container.scrollLeft >= thirdWidth * 2) {
-          container.scrollLeft -= thirdWidth;
+        // Auto-scroll when cards overflow the visible viewport
+        if (maxScroll > 10) {
+          const speed = 0.04 * delta; // gentle speed (~40px/sec)
+
+          if (scrollDirection === 'forward') {
+            container.scrollLeft += speed;
+            if (container.scrollLeft >= maxScroll - 2) {
+              isTransitioningRef.current = true;
+              setTimeout(() => {
+                setScrollDirection('backward');
+                isTransitioningRef.current = false;
+              }, 2200); // pause 2.2s at the end
+            }
+          } else {
+            container.scrollLeft -= speed;
+            if (container.scrollLeft <= 2) {
+              isTransitioningRef.current = true;
+              setTimeout(() => {
+                setScrollDirection('forward');
+                isTransitioningRef.current = false;
+              }, 2200); // pause 2.2s at the beginning
+            }
+          }
         }
       }
       rafId = requestAnimationFrame(animate);
@@ -275,7 +288,7 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [isPaused, isHomepage, filteredVideos.length]);
+  }, [isPaused, isHomepage, filteredVideos.length, scrollDirection]);
 
   // Manual scroll buttons
   const handleScroll = (dir: 'left' | 'right') => {
@@ -399,14 +412,14 @@ export function VideoShowcaseSection({ isHomepage = true }: VideoShowcaseSection
             className="flex gap-5 overflow-x-auto scrollbar-none py-3 scroll-smooth select-none cursor-grab active:cursor-grabbing"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {displayVideos.map((video, idx) => (
+            {filteredVideos.map((video, idx) => (
               <div
-                key={`${video._id}-${idx}`}
+                key={video._id || idx}
                 className="w-[280px] sm:w-[320px] md:w-[350px] shrink-0"
               >
                 <ShowcaseVideoCard
                   video={video}
-                  idx={idx % filteredVideos.length}
+                  idx={idx}
                   onOpen={() => handleOpenVideo(video)}
                   whatsappLink={getWhatsAppLink(video)}
                 />
