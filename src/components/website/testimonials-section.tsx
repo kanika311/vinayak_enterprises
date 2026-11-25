@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { Star, Plus, CheckCircle2, MessageSquarePlus } from 'lucide-react';
+import { Star, Plus, CheckCircle2 } from 'lucide-react';
 import { apiGet } from '@/lib/api';
 import { staggerContainer, fadeUp } from '@/components/website/motion';
 
@@ -56,13 +56,13 @@ const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
 ];
 
 const AVATAR_COLORS = [
-  'bg-emerald-100 text-emerald-800 border-emerald-200',
-  'bg-rose-100 text-rose-800 border-rose-200',
-  'bg-sky-100 text-sky-800 border-sky-200',
-  'bg-amber-100 text-amber-800 border-amber-200',
-  'bg-purple-100 text-purple-800 border-purple-200',
-  'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'bg-teal-100 text-teal-800 border-teal-200',
+  'bg-emerald-100 text-emerald-800 border-emerald-300',
+  'bg-rose-100 text-rose-800 border-rose-300',
+  'bg-sky-100 text-sky-800 border-sky-300',
+  'bg-amber-100 text-amber-800 border-amber-300',
+  'bg-purple-100 text-purple-800 border-purple-300',
+  'bg-indigo-100 text-indigo-800 border-indigo-300',
+  'bg-teal-100 text-teal-800 border-teal-300',
 ];
 
 function getAvatarColor(name: string) {
@@ -99,11 +99,11 @@ function formatReviewDate(dateStr?: string) {
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-1">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={`h-3.5 w-3.5 ${
+          className={`h-4 w-4 ${
             i < rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'
           }`}
         />
@@ -144,13 +144,13 @@ export function TestimonialsSection({
             Testimonials
           </motion.h2>
 
-          {/* Centered '+ Write a Review' Pill Button (matching reference) */}
+          {/* Centered '+ Write a Review' Pill Button */}
           <motion.div variants={fadeUp} className="mt-4 flex justify-center">
             <Link
               href="/share-experience"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-300 hover:border-orange-500 shadow-sm hover:shadow-md text-slate-800 font-bold text-xs sm:text-sm transition-all hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-slate-100"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-300 hover:border-orange-500 shadow-sm hover:shadow-md text-slate-800 font-extrabold text-xs sm:text-sm transition-all hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-slate-100"
             >
-              <Plus className="h-4 w-4 text-orange-600 font-bold" />
+              <Plus className="h-4 w-4 text-orange-600 font-extrabold" />
               <span>Write a Review</span>
             </Link>
           </motion.div>
@@ -158,84 +158,88 @@ export function TestimonialsSection({
 
         {/* Multi-Column Masonry Grid of All Approved Testimonials */}
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-          {list.map((t) => (
-            <div
-              key={t._id}
-              className="break-inside-avoid bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between"
-            >
-              <div>
-                {/* Reviewer Header: Avatar + Name/Institution + Green Verified Badge */}
-                <div className="flex items-start justify-between gap-2.5 mb-2.5">
-                  <div className="flex items-center gap-2.5 min-w-0">
+          {list.map((t) => {
+            const cleanReview = t.review.replace(/^["'“”‘’\s]+|["'“”‘’\s]+$/g, '').trim();
+
+            return (
+              <div
+                key={t._id}
+                className="break-inside-avoid bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* Reviewer Header: Avatar + Name/Institution + Green Verified Badge */}
+                  <div className="flex items-start justify-between gap-2.5 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-extrabold text-sm shrink-0 select-none shadow-2xs ${getAvatarColor(
+                          t.name
+                        )}`}
+                      >
+                        {getInitials(t.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-extrabold text-[15px] sm:text-base text-slate-900 leading-tight">
+                          {t.name}
+                        </h3>
+                        <p className="text-xs font-semibold text-slate-500 leading-snug mt-0.5">
+                          {t.designation ? `${t.designation} · ` : ''}
+                          {t.company}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Green Verified Customer Check Badge */}
                     <div
-                      className={`h-9 w-9 rounded-full border flex items-center justify-center font-bold text-xs shrink-0 select-none ${getAvatarColor(
-                        t.name
-                      )}`}
+                      className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-extrabold shrink-0 shadow-2xs"
+                      title="Verified Institutional Customer"
                     >
-                      {getInitials(t.name)}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-bold text-sm text-slate-900 leading-tight truncate">
-                        {t.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-500 truncate leading-tight mt-0.5">
-                        {t.designation ? `${t.designation} · ` : ''}
-                        {t.company}
-                      </p>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                      <span className="hidden sm:inline">Verified</span>
                     </div>
                   </div>
 
-                  {/* Green Verified Customer Check Badge */}
-                  <div
-                    className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0"
-                    title="Verified Institutional Customer"
-                  >
-                    <CheckCircle2 className="h-3 w-3 text-emerald-600 shrink-0" />
-                    <span className="hidden sm:inline">Verified</span>
+                  {/* 5 Gold Stars */}
+                  <div className="mb-2.5">
+                    <Stars rating={t.rating} />
                   </div>
+
+                  {/* Review Text: Bold, Crisp, High Contrast Font Weight */}
+                  <p className="text-sm sm:text-[15px] font-semibold text-slate-900 leading-relaxed tracking-normal">
+                    &ldquo;{cleanReview}&rdquo;
+                  </p>
+
+                  {/* Purchased Product Tag */}
+                  {t.productName && (
+                    <div className="mt-3">
+                      <span className="inline-block bg-blue-50 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200/90">
+                        Purchased: {t.productName}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Customer Uploaded Photo (if present) */}
+                  {t.image?.url && (
+                    <div className="mt-3.5 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-2xs">
+                      <img
+                        src={t.image.url}
+                        alt={`Product photo by ${t.name}`}
+                        className="w-full h-auto max-h-60 object-cover hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* 5 Gold Stars */}
-                <div className="mb-2">
-                  <Stars rating={t.rating} />
-                </div>
-
-                {/* Review Text */}
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                  &ldquo;{t.review.replace(/^["“”]+|["“”]+$/g, '')}&rdquo;
-                </p>
-
-                {/* Purchased Product Tag */}
-                {t.productName && (
-                  <div className="mt-2.5">
-                    <span className="inline-block bg-blue-50 text-blue-700 text-[11px] font-semibold px-2 py-0.5 rounded-md border border-blue-100">
-                      Purchased: {t.productName}
-                    </span>
-                  </div>
-                )}
-
-                {/* Customer Uploaded Photo (if present) */}
-                {t.image?.url && (
-                  <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-                    <img
-                      src={t.image.url}
-                      alt={`Product photo by ${t.name}`}
-                      className="w-full h-auto max-h-56 object-cover hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
+                {/* Bottom Date & Verification Tag */}
+                {t.createdAt && (
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-semibold">
+                    <span>{formatReviewDate(t.createdAt)}</span>
+                    <span className="text-slate-400 text-[11px]">Vinayak Client</span>
                   </div>
                 )}
               </div>
-
-              {/* Bottom Date & Verification Tag */}
-              {t.createdAt && (
-                <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                  <span>{formatReviewDate(t.createdAt)}</span>
-                  <span className="text-slate-400 text-[10px]">Vinayak Client</span>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
