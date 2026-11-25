@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/website/product-card';
 import { apiGet } from '@/lib/api';
 import { getCategoryStyle } from '@/lib/category-styles';
@@ -19,6 +21,10 @@ export function CategoryDetailClient({
   initialCategory?: Category | null;
   initialProducts?: Product[];
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const ITEMS_PER_PAGE = 9;
+
   const { data: category = initialCategory, isLoading: catLoading } = useQuery({
     queryKey: ['category', slug],
     queryFn: () => apiGet<Category>(`/categories/slug/${slug}`),
@@ -31,7 +37,7 @@ export function CategoryDetailClient({
       apiGet<{ products: Product[] }>('/products', {
         status: 'published',
         category: category!._id,
-        limit: 24,
+        limit: 100,
       }),
     enabled: !!category?._id,
     initialData: initialProducts?.length ? { products: initialProducts } : undefined,
@@ -40,6 +46,20 @@ export function CategoryDetailClient({
   const style = getCategoryStyle(slug);
   const products = productsData?.products || [];
   const isLoading = catLoading || prodLoading;
+
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE) || 1;
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
+  const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, products.length);
+  const paginatedProducts = products.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+    if (gridRef.current) {
+      gridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -66,10 +86,10 @@ export function CategoryDetailClient({
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-10" ref={gridRef}>
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-72 bg-white rounded-xl border animate-pulse" />
             ))}
           </div>
@@ -85,16 +105,66 @@ export function CategoryDetailClient({
             </div>
           </div>
         ) : (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
-          >
-            {products.map((p) => (
-              <ProductCard key={p._id} product={p} />
-            ))}
-          </motion.div>
+          <>
+            <div className="mb-4 text-xs sm:text-sm text-slate-500">
+              Showing <strong>{startIndex + 1}–{endIndex}</strong> of <strong>{products.length}</strong> products
+            </div>
+            <motion.div
+              key={`category-products-${safeCurrentPage}`}
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+            >
+              {paginatedProducts.map((p) => (
+                <ProductCard key={p._id} product={p} />
+              ))}
+            </motion.div>
+
+            {totalPages > 1 && (
+              <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs sm:text-sm text-slate-500">
+                  Page {safeCurrentPage} of {totalPages}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(safeCurrentPage - 1)}
+                    disabled={safeCurrentPage === 1}
+                    className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-2xs"
+                  >
+                    <ChevronLeft className="h-4 w-4" /> Previous
+                  </button>
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    const isActive = pageNum === safeCurrentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`min-w-[36px] h-9 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs ${
+                          isActive
+                            ? 'bg-[#1a3a6b] text-white shadow-md'
+                            : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(safeCurrentPage + 1)}
+                    disabled={safeCurrentPage === totalPages}
+                    className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-2xs"
+                  >
+                    Next <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

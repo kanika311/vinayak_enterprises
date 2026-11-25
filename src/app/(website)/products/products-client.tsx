@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { Search, X, Layers, ArrowRight } from 'lucide-react';
+import { Search, X, Layers, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/website/product-card';
 import { apiGet } from '@/lib/api';
 import { fadeUp, staggerContainer } from '@/components/website/motion';
@@ -27,6 +27,10 @@ function ProductsClientContent({
 
   const [search, setSearch] = useState(urlSearch);
   const [category, setCategory] = useState(urlCategory);
+  const [currentPage, setCurrentPage] = useState(1);
+  const gridTopRef = useRef<HTMLDivElement>(null);
+
+  const ITEMS_PER_PAGE = 9;
 
   // Synchronize when URL search parameters change
   useEffect(() => {
@@ -35,6 +39,11 @@ function ProductsClientContent({
     setSearch(s);
     setCategory(c);
   }, [searchParams]);
+
+  // Reset page when category or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, category]);
 
   const { data: categories = initialCategories } = useQuery({
     queryKey: ['categories-public-with-products'],
@@ -59,7 +68,7 @@ function ProductsClientContent({
     queryFn: () =>
       apiGet<{ products: Product[] }>('/products', {
         status: 'published',
-        limit: 48,
+        limit: 200,
         search: search.trim(),
         category,
       }),
@@ -94,6 +103,21 @@ function ProductsClientContent({
 
   const activeCategoryDoc = categoryList.find((c) => c._id === category || c.slug === category);
 
+  const totalItems = displayProducts.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
+  const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+  const paginatedProducts = displayProducts.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+    if (gridTopRef.current) {
+      gridTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Clean, spacious breadcrumb banner */}
@@ -109,7 +133,14 @@ function ProductsClientContent({
               </p>
             </div>
             <div className="text-sm text-slate-500">
-              Showing <strong className="text-slate-900">{displayProducts.length}</strong> products
+              {totalItems > 0 ? (
+                <>
+                  Showing <strong className="text-slate-900">{startIndex + 1}–{endIndex}</strong> of{' '}
+                  <strong className="text-slate-900">{totalItems}</strong> products
+                </>
+              ) : (
+                <>Showing <strong className="text-slate-900">0</strong> products</>
+              )}
             </div>
           </div>
         </div>
@@ -158,7 +189,7 @@ function ProductsClientContent({
           </aside>
 
           {/* Product Grid Area */}
-          <div className="flex-1">
+          <div className="flex-1" ref={gridTopRef}>
             {/* Search Input Bar */}
             <div className="mb-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
               <div className="relative flex-1">
@@ -198,8 +229,13 @@ function ProductsClientContent({
             {search && (
               <div className="mb-4 text-sm text-slate-600 flex items-center justify-between">
                 <span>
-                  Search results for: <strong className="text-slate-900">&ldquo;{search}&rdquo;</strong> ({displayProducts.length} found)
+                  Search results for: <strong className="text-slate-900">&ldquo;{search}&rdquo;</strong> ({totalItems} found)
                 </span>
+                {totalPages > 1 && (
+                  <span className="text-xs text-slate-500 font-medium">
+                    Page {safeCurrentPage} of {totalPages}
+                  </span>
+                )}
               </div>
             )}
 
@@ -235,13 +271,13 @@ function ProductsClientContent({
                 </div>
               ) : (
                 <motion.div
-                  key="products"
+                  key={`products-page-${safeCurrentPage}`}
                   initial="hidden"
                   animate="visible"
                   variants={staggerContainer}
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  {displayProducts.map((p, i) => (
+                  {paginatedProducts.map((p, i) => (
                     <motion.div key={p._id} variants={fadeUp} custom={i}>
                       <ProductCard product={p} />
                     </motion.div>
@@ -249,6 +285,80 @@ function ProductsClientContent({
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Pagination Controls (after 9 products) */}
+            {totalPages > 1 && (
+              <div className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs sm:text-sm text-slate-500">
+                  Showing <strong className="text-slate-900">{startIndex + 1}–{endIndex}</strong> of{' '}
+                  <strong className="text-slate-900">{totalItems}</strong> products (Page {safeCurrentPage} of {totalPages})
+                </div>
+
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  {/* Previous Page Button */}
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(safeCurrentPage - 1)}
+                    disabled={safeCurrentPage === 1}
+                    className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#1a3a6b] disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-2xs cursor-pointer"
+                    aria-label="Previous Page"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="hidden sm:inline">Previous</span>
+                  </button>
+
+                  {/* Numbered Page Buttons */}
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    if (
+                      totalPages > 6 &&
+                      pageNum !== 1 &&
+                      pageNum !== totalPages &&
+                      Math.abs(pageNum - safeCurrentPage) > 1
+                    ) {
+                      if (pageNum === 2 || pageNum === totalPages - 1) {
+                        return (
+                          <span key={pageNum} className="px-1.5 text-slate-400 text-xs select-none">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    }
+
+                    const isActive = pageNum === safeCurrentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`min-w-[38px] h-9 px-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer ${
+                          isActive
+                            ? 'bg-[#1a3a6b] text-white shadow-md scale-105'
+                            : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}
+                        aria-label={`Page ${pageNum}`}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  {/* Next Page Button */}
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(safeCurrentPage + 1)}
+                    disabled={safeCurrentPage === totalPages}
+                    className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#1a3a6b] disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-2xs cursor-pointer"
+                    aria-label="Next Page"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

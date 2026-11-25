@@ -69,7 +69,7 @@ async function getProductsData() {
     const [products, categories] = await Promise.all([
       ProductModel.find({ status: 'published' })
         .sort({ createdAt: -1 })
-        .limit(24)
+        .limit(200)
         .populate('category', 'name slug')
         .lean(),
       CategoryModel.find({ _id: { $in: publishedCategoryIds }, isActive: true })
