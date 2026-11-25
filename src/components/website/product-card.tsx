@@ -77,11 +77,18 @@ export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
             )}
           </motion.div>
           <div className="p-5">
-            {product.sku && <p className={cn('text-xs font-mono mb-1', isDark ? 'text-orange-400' : 'text-slate-400')}>{product.sku}</p>}
+            {product.sku && (
+              <p
+                className={cn('text-xs font-medium mb-1', isDark ? 'text-orange-400' : 'text-slate-500')}
+                aria-label={`Product Code ${product.sku}`}
+              >
+                SKU: {product.sku}
+              </p>
+            )}
             <h3 className={cn('font-bold line-clamp-2 leading-snug group-hover:text-[#1a3a6b] transition-colors', isDark ? 'text-white' : 'text-slate-900')}>
               {product.name}
             </h3>
-            <p className={cn('text-sm mt-2 line-clamp-2 leading-relaxed', isDark ? 'text-slate-400' : 'text-slate-500')}>
+            <p className={cn('text-sm mt-2 line-clamp-2 leading-relaxed', isDark ? 'text-slate-400' : 'text-slate-600')}>
               {product.shortDescription}
             </p>
 
@@ -102,17 +109,17 @@ export function ProductCard({ product, variant = 'light' }: ProductCardProps) {
                       </span>
                     )}
                   </div>
-                  <p className={cn('text-[11px] font-medium mt-1 flex items-center gap-1', isDark ? 'text-teal-400' : 'text-blue-700')}>
+                  <p className={cn('text-xs font-semibold mt-1 flex items-center gap-1', isDark ? 'text-teal-400' : 'text-blue-700')}>
                     <span>📦</span>
                     <span>Bulk order? Contact for discount</span>
                   </p>
                 </div>
               ) : (
                 <div className="flex items-center justify-between text-xs">
-                  <span className={cn('font-semibold', isDark ? 'text-slate-400' : 'text-slate-600')}>
+                  <span className={cn('font-semibold', isDark ? 'text-slate-400' : 'text-slate-700')}>
                     Price on Request
                   </span>
-                  <span className="text-[11px] text-green-600 font-medium">Bulk supply available</span>
+                  <span className="text-xs text-emerald-700 font-semibold">Bulk supply available</span>
                 </div>
               )}
             </div>

@@ -17,7 +17,7 @@ const connectDatabase = async () => {
     const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/scientific_instruments';
     if (!cached.promise) {
         cached.promise = mongoose_1.default.connect(uri, {
-            bufferCommands: false,
+            bufferCommands: true,
             maxPoolSize: 10,
             minPoolSize: 0,
             serverSelectionTimeoutMS: 5000,

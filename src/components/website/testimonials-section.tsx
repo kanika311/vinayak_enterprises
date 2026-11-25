@@ -181,7 +181,7 @@ export function TestimonialsSection({
                         <h3 className="font-extrabold text-[15px] sm:text-base text-slate-900 leading-tight">
                           {t.name}
                         </h3>
-                        <p className="text-xs font-semibold text-slate-500 leading-snug mt-0.5">
+                        <p className="text-xs font-semibold text-slate-600 leading-snug mt-0.5 break-words">
                           {t.designation ? `${t.designation} · ` : ''}
                           {t.company}
                         </p>

@@ -162,7 +162,7 @@ export function HomePageClient({
             >
               {/* Trust Badge */}
               <motion.div variants={fadeUp}>
-                <span className="inline-flex items-center gap-1.5 bg-orange-500/90 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-4 shadow-sm backdrop-blur-sm border border-orange-400/40">
+                <span className="inline-flex items-center gap-1.5 bg-orange-500/95 text-white text-xs font-bold px-3.5 py-1.5 rounded-full mb-4 shadow-sm backdrop-blur-sm border border-orange-400/40">
                   <ShieldCheck className="h-3.5 w-3.5" /> Direct Manufacturer · Ambala Cantt, India
                 </span>
               </motion.div>
